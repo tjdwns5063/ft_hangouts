@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ft_hangouts</string>
+    <string name="add_phone_number_text">전화번호 :</string>
+    <string name="add_email_text">이메일 :</string>
+    <string name="add_gender_text">성별 :</string>
+    <string name="add_relation_text">관계 :</string>
+    <string name="add_name_text">이름 :</string>
+    <string name="add_save_button">저장</string>
+    <string name="add_cancel_button">취소</string>
+</resources>
