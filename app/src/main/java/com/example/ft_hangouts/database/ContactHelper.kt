@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.database
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -31,6 +32,76 @@ class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
 
     override fun onDowngrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         onUpgrade(db, oldVersion, newVersion)
+    }
+
+    fun getAllItem(): MutableList<Contact> {
+        val readDb = readableDatabase
+
+        val projection = arrayOf(BaseColumns._ID,
+            ContactContract.ContactEntry.COLUMN_NAME_NAME,
+            ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
+            ContactContract.ContactEntry.COLUMN_NAME_GENDER,
+            ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
+            ContactContract.ContactEntry.COLUMN_NAME_RELATION
+        )
+
+        val cursor = readDb.query(ContactContract.ContactEntry.TABLE_NAME, projection, null, null, null, null, null)
+        val list = mutableListOf<Contact>()
+        with(cursor) {
+            while (moveToNext()) {
+                val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
+                val name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME))
+                val phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER))
+                val email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL))
+                val relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
+                val gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
+
+                list += Contact(id, name, phoneNumber, email, relation, gender)
+            }
+        }
+        return list
+    }
+
+    fun getItemById(rowId: Long): Contact {
+        val readDb = readableDatabase
+
+        val projection = arrayOf(BaseColumns._ID,
+            ContactContract.ContactEntry.COLUMN_NAME_NAME,
+            ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
+            ContactContract.ContactEntry.COLUMN_NAME_GENDER,
+            ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
+            ContactContract.ContactEntry.COLUMN_NAME_RELATION
+        )
+
+        val selection = "${BaseColumns._ID} = ?"
+        val selectionArgs = arrayOf(rowId.toString())
+
+        val cursor = readDb.query(ContactContract.ContactEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null)
+        val contact = with(cursor) {
+            val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
+            val name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME))
+            val phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER))
+            val email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL))
+            val relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
+            val gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
+
+            Contact(id, name, phoneNumber, email, relation, gender)
+        }
+        return contact
+    }
+
+    fun addItem(contact: Contact): Long? {
+        val writeDb = writableDatabase
+
+        val values = ContentValues().apply {
+            put(ContactContract.ContactEntry.COLUMN_NAME_NAME, contact.name)
+            put(ContactContract.ContactEntry.COLUMN_NAME_EMAIL, contact.email)
+            put(ContactContract.ContactEntry.COLUMN_NAME_GENDER, contact.gender)
+            put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, contact.relation)
+            put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, contact.phoneNumber)
+        }
+        val newRowId = writeDb?.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
+        return newRowId
     }
 
     companion object {

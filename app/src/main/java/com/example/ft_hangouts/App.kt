@@ -8,7 +8,6 @@ class App : Application() {
 
     init {
         INSTANCE = this
-        contactDbHelper = ContactHelper(INSTANCE)
     }
 
     override fun onCreate() {
@@ -17,6 +16,5 @@ class App : Application() {
 
     companion object {
         lateinit var INSTANCE: App
-        lateinit var contactDbHelper: ContactHelper
     }
 }

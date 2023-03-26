@@ -18,13 +18,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.ft_hangouts.database.Contact
 import com.example.ft_hangouts.database.ContactContract
+import com.example.ft_hangouts.database.createDatabase
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val dbHelper = App.contactDbHelper
-    private val contactList = mutableListOf<Contact>()
+    private val dbHelper = createDatabase()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,13 +32,11 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        val adapter = ContactRecyclerAdapter(getAllItem()) {
+        val adapter = ContactRecyclerAdapter(dbHelper.getAllItem()) {
             // goto detail activity.
             val position = binding.contactRecyclerView.getChildLayoutPosition(it)
-            val id = contactList[position].id
-
-            goToDetailActivity(id)
-            Toast.makeText(this, "$id clicked", Toast.LENGTH_SHORT).show()
+            goToDetailActivity(position.toLong() + 1)
+            Toast.makeText(this, "$position clicked", Toast.LENGTH_SHORT).show()
         }
 
         binding.contactRecyclerView.adapter = adapter
@@ -71,71 +69,11 @@ class MainActivity : AppCompatActivity() {
                 rowId?.let {
                     if (it < 0L)
                         return@let
-                    getLastItem(rowId)
-                    adapter.addItem(contactList)
+                    val contact = dbHelper.getItemById(rowId)
+                    adapter.addItem(contact)
                 }
             } else {
                 Log.i("data", "FAIL")
-            }
-        }
-    }
-
-    private fun getAllItem(): MutableList<Contact> {
-        val readDb = dbHelper.readableDatabase
-
-        val projection = arrayOf(BaseColumns._ID,
-            ContactContract.ContactEntry.COLUMN_NAME_NAME,
-            ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
-            ContactContract.ContactEntry.COLUMN_NAME_GENDER,
-            ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
-            ContactContract.ContactEntry.COLUMN_NAME_RELATION
-        )
-
-        val cursor = readDb.query(ContactContract.ContactEntry.TABLE_NAME, projection, null, null, null, null, null)
-        var idx = 0
-        with(cursor) {
-            while (moveToNext()) {
-                val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
-                val name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME))
-                val phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER))
-                val email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL))
-                val relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
-                val gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
-
-                if (idx >= contactList.size) {
-                    contactList += Contact(id, name, phoneNumber, email, relation, gender)
-                }
-                ++idx
-            }
-        }
-        return contactList
-    }
-
-    fun getLastItem(rowId: Long) {
-        val readDb = dbHelper.readableDatabase
-
-        val projection = arrayOf(BaseColumns._ID,
-            ContactContract.ContactEntry.COLUMN_NAME_NAME,
-            ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
-            ContactContract.ContactEntry.COLUMN_NAME_GENDER,
-            ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
-            ContactContract.ContactEntry.COLUMN_NAME_RELATION
-        )
-
-        val selection = "${BaseColumns._ID} = ?"
-        val selectionArgs = arrayOf(rowId.toString())
-
-        val cursor = readDb.query(ContactContract.ContactEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null)
-        with(cursor) {
-            while (moveToNext()) {
-                val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
-                val name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME))
-                val phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER))
-                val email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL))
-                val relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
-                val gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
-
-                contactList += Contact(id, name, phoneNumber, email, relation, gender)
             }
         }
     }

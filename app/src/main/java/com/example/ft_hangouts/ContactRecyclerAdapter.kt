@@ -24,9 +24,8 @@ class ContactRecyclerAdapter(
         return items.size
     }
 
-    fun addItem(comps: MutableList<Contact>) {
-        for (i in items.size until comps.size)
-            items += comps[i]
+    fun addItem(contact: Contact) {
+        items.add(contact)
         notifyItemChanged(items.size)
     }
 
