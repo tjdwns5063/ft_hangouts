@@ -16,11 +16,12 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.ft_hangouts.database.Contact
-import com.example.ft_hangouts.database.ContactContract
-import com.example.ft_hangouts.database.createDatabase
+import com.example.ft_hangouts.database.*
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -32,14 +33,17 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        val adapter = ContactRecyclerAdapter(dbHelper.getAllItems().toMutableList()) {
-            // goto detail activity.
+        val adapter = ContactRecyclerAdapter {
             val position = binding.contactRecyclerView.getChildLayoutPosition(it)
+
             goToDetailActivity(position.toLong() + 1)
         }
-
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        getAllItems()?.let {
+            adapter.addItem(it)
+        }
 
         val addContactActivityResultLauncher = makeAddContactActivityResultLauncher(adapter)
 
@@ -63,16 +67,14 @@ class MainActivity : AppCompatActivity() {
     private fun makeAddContactActivityResultLauncher(adapter: ContactRecyclerAdapter): ActivityResultLauncher<Intent> {
         return registerForActivityResult(StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                Log.i("data", "SUCCESS")
                 val rowId = result?.data?.getLongExtra("data", -1L)
                 rowId?.let {
                     if (it < 0L)
                         return@let
-                    val contact = dbHelper.getItemById(rowId)
-                    contact?.let { item -> adapter.addItem(item) }
+                    getItemById(rowId)?.let { item -> adapter.addItem(listOf(item)) }
                 }
             } else {
-                Log.i("data", "FAIL")
+                Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
             }
         }
     }

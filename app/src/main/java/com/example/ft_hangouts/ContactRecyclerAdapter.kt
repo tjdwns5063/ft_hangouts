@@ -9,9 +9,9 @@ import com.example.ft_hangouts.database.Contact
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 
 class ContactRecyclerAdapter(
-        private val items: MutableList<Contact>,
         private val clickListener: OnClickListener
     ): RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>() {
+    private val items: MutableList<Contact> = mutableListOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, clickListener)
     }
@@ -24,8 +24,10 @@ class ContactRecyclerAdapter(
         return items.size
     }
 
-    fun addItem(contact: Contact) {
-        items.add(contact)
+    fun addItem(contacts: List<Contact>) {
+        contacts.forEach {
+            items += it
+        }
         notifyItemChanged(items.size)
     }
 

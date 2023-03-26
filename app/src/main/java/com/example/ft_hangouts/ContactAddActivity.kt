@@ -8,14 +8,19 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import com.example.ft_hangouts.database.Contact
 import com.example.ft_hangouts.database.ContactContract
+import com.example.ft_hangouts.database.addItem
 import com.example.ft_hangouts.database.createDatabase
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
 
 class ContactAddActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val dbHelper = createDatabase()
+    private var result: Long? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactAddBinding.inflate(layoutInflater)
@@ -40,23 +45,28 @@ class ContactAddActivity : AppCompatActivity() {
                 gender = binding.addGenderEditText.text.toString(),
                 relation = binding.addRelationEditText.text.toString()
             )
-
-            val result = dbHelper.addItem(contact)
-
-            if (result == null) {
-                setResult(Activity.RESULT_CANCELED)
-            } else {
-                val intent = Intent(this, MainActivity::class.java).apply {
-                    putExtra("data", result)
-                }
+            addItem(contact)?.let {
+                val intent = Intent(this, MainActivity::class.java)
+                    .apply { putExtra("data", result) }
                 setResult(Activity.RESULT_OK, intent)
+                finish()
+            } ?: run {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
             }
-            finish()
         }
 
         binding.addCancelButton.setOnClickListener {
+            setResult(Activity.RESULT_OK)
             finish()
         }
+
+        onBackPressedDispatcher.addCallback(object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+        })
     }
 
     private fun checkEditText(): Boolean {

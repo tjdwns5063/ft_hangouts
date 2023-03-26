@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import com.example.ft_hangouts.database.createDatabase
+import com.example.ft_hangouts.database.getItemById
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 
 class ContactDetailActivity : AppCompatActivity() {
@@ -15,9 +16,8 @@ class ContactDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val id = intent.getLongExtra("id", -1)
-        val contact = dbHelper.getItemById(id)
 
-        contact?.let {
+        getItemById(id)?.let {
             binding.detailNameValueText.text = it.name
             binding.detailPhoneNumberValueText.text = it.phoneNumber
             binding.detailEmailValueText.text = it.email
