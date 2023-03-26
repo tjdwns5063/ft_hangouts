@@ -7,15 +7,19 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.BaseColumns
 import android.util.Log
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.ft_hangouts.database.Contact
 import com.example.ft_hangouts.database.ContactContract
 import com.example.ft_hangouts.databinding.ActivityMainBinding
+import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -28,7 +32,14 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        val adapter = ContactRecyclerAdapter(getAllItem())
+        val adapter = ContactRecyclerAdapter(getAllItem()) {
+            // goto detail activity.
+            val position = binding.contactRecyclerView.getChildLayoutPosition(it)
+            val id = contactList[position].id
+
+            goToDetailActivity(id)
+            Toast.makeText(this, "$id clicked", Toast.LENGTH_SHORT).show()
+        }
 
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -38,6 +49,13 @@ class MainActivity : AppCompatActivity() {
         binding.button.setOnClickListener {
             addContactActivityResultLauncher.launch(Intent(this, ContactAddActivity::class.java))
         }
+    }
+
+    private fun goToDetailActivity(id: Long) {
+        val intent = Intent(this, ContactDetailActivity::class.java).apply {
+            putExtra("id", id)
+        }
+        startActivity(intent)
     }
 
     override fun onDestroy() {
