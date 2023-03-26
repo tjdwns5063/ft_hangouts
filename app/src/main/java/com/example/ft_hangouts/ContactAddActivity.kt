@@ -43,10 +43,10 @@ class ContactAddActivity : AppCompatActivity() {
 
         val values = ContentValues().apply {
             put(ContactContract.ContactEntry.COLUMN_NAME_NAME, binding.addNameEditText.text.toString())
-            put(ContactContract.ContactEntry.COLUMN_NAME_EMAIL, binding.addEditEmailText.text.toString())
-            put(ContactContract.ContactEntry.COLUMN_NAME_GENDER, binding.addGenderEditText.text.toString())
-            put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, binding.addRelationEditText.text.toString())
-            put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, binding.addEditPhoneNumberText.text.toString())
+//            put(ContactContract.ContactEntry.COLUMN_NAME_EMAIL, binding.addEditEmailText.text.toString())
+//            put(ContactContract.ContactEntry.COLUMN_NAME_GENDER, binding.addGenderEditText.text.toString())
+//            put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, binding.addRelationEditText.text.toString())
+//            put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, binding.addEditPhoneNumberText.text.toString())
         }
         val newRowId = writeDb?.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
         return newRowId
