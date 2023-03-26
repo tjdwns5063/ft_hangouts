@@ -7,6 +7,7 @@ import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import com.example.ft_hangouts.database.ContactContract
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 
@@ -24,6 +25,11 @@ class ContactAddActivity : AppCompatActivity() {
 
     private fun setClickListener() {
         binding.addOkButton.setOnClickListener {
+            if (!checkEditText()) {
+                Toast.makeText(this, "이름과 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val result = addItem()
 
             if (result == null) {
@@ -40,6 +46,10 @@ class ContactAddActivity : AppCompatActivity() {
         binding.addCancelButton.setOnClickListener {
             finish()
         }
+    }
+
+    private fun checkEditText(): Boolean {
+        return binding.addNameEditText.text.isNotBlank() && binding.addEditPhoneNumberText.text.isNotBlank()
     }
 
     private fun addItem(): Long? {
@@ -81,7 +91,7 @@ class ContactAddActivity : AppCompatActivity() {
     private fun tintRelateImage(imageView: ImageView, isFocus: Boolean) {
         when (isFocus) {
             true -> {
-                imageView.imageTintList = ColorStateList.valueOf(getColor(R.color.teal_700))
+                imageView.imageTintList = ColorStateList.valueOf(getColor(R.color.teal_200))
             }
             else -> {
                 imageView.imageTintList = ColorStateList.valueOf(getColor(R.color.contact_image_default_color))
