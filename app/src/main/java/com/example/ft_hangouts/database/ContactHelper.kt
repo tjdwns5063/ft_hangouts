@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import android.util.Log
 
 
 private const val SQL_CREATE_ENTRIES =
@@ -34,7 +35,7 @@ class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
         onUpgrade(db, oldVersion, newVersion)
     }
 
-    fun getAllItem(): MutableList<Contact> {
+    fun getAllItems(): List<Contact> {
         val readDb = readableDatabase
 
         val projection = arrayOf(BaseColumns._ID,
@@ -62,7 +63,7 @@ class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
         return list
     }
 
-    fun getItemById(rowId: Long): Contact {
+    fun getItemById(rowId: Long): Contact? {
         val readDb = readableDatabase
 
         val projection = arrayOf(BaseColumns._ID,
@@ -77,17 +78,19 @@ class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
         val selectionArgs = arrayOf(rowId.toString())
 
         val cursor = readDb.query(ContactContract.ContactEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null)
-        val contact = with(cursor) {
-            val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
-            val name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME))
-            val phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER))
-            val email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL))
-            val relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
-            val gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
-
-            Contact(id, name, phoneNumber, email, relation, gender)
+        with(cursor) {
+            if (moveToNext()) {
+                return Contact(
+                    id = getLong(getColumnIndexOrThrow(BaseColumns._ID)),
+                    name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME)),
+                    phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER)),
+                    email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL)),
+                    relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION)),
+                    gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
+                )
+            }
         }
-        return contact
+        return null
     }
 
     fun addItem(contact: Contact): Long? {

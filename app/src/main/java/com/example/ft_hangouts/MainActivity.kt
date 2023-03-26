@@ -32,11 +32,10 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(binding.root)
 
-        val adapter = ContactRecyclerAdapter(dbHelper.getAllItem()) {
+        val adapter = ContactRecyclerAdapter(dbHelper.getAllItems().toMutableList()) {
             // goto detail activity.
             val position = binding.contactRecyclerView.getChildLayoutPosition(it)
             goToDetailActivity(position.toLong() + 1)
-            Toast.makeText(this, "$position clicked", Toast.LENGTH_SHORT).show()
         }
 
         binding.contactRecyclerView.adapter = adapter
@@ -70,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                     if (it < 0L)
                         return@let
                     val contact = dbHelper.getItemById(rowId)
-                    adapter.addItem(contact)
+                    contact?.let { item -> adapter.addItem(item) }
                 }
             } else {
                 Log.i("data", "FAIL")

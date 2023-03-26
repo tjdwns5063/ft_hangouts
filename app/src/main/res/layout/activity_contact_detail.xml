@@ -159,6 +159,7 @@
                 style="@style/detail_item_text_style"/>
 
             <TextView
+                android:id="@+id/detail_gender_value_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/add_gender_text"
@@ -195,6 +196,7 @@
                 style="@style/detail_item_text_style"/>
 
             <TextView
+                android:id="@+id/detail_relation_value_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/add_relation_text"

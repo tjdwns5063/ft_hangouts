@@ -36,7 +36,6 @@ class ContactRecyclerAdapter(
         fun bind(contact: Contact) {
             binding.idText.text = contact.id.toString()
             binding.nameText.text = contact.name
-//            binding.phoneNumberText.text = contact.phoneNumber
             binding.root.setOnClickListener(clickListener)
         }
 
