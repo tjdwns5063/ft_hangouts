@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/detail_bottom_call"
+        android:title="통화"
+        android:icon="@drawable/baseline_call_24" />
+    <item android:id="@+id/detail_bottom_sms"
+        android:title="문자"
+        android:icon="@drawable/baseline_email_32" />
+    <item android:id="@+id/detail_bottom_edit"
+        android:title="편집"
+        android:icon="@drawable/baseline_edit_32" />
+
+    <item android:id="@+id/detail_bottom_delete"
+        android:title="삭제"
+        android:icon="@drawable/baseline_delete_32" />
+</menu>

@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_background"
-    android:padding="10dp"
-    tools:context=".ContactAddActivity">
+    tools:context=".ContactDetailActivity">
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/detail_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/contact_detail_bottom_menu"/>
 
     <TextView
         android:id="@+id/contact_detail_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/contact_detail_title_text"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         style="@style/title_style" />
@@ -24,7 +31,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/contact_detail_title"
-        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
         <LinearLayout
@@ -61,7 +71,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/detail_name_card"
-        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
         <LinearLayout
@@ -98,7 +111,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/detail_phone_number_card"
-        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
         <LinearLayout
@@ -135,7 +151,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/detail_email_card"
-        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
         <LinearLayout
@@ -172,7 +191,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/detail_gender_card"
-        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginVertical="16dp"
+        android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
         <LinearLayout
@@ -203,6 +225,8 @@
                 style="@style/detail_item_text_style"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
