@@ -23,5 +23,19 @@ class ContactDetailActivity : AppCompatActivity() {
             binding.detailGenderValueText.text = it.gender
             binding.detailRelationValueText.text = it.relation
         }
+
+        binding.detailBottomNav.setOnItemSelectedListener { menu ->
+            when(menu.itemId) {
+                R.id.detail_bottom_delete -> { contactDAO.deleteById(id).let {
+                    it?.let {
+                        Toast.makeText(this, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                    } ?: run {
+                        Toast.makeText(this, "삭제가 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                    finish()
+                } }
+            }
+            true
+        }
     }
 }

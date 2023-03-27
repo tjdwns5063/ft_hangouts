@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.ft_hangouts.database.*
 import com.example.ft_hangouts.databinding.ActivityMainBinding
@@ -34,9 +35,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val adapter = ContactRecyclerAdapter {
+            val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
             val position = binding.contactRecyclerView.getChildLayoutPosition(it)
-
-            goToDetailActivity(position.toLong() + 1)
+            goToDetailActivity(adapter.getIdByPosition(position))
         }
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -50,6 +51,16 @@ class MainActivity : AppCompatActivity() {
         binding.button.setOnClickListener {
             addContactActivityResultLauncher.launch(Intent(this, ContactAddActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.i("main", "onresume called")
+        val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
+
+        val items = contactDAO.getAllItems()
+        items?.let { adapter.addItem(items) }
+        Log.i("main", "${items}")
     }
 
     private fun goToDetailActivity(id: Long) {
@@ -71,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                 rowId?.let {
                     if (it < 0L)
                         return@let
-                    contactDAO.getItemById(rowId)?.let { item -> adapter.addItem(listOf(item)) }
+//                    contactDAO.getItemById(rowId)?.let { item -> adapter.addItem(listOf(item)) }
                 }
             } else {
                 Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()

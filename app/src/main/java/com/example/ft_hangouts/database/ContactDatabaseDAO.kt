@@ -46,6 +46,18 @@ class ContactDatabaseDAO {
         }
     }
 
+    fun deleteById(rowId: Long): Int? {
+        val callable = Callable {
+            contactHelper.deleteById(rowId)
+        }
+        val future = executor.submit(callable)
+        return try {
+            future.get()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun closeDatabase() {
         contactHelper.close()
     }
@@ -108,6 +120,14 @@ class ContactDatabaseDAO {
             }
         }
         return null
+    }
+    private fun ContactHelper.deleteById(rowId: Long): Int {
+        val db = writableDatabase
+
+        val selection = "${BaseColumns._ID} LIKE ?"
+        val selectionArgs = arrayOf("$rowId")
+        val deletedRows = db.delete(ContactContract.ContactEntry.TABLE_NAME, selection, selectionArgs)
+        return deletedRows
     }
 
     private fun ContactHelper.addItem(contact: Contact): Long? {
