@@ -9,17 +9,14 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import com.example.ft_hangouts.database.Contact
-import com.example.ft_hangouts.database.ContactContract
-import com.example.ft_hangouts.database.addItem
-import com.example.ft_hangouts.database.createDatabase
+import com.example.ft_hangouts.database.*
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 
 class ContactAddActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactAddBinding
-    private val dbHelper = createDatabase()
+    private val contactDAO = ContactDatabaseDAO()
     private var result: Long? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +42,7 @@ class ContactAddActivity : AppCompatActivity() {
                 gender = binding.addGenderEditText.text.toString(),
                 relation = binding.addRelationEditText.text.toString()
             )
-            addItem(contact)?.let {
+            contactDAO.addItem(contact)?.let {
                 val intent = Intent(this, MainActivity::class.java)
                     .apply { putExtra("data", result) }
                 setResult(Activity.RESULT_OK, intent)
