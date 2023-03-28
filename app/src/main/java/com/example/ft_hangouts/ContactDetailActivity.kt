@@ -10,11 +10,11 @@ import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 class ContactDetailActivity : AppCompatActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val contactDAO = ContactDatabaseDAO()
+    private val id by lazy { intent.getLongExtra("id", -1) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val id = intent.getLongExtra("id", -1)
 
         contactDAO.getItemById(id)?.let {
             binding.detailNameValueText.text = it.name
@@ -26,16 +26,25 @@ class ContactDetailActivity : AppCompatActivity() {
 
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
             when(menu.itemId) {
-                R.id.detail_bottom_delete -> { contactDAO.deleteById(id).let {
-                    it?.let {
-                        Toast.makeText(this, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                    } ?: run {
-                        Toast.makeText(this, "삭제가 실패했습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                    finish()
-                } }
+                R.id.detail_bottom_delete -> { EventDialog.showEventDialog(
+                    fragmentManager = supportFragmentManager,
+                    message = "연락처를 영구히 삭제하시겠습니까?",
+                    onClick = { dialog, _ -> deleteContact() }
+                    )
+                }
             }
             true
+        }
+    }
+
+    private fun deleteContact() {
+        contactDAO.deleteById(id).let {
+            it?.let {
+                Toast.makeText(this, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+            } ?: run {
+                Toast.makeText(this, "삭제가 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+            finish()
         }
     }
 }
