@@ -6,18 +6,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.telephony.SmsManager
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.core.content.ContextCompat
-import com.example.ft_hangouts.database.Contact
+import com.example.ft_hangouts.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
-import java.security.Permission
-import java.util.jar.Manifest
+import com.example.ft_hangouts.sms_database.Sms
+import com.example.ft_hangouts.sms_database.SmsDatabaseDAO
 
 class SmsActivity : AppCompatActivity() {
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private val contact by lazy { receiveContact() }
+    private val smsDatabaseDAO by lazy { SmsDatabaseDAO() }
     private lateinit var smsManager: SmsManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +25,9 @@ class SmsActivity : AppCompatActivity() {
         requestPermission()
 
         setData()
+        smsDatabaseDAO.addItem(Sms(0, "seongjki", "seongjki", "hello world", 0))
+        Log.i("sms", "${smsDatabaseDAO.getAllItems()}")
+        
         binding.smsSendBtn.setOnClickListener { sendMessage() }
     }
 

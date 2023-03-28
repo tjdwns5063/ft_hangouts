@@ -1,4 +1,4 @@
-package com.example.ft_hangouts.database
+package com.example.ft_hangouts.contact_database
 
 import java.io.Serializable
 

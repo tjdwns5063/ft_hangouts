@@ -1,11 +1,10 @@
 package com.example.ft_hangouts
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.ft_hangouts.database.Contact
+import com.example.ft_hangouts.contact_database.Contact
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 
 class ContactRecyclerAdapter(

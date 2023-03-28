@@ -1,7 +1,6 @@
 package com.example.ft_hangouts
 
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
@@ -9,10 +8,8 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import com.example.ft_hangouts.database.*
+import com.example.ft_hangouts.contact_database.*
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
 
 class ContactAddActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactAddBinding

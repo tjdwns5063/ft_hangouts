@@ -1,8 +1,7 @@
-package com.example.ft_hangouts.database
+package com.example.ft_hangouts.contact_database
 
 import android.content.ContentValues
 import android.provider.BaseColumns
-import com.example.ft_hangouts.App
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 

@@ -1,8 +1,6 @@
 package com.example.ft_hangouts
 
 import android.app.Application
-import android.content.Context
-import com.example.ft_hangouts.database.ContactHelper
 
 class App : Application() {
 

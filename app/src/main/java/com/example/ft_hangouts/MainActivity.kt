@@ -1,28 +1,16 @@
 package com.example.ft_hangouts
 
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.BaseColumns
 import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.example.ft_hangouts.database.*
+import com.example.ft_hangouts.contact_database.*
 import com.example.ft_hangouts.databinding.ActivityMainBinding
-import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
-import java.util.concurrent.Callable
-import java.util.concurrent.Executors
-import kotlin.coroutines.CoroutineContext
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

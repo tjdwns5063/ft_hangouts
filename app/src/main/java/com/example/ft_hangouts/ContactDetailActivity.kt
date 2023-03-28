@@ -3,10 +3,9 @@ package com.example.ft_hangouts
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcelable
 import android.widget.Toast
-import com.example.ft_hangouts.database.Contact
-import com.example.ft_hangouts.database.ContactDatabaseDAO
+import com.example.ft_hangouts.contact_database.Contact
+import com.example.ft_hangouts.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 
 class ContactDetailActivity : AppCompatActivity() {
