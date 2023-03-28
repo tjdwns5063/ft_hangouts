@@ -1,9 +1,11 @@
 package com.example.ft_hangouts
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.os.Parcelable
 import android.widget.Toast
+import com.example.ft_hangouts.database.Contact
 import com.example.ft_hangouts.database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 
@@ -15,13 +17,16 @@ class ContactDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-
-        contactDAO.getItemById(id)?.let {
+        val contact: Contact = contactDAO.getItemById(id)?.let {
             binding.detailNameValueText.text = it.name
             binding.detailPhoneNumberValueText.text = it.phoneNumber
             binding.detailEmailValueText.text = it.email
             binding.detailGenderValueText.text = it.gender
             binding.detailRelationValueText.text = it.relation
+            it
+        } ?: run { Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+            finish()
+            Contact(0, "", "", "", "", "")
         }
 
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
@@ -32,9 +37,18 @@ class ContactDetailActivity : AppCompatActivity() {
                     onClick = { dialog, _ -> deleteContact() }
                     )
                 }
+
+                R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
             }
             true
         }
+    }
+
+    private fun goToSmsActivity(contact: Contact) {
+        val intent = Intent(this, SmsActivity::class.java).apply {
+            putExtra("contact", contact)
+        }
+        startActivity(intent)
     }
 
     private fun deleteContact() {

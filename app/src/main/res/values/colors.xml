@@ -10,4 +10,5 @@
     <color name="main_background">#F5F5F5</color>
     <color name="bottom_stroke_color">#E4E4E4</color>
     <color name="contact_image_default_color">#D9D9D9</color>
+    <color name="receive_background_color">#D1D0D0</color>
 </resources>

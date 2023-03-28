@@ -1,5 +1,7 @@
 package com.example.ft_hangouts.database
 
+import java.io.Serializable
+
 data class Contact(
     val id: Long,
     val name: String,
@@ -7,4 +9,4 @@ data class Contact(
     val email: String,
     val relation: String,
     val gender:String
-    )
+    ): Serializable
