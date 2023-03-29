@@ -1,22 +1,30 @@
 package com.example.ft_hangouts.sms_database
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
 import java.util.concurrent.Executors
 import com.example.ft_hangouts.sms_database.SmsContract.SmsEntry
 import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
 
-class SmsDatabaseDAO {
-    private val smsDatabaseHelper = SmsDatabaseHelper.createDatabase()
-    private val executor = Executors.newFixedThreadPool(8)
+abstract class DatabaseDAO {
+    abstract val dbHelper: SQLiteOpenHelper
+    abstract val executor: ExecutorService
+}
+class SmsDatabaseDAO: DatabaseDAO() {
+    override val dbHelper: SmsDatabaseHelper
+        get() = SmsDatabaseHelper.createDatabase()
+    override val executor: ExecutorService
+        get() = Executors.newFixedThreadPool(8)
 
     fun closeDatabase() {
-        smsDatabaseHelper.close()
+        dbHelper.close()
     }
 
     fun getAllItems(): List<Sms>? {
         val callable = Callable {
-            smsDatabaseHelper.getAllItems()
+            dbHelper.getAllItems()
         }
         val future = executor.submit(callable)
         return try {
@@ -28,7 +36,7 @@ class SmsDatabaseDAO {
 
     fun addItem(sms: Sms): Long? {
         val callable = Callable {
-            smsDatabaseHelper.addItem(sms)
+            dbHelper.addItem(sms)
         }
         val future = executor.submit(callable)
         return try {

@@ -1,5 +1,6 @@
 package com.example.ft_hangouts
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -33,18 +34,18 @@ class SmsActivity : AppCompatActivity() {
 
     private fun requestPermission() {
         val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            Log.i("ret", "$it")
+
         }
 
         if (ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.SEND_SMS
+                Manifest.permission.SEND_SMS
             ) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
                 this,
-                android.Manifest.permission.READ_SMS
+                Manifest.permission.READ_SMS
             ) != PackageManager.PERMISSION_GRANTED
             ) {
-            requestPermissionLauncher.launch(arrayOf(android.Manifest.permission.SEND_SMS, android.Manifest.permission.READ_SMS))
+            requestPermissionLauncher.launch(arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS))
         }
     }
 

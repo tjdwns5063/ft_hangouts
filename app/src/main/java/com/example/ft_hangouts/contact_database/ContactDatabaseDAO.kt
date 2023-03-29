@@ -1,17 +1,22 @@
 package com.example.ft_hangouts.contact_database
 
 import android.content.ContentValues
+import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
+import com.example.ft_hangouts.sms_database.DatabaseDAO
 import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-class ContactDatabaseDAO {
-    private val contactHelper = ContactHelper.createDatabase()
-    private val executor = Executors.newFixedThreadPool(8)
+class ContactDatabaseDAO: DatabaseDAO() {
+    override val dbHelper: ContactHelper
+        get() = ContactHelper.createDatabase()
+    override val executor: ExecutorService
+        get() = Executors.newFixedThreadPool(8)
     fun getAllItems(): List<Contact>? {
         val callable = Callable {
-            contactHelper.getAllItems()
+            dbHelper.getAllItems()
         }
         val future = executor.submit(callable)
         return try {
@@ -23,7 +28,7 @@ class ContactDatabaseDAO {
 
     fun getItemById(rowId: Long): Contact? {
         val callable = Callable {
-            contactHelper.getItemById(rowId)
+            dbHelper.getItemById(rowId)
         }
         val future = executor.submit(callable)
         return try {
@@ -35,7 +40,7 @@ class ContactDatabaseDAO {
 
     fun addItem(contact: Contact): Long? {
         val callable = Callable {
-            contactHelper.addItem(contact)
+            dbHelper.addItem(contact)
         }
         val future = executor.submit(callable)
         return try {
@@ -47,7 +52,7 @@ class ContactDatabaseDAO {
 
     fun deleteById(rowId: Long): Int? {
         val callable = Callable {
-            contactHelper.deleteById(rowId)
+            dbHelper.deleteById(rowId)
         }
         val future = executor.submit(callable)
         return try {
@@ -58,7 +63,7 @@ class ContactDatabaseDAO {
     }
 
     fun closeDatabase() {
-        contactHelper.close()
+        dbHelper.close()
     }
 
     private fun ContactHelper.getAllItems(): List<Contact> {
