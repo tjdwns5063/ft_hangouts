@@ -7,16 +7,13 @@ import java.util.concurrent.Executors
 import com.example.ft_hangouts.sms_database.SmsContract.SmsEntry
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
-
-abstract class DatabaseDAO {
-    abstract val dbHelper: SQLiteOpenHelper
-    abstract val executor: ExecutorService
+interface DatabaseDAO {
+//    private val dbHelper: SQLiteOpenHelper
+//    abstract val executor: ExecutorService
 }
-class SmsDatabaseDAO: DatabaseDAO() {
-    override val dbHelper: SmsDatabaseHelper
-        get() = SmsDatabaseHelper.createDatabase()
-    override val executor: ExecutorService
-        get() = Executors.newFixedThreadPool(8)
+class SmsDatabaseDAO: DatabaseDAO {
+    private val dbHelper: SmsDatabaseHelper = SmsDatabaseHelper.createDatabase()
+    private val executor: ExecutorService = Executors.newFixedThreadPool(8)
 
     fun closeDatabase() {
         dbHelper.close()

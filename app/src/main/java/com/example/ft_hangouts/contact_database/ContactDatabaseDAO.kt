@@ -8,12 +8,12 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
-class ContactDatabaseDAO: DatabaseDAO() {
-    override val dbHelper: ContactHelper
-        get() = ContactHelper.createDatabase()
-    override val executor: ExecutorService
-        get() = Executors.newFixedThreadPool(8)
+//class ContactRepository: Repository() {
+//    override val databaseDAO: ContactDatabaseDAO = ContactDatabaseDAO()
+//}
+class ContactDatabaseDAO: DatabaseDAO {
+    private val dbHelper: ContactHelper = ContactHelper.createDatabase()
+    private val executor: ExecutorService = Executors.newFixedThreadPool(8)
     fun getAllItems(): List<Contact>? {
         val callable = Callable {
             dbHelper.getAllItems()
