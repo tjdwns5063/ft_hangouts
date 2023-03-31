@@ -12,8 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.ft_hangouts.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
-import com.example.ft_hangouts.sms_database.Sms
-import com.example.ft_hangouts.sms_database.SmsDatabaseDAO
 
 class SmsActivity : AppCompatActivity() {
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
