@@ -1,17 +1,12 @@
 package com.example.ft_hangouts.contact_database
 
 import android.content.ContentValues
-import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import com.example.ft_hangouts.sms_database.DatabaseDAO
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-//class ContactRepository: Repository() {
-//    override val databaseDAO: ContactDatabaseDAO = ContactDatabaseDAO()
-//}
-class ContactDatabaseDAO: DatabaseDAO {
+class ContactDatabaseDAO {
     private val dbHelper: ContactHelper = ContactHelper.createDatabase()
     private val executor: ExecutorService = Executors.newFixedThreadPool(8)
     fun getAllItems(): List<Contact>? {

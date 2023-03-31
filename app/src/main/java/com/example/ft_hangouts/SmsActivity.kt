@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.telephony.SmsManager
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.example.ft_hangouts.contact_database.Contact
@@ -21,9 +22,8 @@ class SmsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initSmsManager()
-        requestPermission()
-
         setData()
+        requestPermission()
         binding.smsSendBtn.setOnClickListener { sendMessage() }
     }
 
@@ -36,8 +36,12 @@ class SmsActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
+        val permissions = arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS)
         val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-
+            val allPermissionGranted = it[permissions[0]] == true && it[permissions[1]] == true
+            if (!allPermissionGranted) {
+                finish()
+            }
         }
 
         if (ContextCompat.checkSelfPermission(
@@ -48,7 +52,7 @@ class SmsActivity : AppCompatActivity() {
                 Manifest.permission.READ_SMS
             ) != PackageManager.PERMISSION_GRANTED
             ) {
-            requestPermissionLauncher.launch(arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS))
+            requestPermissionLauncher.launch(permissions)
         }
     }
 
