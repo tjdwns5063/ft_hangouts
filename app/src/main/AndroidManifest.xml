@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
-<!--    <uses-permission android:name="android.permission.RECEIVE_SMS"/>-->
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -17,7 +17,7 @@
         android:theme="@style/Theme.Ft_hangouts"
         tools:targetApi="31">
         <activity
-            android:name=".SmsActivity"
+            android:name=".ContactSmsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize"/>
         <activity

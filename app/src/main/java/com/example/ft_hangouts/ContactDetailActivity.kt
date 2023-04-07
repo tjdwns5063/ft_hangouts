@@ -1,5 +1,6 @@
 package com.example.ft_hangouts
 
+import com.example.ft_hangouts.ContactSmsActivity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -20,7 +21,6 @@ class ContactDetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
         requestCallPermission()
 
         val contact: Contact = contactDAO.getItemById(id)?.let {
@@ -83,7 +83,7 @@ class ContactDetailActivity : AppCompatActivity() {
     }
 
     private fun goToSmsActivity(contact: Contact) {
-        val intent = Intent(this, SmsActivity::class.java).apply {
+        val intent = Intent(this, ContactSmsActivity::class.java).apply {
             putExtra("contact", contact)
         }
         startActivity(intent)
@@ -100,3 +100,7 @@ class ContactDetailActivity : AppCompatActivity() {
         }
     }
 }
+
+/*
+    배운점: 권한 설정은 반드시 OnCreate에서 해야함.... (정확히는 액티비티가 STARTED 상태 전에!)
+ */

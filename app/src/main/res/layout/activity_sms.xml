@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SmsActivity">
+    tools:context=".ContactSmsActivity">
 
     <ImageView
         android:id="@+id/sms_back_btn"
@@ -53,8 +53,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/sms_chat_recycler_view"
-        android:layout_width="409dp"
-        android:layout_height="652dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/send_sms_edit_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
