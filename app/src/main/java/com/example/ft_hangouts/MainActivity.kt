@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -38,6 +40,13 @@ class MainActivity : AppCompatActivity() {
 
         binding.button.setOnClickListener {
             addContactActivityResultLauncher.launch(Intent(this, ContactAddActivity::class.java))
+        }
+
+        binding.settingButton.setOnClickListener {
+            val popupMenu = PopupMenu(this, it)
+
+            popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
+
         }
     }
 
