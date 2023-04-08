@@ -9,12 +9,16 @@ import com.example.ft_hangouts.databinding.SmsChatRecyclerReceiveItemViewBinding
 import com.example.ft_hangouts.databinding.SmsChatRecyclerSendItemViewBinding
 import com.example.ft_hangouts.sms.SmsInfo
 
-class SmsChatRecyclerAdapter: ListAdapter<SmsInfo, RecyclerView.ViewHolder>(callback) {
+class SmsChatRecyclerAdapter(val currentList: MutableList<SmsInfo>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             1 -> SmsChatRecyclerReceiveViewHolder.from(parent)
             else -> SmsChatRecyclerSendViewHolder.from(parent)
         }
+    }
+
+    override fun getItemCount(): Int {
+        return currentList.size
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -26,6 +30,15 @@ class SmsChatRecyclerAdapter: ListAdapter<SmsInfo, RecyclerView.ViewHolder>(call
             1 -> (holder as SmsChatRecyclerReceiveViewHolder).bind(currentList[position])
             else -> (holder as SmsChatRecyclerSendViewHolder).bind(currentList[position])
         }
+    }
+
+    fun update(list: MutableList<SmsInfo>) {
+        var cnt: Int = 0
+        for (i in currentList.size until list.size) {
+            currentList += list[i]
+            ++cnt
+        }
+        notifyItemRangeChanged(currentList.size, cnt)
     }
 
     class SmsChatRecyclerReceiveViewHolder private constructor(
@@ -57,18 +70,6 @@ class SmsChatRecyclerAdapter: ListAdapter<SmsInfo, RecyclerView.ViewHolder>(call
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = SmsChatRecyclerSendItemViewBinding.inflate(layoutInflater, parent, false)
                 return SmsChatRecyclerSendViewHolder(binding)
-            }
-        }
-    }
-
-    companion object {
-        val callback = object : DiffUtil.ItemCallback<SmsInfo>() {
-            override fun areItemsTheSame(oldItem: SmsInfo, newItem: SmsInfo): Boolean {
-                return oldItem === newItem
-            }
-
-            override fun areContentsTheSame(oldItem: SmsInfo, newItem: SmsInfo): Boolean {
-                return oldItem == newItem
             }
         }
     }

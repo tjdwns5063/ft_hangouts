@@ -2,56 +2,46 @@ package com.example.ft_hangouts.contact_database
 
 import android.content.ContentValues
 import android.provider.BaseColumns
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import com.example.ft_hangouts.BackgroundHelper
 
 class ContactDatabaseDAO {
     private val dbHelper: ContactHelper = ContactHelper.createDatabase()
-    private val executor: ExecutorService = Executors.newFixedThreadPool(8)
+    private val backgroundHelper = BackgroundHelper
     fun getAllItems(): List<Contact>? {
-        val callable = Callable {
-            dbHelper.getAllItems()
-        }
-        val future = executor.submit(callable)
         return try {
-            future.get()
+            backgroundHelper.execute {
+                dbHelper.getAllItems()
+            }
         } catch (e: Exception) {
             null
         }
     }
 
     fun getItemById(rowId: Long): Contact? {
-        val callable = Callable {
-            dbHelper.getItemById(rowId)
-        }
-        val future = executor.submit(callable)
         return try {
-            future.get()
+            backgroundHelper.execute {
+                dbHelper.getItemById(rowId)
+            }
         } catch (e: Exception) {
             null
         }
     }
 
     fun addItem(contact: Contact): Long? {
-        val callable = Callable {
-            dbHelper.addItem(contact)
-        }
-        val future = executor.submit(callable)
         return try {
-            future.get()
+            backgroundHelper.execute {
+                dbHelper.addItem(contact)
+            }
         } catch (e: Exception) {
             null
         }
     }
 
     fun deleteById(rowId: Long): Int? {
-        val callable = Callable {
-            dbHelper.deleteById(rowId)
-        }
-        val future = executor.submit(callable)
         return try {
-            future.get()
+            backgroundHelper.execute {
+                dbHelper.deleteById(rowId)
+            }
         } catch (e: Exception) {
             null
         }
