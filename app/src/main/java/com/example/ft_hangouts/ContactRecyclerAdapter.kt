@@ -25,7 +25,7 @@ class ContactRecyclerAdapter(
 
     fun addItem(contacts: List<Contact>) {
         items = contacts
-        notifyItemChanged(items.size)
+        notifyDataSetChanged()
     }
 
     fun getIdByPosition(position: Int): Long {

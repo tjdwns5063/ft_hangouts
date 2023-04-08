@@ -34,8 +34,8 @@ class ContactAddActivity : AppCompatActivity() {
             val contact = Contact(
                 id = 0,
                 name = binding.addNameEditText.text.toString(),
-                email = binding.addEditEmailText.text.toString(),
-                phoneNumber = binding.addEditPhoneNumberText.text.toString(),
+                email = binding.addEmailEditText.text.toString(),
+                phoneNumber = binding.addPhoneNumberEditText.text.toString(),
                 gender = binding.addGenderEditText.text.toString(),
                 relation = binding.addRelationEditText.text.toString()
             )
@@ -64,7 +64,7 @@ class ContactAddActivity : AppCompatActivity() {
     }
 
     private fun checkEditText(): Boolean {
-        return binding.addNameEditText.text.isNotBlank() && binding.addEditPhoneNumberText.text.isNotBlank()
+        return binding.addNameEditText.text.isNotBlank() && binding.addPhoneNumberEditText.text.isNotBlank()
     }
 
     private fun setFocusChangeListener() {
@@ -72,11 +72,11 @@ class ContactAddActivity : AppCompatActivity() {
             tintRelateImage(binding.addNameImage, b)
         }
 
-        binding.addEditPhoneNumberText.setOnFocusChangeListener { view, b ->
+        binding.addPhoneNumberEditText.setOnFocusChangeListener { view, b ->
             tintRelateImage(binding.addPhoneNumberImage, b)
         }
 
-        binding.addEditEmailText.setOnFocusChangeListener { view, b ->
+        binding.addEmailEditText.setOnFocusChangeListener { view, b ->
             tintRelateImage(binding.addEmailImage, b)
         }
 

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,22 +6,22 @@
     android:layout_height="match_parent"
     android:background="@color/main_background"
     android:padding="10dp"
-    tools:context=".ContactAddActivity">
+    tools:context=".ContactEditActivity">
 
     <TextView
-        android:id="@+id/contact_add_title"
+        android:id="@+id/contact_edit_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="연락처 추가"
+        android:text="연락처 편집"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         style="@style/title_style" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/name_add_card"
+        android:id="@+id/name_edit_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/contact_add_title"
+        app:layout_constraintTop_toBottomOf="@id/contact_edit_title"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
@@ -34,7 +32,7 @@
             android:padding="8dp"
             android:gravity="center_vertical">
             <ImageView
-                android:id="@+id/add_name_image"
+                android:id="@+id/edit_name_image"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
@@ -42,7 +40,7 @@
                 android:src="@drawable/baseline_person_24" />
 
             <EditText
-                android:id="@+id/add_name_edit_text"
+                android:id="@+id/edit_name_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -53,10 +51,10 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/phone_number_add_card"
+        android:id="@+id/phone_number_edit_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/name_add_card"
+        app:layout_constraintTop_toBottomOf="@id/name_edit_card"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
@@ -67,7 +65,7 @@
             android:padding="8dp"
             android:gravity="center_vertical">
             <ImageView
-                android:id="@+id/add_phone_number_image"
+                android:id="@+id/edit_phone_number_image"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
@@ -75,7 +73,7 @@
                 android:src="@drawable/baseline_call_24" />
 
             <EditText
-                android:id="@+id/add_phone_number_edit_text"
+                android:id="@+id/edit_phone_number_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -86,10 +84,10 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/email_add_card"
+        android:id="@+id/email_edit_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/phone_number_add_card"
+        app:layout_constraintTop_toBottomOf="@id/phone_number_edit_card"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
@@ -100,7 +98,7 @@
             android:padding="8dp"
             android:gravity="center_vertical">
             <ImageView
-                android:id="@+id/add_email_image"
+                android:id="@+id/edit_email_image"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
@@ -108,7 +106,7 @@
                 android:src="@drawable/baseline_email_32" />
 
             <EditText
-                android:id="@+id/add_email_edit_text"
+                android:id="@+id/edit_email_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -119,10 +117,10 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/gender_add_card"
+        android:id="@+id/gender_edit_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/email_add_card"
+        app:layout_constraintTop_toBottomOf="@id/email_edit_card"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
@@ -133,7 +131,7 @@
             android:padding="8dp"
             android:gravity="center_vertical">
             <ImageView
-                android:id="@+id/add_gender_image"
+                android:id="@+id/edit_gender_image"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
@@ -141,7 +139,7 @@
                 android:src="@drawable/baseline_man_4_32" />
 
             <EditText
-                android:id="@+id/add_gender_edit_text"
+                android:id="@+id/edit_gender_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -152,10 +150,10 @@
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/relation_add_card"
+        android:id="@+id/relation_edit_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/gender_add_card"
+        app:layout_constraintTop_toBottomOf="@id/gender_edit_card"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
@@ -166,7 +164,7 @@
             android:padding="8dp"
             android:gravity="center_vertical">
             <ImageView
-                android:id="@+id/add_relation_image"
+                android:id="@+id/edit_relation_image"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
@@ -174,7 +172,7 @@
                 android:src="@drawable/baseline_diversity_3_32" />
 
             <EditText
-                android:id="@+id/add_relation_edit_text"
+                android:id="@+id/edit_relation_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
@@ -194,7 +192,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         <TextView
-            android:id="@+id/add_cancel_button"
+            android:id="@+id/edit_cancel_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -203,7 +201,7 @@
             style="@style/contact_add_button_style" />
 
         <TextView
-            android:id="@+id/add_ok_button"
+            android:id="@+id/edit_ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"

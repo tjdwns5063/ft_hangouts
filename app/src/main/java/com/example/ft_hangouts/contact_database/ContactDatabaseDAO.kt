@@ -47,6 +47,16 @@ class ContactDatabaseDAO {
         }
     }
 
+    fun updateById(rowId: Long, contact: Contact): Int? {
+        return try {
+            backgroundHelper.execute {
+                dbHelper.updateById(rowId, contact)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     fun closeDatabase() {
         dbHelper.close()
     }
@@ -119,7 +129,7 @@ class ContactDatabaseDAO {
         return deletedRows
     }
 
-    private fun ContactHelper.addItem(contact: Contact): Long? {
+    private fun ContactHelper.addItem(contact: Contact): Long {
         val writeDb = writableDatabase
 
         val values = ContentValues().apply {
@@ -129,8 +139,24 @@ class ContactDatabaseDAO {
             put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, contact.relation)
             put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, contact.phoneNumber)
         }
-        val newRowId = writeDb?.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
+        val newRowId = writeDb.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
         return newRowId
+    }
+
+    private fun ContactHelper.updateById(rowId: Long, contact: Contact): Int {
+        val writeDb = writableDatabase
+
+        val values = ContentValues().apply {
+            put(ContactContract.ContactEntry.COLUMN_NAME_NAME, contact.name)
+            put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, contact.phoneNumber)
+            put(ContactContract.ContactEntry.COLUMN_NAME_EMAIL, contact.email)
+            put(ContactContract.ContactEntry.COLUMN_NAME_GENDER, contact.gender)
+            put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, contact.relation)
+        }
+        val selection = "${BaseColumns._ID} LIKE ?"
+        val selectionArgs = arrayOf(rowId.toString())
+
+        return writeDb.update(ContactContract.ContactEntry.TABLE_NAME, values, selection, selectionArgs)
     }
 }
 

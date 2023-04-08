@@ -1,6 +1,5 @@
 package com.example.ft_hangouts
 
-import com.example.ft_hangouts.ContactSmsActivity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,12 +17,13 @@ class ContactDetailActivity : AppCompatActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val contactDAO = ContactDatabaseDAO()
     private val id by lazy { intent.getLongExtra("id", -1) }
+    private lateinit var contact: Contact
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         requestCallPermission()
 
-        val contact: Contact = contactDAO.getItemById(id)?.let {
+        contact = contactDAO.getItemById(id)?.let {
             binding.detailNameValueText.text = it.name
             binding.detailPhoneNumberValueText.text = it.phoneNumber
             binding.detailEmailValueText.text = it.email
@@ -38,23 +38,43 @@ class ContactDetailActivity : AppCompatActivity() {
         setBottomNavItemListener(contact)
     }
 
+    override fun onResume() {
+        super.onResume()
+        contact = contactDAO.getItemById(id)?.let {
+            binding.detailNameValueText.text = it.name
+            binding.detailPhoneNumberValueText.text = it.phoneNumber
+            binding.detailEmailValueText.text = it.email
+            binding.detailGenderValueText.text = it.gender
+            binding.detailRelationValueText.text = it.relation
+            it
+        } ?: run { Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+            finish()
+            Contact(0, "", "", "", "", "")
+        }
+    }
+
     private fun setBottomNavItemListener(contact: Contact) {
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
             when(menu.itemId) {
                 R.id.detail_bottom_delete -> { EventDialog.showEventDialog(
                     fragmentManager = supportFragmentManager,
                     message = "연락처를 영구히 삭제하시겠습니까?",
-                    onClick = { dialog, _ -> deleteContact() }
-                )
+                    onClick = { _, _ -> deleteContact() })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
-                R.id.detail_bottom_call -> {
-//                    requestCallPermission()
-                    call(contact.phoneNumber)
-                }
+                R.id.detail_bottom_call -> { call(contact.phoneNumber) }
+                R.id.detail_bottom_edit -> { goToContactEditActivity(contact) }
             }
             true
         }
+    }
+
+    private fun goToContactEditActivity(contact: Contact) {
+        val intent = Intent(this, ContactEditActivity::class.java).apply {
+            putExtra("contact", contact)
+        }
+
+        startActivity(intent)
     }
 
     private fun requestCallPermission() {
