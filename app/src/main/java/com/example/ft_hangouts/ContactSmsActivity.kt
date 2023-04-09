@@ -16,7 +16,10 @@ import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.sms.SmsInfo
@@ -46,9 +49,13 @@ class ContactSmsActivity : AppCompatActivity() {
 
     private fun setRecyclerView() {
         val list = BackgroundHelper.execute { readSms() }
-        val adapter = SmsChatRecyclerAdapter(list.toMutableList())
+        val adapter = SmsChatRecyclerAdapter { len -> binding.smsChatRecyclerView.scrollToPosition(len) }
 
-        list ?: run { Toast.makeText(this, "데이터를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show() }
+        if (list == null) {
+            Toast.makeText(this, "데이터를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+        } else {
+            adapter.submitList(list)
+        }
         binding.smsChatRecyclerView.adapter = adapter
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
@@ -63,9 +70,10 @@ class ContactSmsActivity : AppCompatActivity() {
                     val curr = adapter.currentList.toMutableList()
 
                     curr.add(SmsInfo(message, 2))
-                    adapter.update(curr)
+                    adapter.submitList(curr)
+//                    adapter.update(curr)
                     binding.sendSmsEditText.text.clear()
-                    binding.smsChatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1)
+//                    binding.smsChatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1)
                 } else {
                     EventDialog("문자 메세지 전송이 실패했습니다. 재전송 하시겠습니까?") { dialog, _ ->
                         sendMessage()
@@ -82,8 +90,9 @@ class ContactSmsActivity : AppCompatActivity() {
                     val curr = adapter.currentList.toMutableList()
 
                     curr.add(SmsInfo(newMessage, 1))
-                    adapter.update(curr)
-                    binding.smsChatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1)
+                    adapter.submitList(curr)
+//                    adapter.update(curr)
+//                    binding.smsChatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1)
                 }
             }
         }, IntentFilter("android.provider.Telephony.SMS_RECEIVED"))

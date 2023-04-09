@@ -1,5 +1,6 @@
 package com.example.ft_hangouts
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,7 +10,7 @@ import com.example.ft_hangouts.databinding.SmsChatRecyclerReceiveItemViewBinding
 import com.example.ft_hangouts.databinding.SmsChatRecyclerSendItemViewBinding
 import com.example.ft_hangouts.sms.SmsInfo
 
-class SmsChatRecyclerAdapter(val currentList: MutableList<SmsInfo>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SmsChatRecyclerAdapter(private val scrollToBottom: (Int) -> Unit): ListAdapter<SmsInfo, RecyclerView.ViewHolder>(callback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             1 -> SmsChatRecyclerReceiveViewHolder.from(parent)
@@ -17,8 +18,12 @@ class SmsChatRecyclerAdapter(val currentList: MutableList<SmsInfo>): RecyclerVie
         }
     }
 
-    override fun getItemCount(): Int {
-        return currentList.size
+    override fun onCurrentListChanged(
+        previousList: MutableList<SmsInfo>,
+        currentList: MutableList<SmsInfo>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        scrollToBottom(currentList.size - 1)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -30,15 +35,6 @@ class SmsChatRecyclerAdapter(val currentList: MutableList<SmsInfo>): RecyclerVie
             1 -> (holder as SmsChatRecyclerReceiveViewHolder).bind(currentList[position])
             else -> (holder as SmsChatRecyclerSendViewHolder).bind(currentList[position])
         }
-    }
-
-    fun update(list: MutableList<SmsInfo>) {
-        var cnt: Int = 0
-        for (i in currentList.size until list.size) {
-            currentList += list[i]
-            ++cnt
-        }
-        notifyItemRangeChanged(currentList.size, cnt)
     }
 
     class SmsChatRecyclerReceiveViewHolder private constructor(
@@ -70,6 +66,18 @@ class SmsChatRecyclerAdapter(val currentList: MutableList<SmsInfo>): RecyclerVie
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = SmsChatRecyclerSendItemViewBinding.inflate(layoutInflater, parent, false)
                 return SmsChatRecyclerSendViewHolder(binding)
+            }
+        }
+    }
+
+    companion object {
+        val callback = object : DiffUtil.ItemCallback<SmsInfo>() {
+            override fun areItemsTheSame(oldItem: SmsInfo, newItem: SmsInfo): Boolean {
+                return oldItem === newItem
+            }
+
+            override fun areContentsTheSame(oldItem: SmsInfo, newItem: SmsInfo): Boolean {
+                return oldItem == newItem
             }
         }
     }
