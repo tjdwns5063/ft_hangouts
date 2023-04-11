@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AppBarSettingActivity">
+
+    <com.example.ft_hangouts.custom_view.ColorPickerView
+        android:id="@+id/appbar_setting_color_picker"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="30dp"
+        android:paddingHorizontal="30dp"
+        app:layout_constraintBottom_toTopOf="@+id/appbar_setting_selected_color_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:selectorSize="10dp">
+
+    </com.example.ft_hangouts.custom_view.ColorPickerView>
+
+    <ImageView
+        android:id="@+id/appbar_setting_selected_color_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/selected_color_drawable"
+        app:layout_constraintBottom_toBottomOf="@+id/appbar_setting_selected_color_text"
+        app:layout_constraintStart_toEndOf="@+id/appbar_setting_selected_color_text"
+        app:layout_constraintTop_toTopOf="@+id/appbar_setting_selected_color_text"         />
+
+    <TextView
+        android:id="@+id/appbar_setting_selected_color_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="30dp"
+        android:textSize="25dp"
+        android:text="@string/selected_color_text"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/main_background"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <TextView
+            android:id="@+id/appbar_setting_cancel_button"
+            style="@style/contact_add_button_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/add_cancel_button" />
+
+        <TextView
+            android:id="@+id/appbar_setting_default_button"
+            style="@style/contact_add_button_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/app_bar_setting_default_text"/>
+
+        <TextView
+            android:id="@+id/appbar_setting_ok_button"
+            style="@style/contact_add_button_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/add_save_button" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

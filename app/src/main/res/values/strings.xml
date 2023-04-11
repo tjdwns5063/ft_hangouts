@@ -8,4 +8,6 @@
     <string name="add_save_button">저장</string>
     <string name="add_cancel_button">취소</string>
     <string name="contact_detail_title_text">연락처 정보</string>
+    <string name="selected_color_text">선택된 색상 :</string>
+    <string name="app_bar_setting_default_text">초기화</string>
 </resources>
