@@ -16,6 +16,10 @@ import androidx.appcompat.content.res.AppCompatResources
 import com.example.ft_hangouts.R
 import kotlin.math.*
 
+/*
+ * 엄재웅님의 ColorPickerView를 참고하여 만들었습니다. https://github.com/skydoves/ColorPickerView
+ */
+
 fun interface ColorListener {
     fun onColorListener(@ColorInt color: Int)
 }
@@ -50,6 +54,22 @@ class ColorPickerView(context: Context, attrs: AttributeSet?): FrameLayout(conte
         initialize()
     }
 
+    private fun initialize() {
+        selectorDrawable = AppCompatResources.getDrawable(context, R.drawable.selector_drawable)!!
+        palette.setImageDrawable(paletteDrawable)
+        selector.setImageDrawable(selectorDrawable)
+
+        val paletteParam = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        val selectorParam = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+
+        paletteParam.gravity = Gravity.CENTER
+        selectorParam.gravity = Gravity.CENTER
+        selectorParam.width = selectorSize
+        selectorParam.height = selectorSize
+
+        addView(palette, paletteParam)
+        addView(selector, selectorParam)
+    }
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         event ?:  return false
         return when (event.actionMasked) {
@@ -114,22 +134,7 @@ class ColorPickerView(context: Context, attrs: AttributeSet?): FrameLayout(conte
         }
     }
 
-    private fun initialize() {
-        selectorDrawable = AppCompatResources.getDrawable(context, R.drawable.selector_drawable)!!
-        palette.setImageDrawable(paletteDrawable)
-        selector.setImageDrawable(selectorDrawable)
 
-        val paletteParam = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        val selectorParam = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-        paletteParam.gravity = Gravity.CENTER
-        selectorParam.gravity = Gravity.CENTER
-        selectorParam.width = selectorSize
-        selectorParam.height = selectorSize
-
-        addView(palette, paletteParam)
-        addView(selector, selectorParam)
-    }
 
     fun setOnColorListener(OnColorListener: ColorListener) {
         colorListener = OnColorListener
