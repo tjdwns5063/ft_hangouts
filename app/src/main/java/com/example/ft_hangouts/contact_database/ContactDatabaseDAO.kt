@@ -172,7 +172,7 @@ class ContactDatabaseDAO {
         }
     }
 
-    fun updateById(rowId: Long, contact: Contact): Int {
+    fun updateById(rowId: Long, contact: Contact) {
         with(dbHelper) {
             val writeDb = writableDatabase
 
@@ -185,13 +185,15 @@ class ContactDatabaseDAO {
             }
             val selection = "${BaseColumns._ID} LIKE ?"
             val selectionArgs = arrayOf(rowId.toString())
-
-            return writeDb.update(
+            val ret = writeDb.update(
                 ContactContract.ContactEntry.TABLE_NAME,
                 values,
                 selection,
                 selectionArgs
             )
+
+            if (ret == 0)
+                throw IllegalStateException("can't update this rowId $rowId")
         }
     }
 }
