@@ -14,7 +14,6 @@ import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 class ContactAddActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val contactDAO = ContactDatabaseDAO()
-    private var result: Long? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactAddBinding.inflate(layoutInflater)
@@ -26,41 +25,43 @@ class ContactAddActivity : AppCompatActivity() {
 
     private fun setClickListener() {
         binding.addOkButton.setOnClickListener {
-            if (!checkEditText()) {
-                Toast.makeText(this, "이름과 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val contact = Contact(
-                id = 0,
-                name = binding.addNameEditText.text.toString(),
-                email = binding.addEmailEditText.text.toString(),
-                phoneNumber = binding.addPhoneNumberEditText.text.toString(),
-                gender = binding.addGenderEditText.text.toString(),
-                relation = binding.addRelationEditText.text.toString()
-            )
-            contactDAO.addItem(contact)?.let {
-                val intent = Intent(this, MainActivity::class.java)
-                    .apply { putExtra("data", result) }
-                setResult(Activity.RESULT_OK, intent)
-                finish()
-            } ?: run {
-                setResult(Activity.RESULT_CANCELED)
-                finish()
-            }
+            onOkButtonClick()
         }
 
         binding.addCancelButton.setOnClickListener {
-            setResult(Activity.RESULT_OK)
             finish()
         }
 
         onBackPressedDispatcher.addCallback(object: OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                setResult(Activity.RESULT_OK)
                 finish()
             }
         })
+    }
+
+    private fun onOkButtonClick() {
+        if (!checkEditText()) {
+            Toast.makeText(this, "이름과 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val contact = Contact(
+            id = 0,
+            name = binding.addNameEditText.text.toString(),
+            email = binding.addEmailEditText.text.toString(),
+            phoneNumber = binding.addPhoneNumberEditText.text.toString(),
+            gender = binding.addGenderEditText.text.toString(),
+            relation = binding.addRelationEditText.text.toString()
+        )
+
+        Thread {
+            try {
+                contactDAO.addItem(contact)
+            } catch(err: Exception) {
+                Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }.start()
+        finish()
     }
 
     private fun checkEditText(): Boolean {
