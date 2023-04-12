@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.AsyncTask
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -122,7 +123,9 @@ class ContactSmsActivity : AppCompatActivity() {
         binding.smsChatRecyclerView.adapter = adapter
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
+
         handler.post {
+//            val asyncTask = AsyncTask
             adapter.submitList(smsDatabaseDAO.getMessage(contact.phoneNumber))
         }
     }

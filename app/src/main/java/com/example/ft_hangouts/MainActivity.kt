@@ -3,8 +3,10 @@ package com.example.ft_hangouts
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val contactDAO = ContactDatabaseDAO()
     private val appbarSettingActivityLauncher = registerChangeAppBarResult()
+    private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +40,7 @@ class MainActivity : AppCompatActivity() {
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        contactDAO.getAllItems()?.let {
-            adapter.addItem(it)
-        }
+        getAllContactAndUpdateRecyclerView(adapter)
 
         binding.button.setOnClickListener {
             startActivity(Intent(this, ContactAddActivity::class.java))
@@ -68,9 +69,18 @@ class MainActivity : AppCompatActivity() {
         Log.i("main", "onresume called")
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
 
-        val items = contactDAO.getAllItems()
-        items?.let { adapter.addItem(items) }
-        Log.i("main", "${items}")
+        getAllContactAndUpdateRecyclerView(adapter)
+    }
+
+    private fun getAllContactAndUpdateRecyclerView(adapter: ContactRecyclerAdapter) {
+        BackgroundHelper.execute {
+            try {
+                val list = contactDAO.getAllItems()
+                handler.post { adapter.addItem(list) }
+            } catch (err: Exception) {
+                Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun registerChangeAppBarResult(): ActivityResultLauncher<Intent> {
