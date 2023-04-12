@@ -124,9 +124,16 @@ class ContactSmsActivity : AppCompatActivity() {
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
 
-        handler.post {
-//            val asyncTask = AsyncTask
-            adapter.submitList(smsDatabaseDAO.getMessage(contact.phoneNumber))
+        BackgroundHelper.execute {
+            try {
+                val list = smsDatabaseDAO.getMessage(contact.phoneNumber)
+                handler.post { adapter.submitList(list) }
+            } catch (err: Exception) {
+                handler.post {
+                    Toast.makeText(this, "문자메세지를 불러온는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
         }
     }
 
