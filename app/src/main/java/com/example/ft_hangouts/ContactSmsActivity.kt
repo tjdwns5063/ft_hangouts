@@ -14,12 +14,10 @@ import android.os.Bundle
 import android.provider.Telephony
 import android.telephony.SmsManager
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.sms.SmsInfo
@@ -33,32 +31,46 @@ import com.example.ft_hangouts.sms.SmsInfo
  */
 
 class ContactSmsActivity : AppCompatActivity() {
+    private val permissions = arrayOf(
+        Manifest.permission.SEND_SMS,
+        Manifest.permission.READ_SMS,
+        Manifest.permission.RECEIVE_SMS
+    )
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private val contact by lazy { receiveContact() }
     private var smsManager: SmsManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        initSmsManager()
-        registerSmsReceiver()
-        setData()
-        requestPermission()
-        setRecyclerView()
-        binding.smsSendBtn.setOnClickListener { sendMessage() }
+        val launcher = registerPermissionActivityResult()
+        requestPermission(launcher)
     }
 
-    private fun setRecyclerView() {
-        val list = BackgroundHelper.execute { readSms() }
-        val adapter = SmsChatRecyclerAdapter { len -> binding.smsChatRecyclerView.scrollToPosition(len) }
-
-        if (list == null) {
-            Toast.makeText(this, "데이터를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-        } else {
-            adapter.submitList(list)
+    private fun registerPermissionActivityResult(): ActivityResultLauncher<Array<String>> {
+        return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            val allPermissionGranted = it[permissions[0]] == true && it[permissions[1]] == true && it[permissions[2]] == true
+            if (allPermissionGranted) {
+                initSmsManager()
+                registerSmsReceiver()
+                setData()
+                setRecyclerView()
+                binding.smsSendBtn.setOnClickListener { sendMessage() }
+            } else {
+                finish()
+            }
         }
-        binding.smsChatRecyclerView.adapter = adapter
-        binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
+    }
+
+    private fun requestPermission(permissionLauncher: ActivityResultLauncher<Array<String>>) {
+        permissionLauncher.launch(permissions)
+    }
+
+    private fun initSmsManager() {
+        smsManager = getSystemService(SmsManager::class.java)
+        smsManager ?: run {
+            Toast.makeText(this, "SMS 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
     }
 
     private fun registerSmsReceiver() {
@@ -71,9 +83,7 @@ class ContactSmsActivity : AppCompatActivity() {
 
                     curr.add(SmsInfo(message, 2))
                     adapter.submitList(curr)
-//                    adapter.update(curr)
                     binding.sendSmsEditText.text.clear()
-//                    binding.smsChatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1)
                 } else {
                     EventDialog("문자 메세지 전송이 실패했습니다. 재전송 하시겠습니까?") { dialog, _ ->
                         sendMessage()
@@ -91,43 +101,26 @@ class ContactSmsActivity : AppCompatActivity() {
 
                     curr.add(SmsInfo(newMessage, 1))
                     adapter.submitList(curr)
-//                    adapter.update(curr)
-//                    binding.smsChatRecyclerView.smoothScrollToPosition(adapter.itemCount - 1)
                 }
             }
         }, IntentFilter("android.provider.Telephony.SMS_RECEIVED"))
     }
 
-    private fun initSmsManager() {
-        smsManager = getSystemService(SmsManager::class.java)
-        smsManager ?: run {
-            Toast.makeText(this, "SMS 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
-            finish()
-        }
+    private fun setData() {
+        binding.smsProfileName.text = contact.name
     }
+    private fun setRecyclerView() {
+        val list = BackgroundHelper.execute { readSms() }
+        val adapter = SmsChatRecyclerAdapter { len -> binding.smsChatRecyclerView.scrollToPosition(len) }
 
-    private fun requestPermission() {
-        val permissions = arrayOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS)
-        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            val allPermissionGranted = it[permissions[0]] == true && it[permissions[1]] == true && it[permissions[2]] == true
-            if (!allPermissionGranted) {
-                finish()
-            }
+        if (list == null) {
+            Toast.makeText(this, "데이터를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+        } else {
+            adapter.submitList(list)
         }
-
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.SEND_SMS
-            ) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_SMS
-            ) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECEIVE_SMS
-            ) != PackageManager.PERMISSION_GRANTED
-            ) {
-            requestPermissionLauncher.launch(permissions)
-        }
+        binding.smsChatRecyclerView.adapter = adapter
+        binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun sendMessage() {
@@ -142,10 +135,6 @@ class ContactSmsActivity : AppCompatActivity() {
             sendIntent,
             null
         )
-    }
-
-    private fun setData() {
-        binding.smsProfileName.text = contact.name
     }
 
     private fun receiveContact(): Contact {
