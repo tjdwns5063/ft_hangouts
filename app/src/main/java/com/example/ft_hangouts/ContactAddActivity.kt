@@ -3,8 +3,10 @@ package com.example.ft_hangouts
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -14,6 +16,7 @@ import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 class ContactAddActivity : AppCompatActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val contactDAO = ContactDatabaseDAO()
+    private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactAddBinding.inflate(layoutInflater)
@@ -53,15 +56,15 @@ class ContactAddActivity : AppCompatActivity() {
             gender = binding.addGenderEditText.text.toString(),
             relation = binding.addRelationEditText.text.toString()
         )
-
-        Thread {
+        BackgroundHelper.execute {
             try {
                 contactDAO.addItem(contact)
             } catch(err: Exception) {
-                Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                handler.post { Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show() }
+            } finally {
+                handler.post { finish() }
             }
-        }.start()
-        finish()
+        }
     }
 
     private fun checkEditText(): Boolean {
