@@ -41,10 +41,8 @@ class MainActivity : AppCompatActivity() {
             adapter.addItem(it)
         }
 
-        val addContactActivityResultLauncher = makeAddContactActivityResultLauncher(adapter)
-
         binding.button.setOnClickListener {
-            addContactActivityResultLauncher.launch(Intent(this, ContactAddActivity::class.java))
+            startActivity(Intent(this, ContactAddActivity::class.java))
         }
 
         binding.settingButton.setOnClickListener {
@@ -96,20 +94,5 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         contactDAO.closeDatabase()
-    }
-
-    private fun makeAddContactActivityResultLauncher(adapter: ContactRecyclerAdapter): ActivityResultLauncher<Intent> {
-        return registerForActivityResult(StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val rowId = result?.data?.getLongExtra("data", -1L)
-                rowId?.let {
-                    if (it < 0L)
-                        return@let
-//                    contactDAO.getItemById(rowId)?.let { item -> adapter.addItem(listOf(item)) }
-                }
-            } else {
-                Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 }

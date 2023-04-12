@@ -11,8 +11,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Telephony
 import android.telephony.SmsManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
+import com.example.ft_hangouts.sms.SmsDatabaseDAO
 import com.example.ft_hangouts.sms.SmsInfo
 
 /*
@@ -30,15 +33,22 @@ import com.example.ft_hangouts.sms.SmsInfo
     진심 맞는듯? 제거하니까 딜레이 안줘도 됨;;;
  */
 
+/*
+    권한 설정만 해주는 클래스 만들면 좋을듯
+    브로드캐스트 리시버 따로 빼자...
+ */
+
 class ContactSmsActivity : AppCompatActivity() {
     private val permissions = arrayOf(
         Manifest.permission.SEND_SMS,
         Manifest.permission.READ_SMS,
         Manifest.permission.RECEIVE_SMS
     )
+    private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private val contact by lazy { receiveContact() }
     private var smsManager: SmsManager? = null
+    private val smsDatabaseDAO by lazy { SmsDatabaseDAO(contentResolver) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -81,7 +91,7 @@ class ContactSmsActivity : AppCompatActivity() {
                     val adapter = binding.smsChatRecyclerView.adapter as SmsChatRecyclerAdapter
                     val curr = adapter.currentList.toMutableList()
 
-                    curr.add(SmsInfo(message, 2))
+                    curr.add(SmsInfo(message, System.currentTimeMillis(),2))
                     adapter.submitList(curr)
                     binding.sendSmsEditText.text.clear()
                 } else {
@@ -99,7 +109,7 @@ class ContactSmsActivity : AppCompatActivity() {
                     val adapter = binding.smsChatRecyclerView.adapter as SmsChatRecyclerAdapter
                     val curr = adapter.currentList.toMutableList()
 
-                    curr.add(SmsInfo(newMessage, 1))
+                    curr.add(SmsInfo(newMessage, System.currentTimeMillis(), 1))
                     adapter.submitList(curr)
                 }
             }
@@ -110,17 +120,14 @@ class ContactSmsActivity : AppCompatActivity() {
         binding.smsProfileName.text = contact.name
     }
     private fun setRecyclerView() {
-        val list = BackgroundHelper.execute { readSms() }
         val adapter = SmsChatRecyclerAdapter { len -> binding.smsChatRecyclerView.scrollToPosition(len) }
 
-        if (list == null) {
-            Toast.makeText(this, "데이터를 가져오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-        } else {
-            adapter.submitList(list)
-        }
         binding.smsChatRecyclerView.adapter = adapter
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
+        handler.post {
+            adapter.submitList(smsDatabaseDAO.getMessage(contact.phoneNumber))
+        }
     }
 
     private fun sendMessage() {
@@ -143,34 +150,6 @@ class ContactSmsActivity : AppCompatActivity() {
         } else {
             intent.getSerializableExtra("contact", Contact::class.java) as Contact
         }
-    }
-
-    private fun readSms(): List<SmsInfo> {
-        val numberCol = Telephony.TextBasedSmsColumns.ADDRESS
-        val textCol = Telephony.TextBasedSmsColumns.BODY
-        val typeCol = Telephony.TextBasedSmsColumns.TYPE
-
-        val projection = arrayOf(numberCol, textCol, typeCol)
-        val cursor = contentResolver.query(
-            Telephony.Sms.CONTENT_URI,
-            projection,
-            "$numberCol=?",
-            arrayOf(contact.phoneNumber),
-            null
-        )
-
-        val textColIdx = cursor!!.getColumnIndex(textCol)
-        val typeColIdx = cursor.getColumnIndex(typeCol)
-
-        val smsList = mutableListOf<SmsInfo>()
-        while (cursor.moveToNext()) {
-            val text = cursor.getString(textColIdx)
-            val type = cursor.getInt(typeColIdx)
-
-            smsList += SmsInfo(text, type)
-        }
-        cursor.close()
-        return smsList.reversed()
     }
 
     private fun parseSmsMessage(intent: Intent): String {
