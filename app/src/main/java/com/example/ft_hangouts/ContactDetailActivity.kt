@@ -4,8 +4,10 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.telecom.TelecomManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,39 +19,37 @@ class ContactDetailActivity : AppCompatActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val contactDAO = ContactDatabaseDAO()
     private val id by lazy { intent.getLongExtra("id", -1) }
+    private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
     private lateinit var contact: Contact
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         requestCallPermission()
 
-        contact = contactDAO.getItemById(id)?.let {
-            binding.detailNameValueText.text = it.name
-            binding.detailPhoneNumberValueText.text = it.phoneNumber
-            binding.detailEmailValueText.text = it.email
-            binding.detailGenderValueText.text = it.gender
-            binding.detailRelationValueText.text = it.relation
-            it
-        } ?: run { Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-            finish()
-            Contact(0, "", "", "", "", "")
-        }
-
-        setBottomNavItemListener(contact)
+        getContactInfoAndUpdateUI()
     }
 
     override fun onResume() {
         super.onResume()
-        contact = contactDAO.getItemById(id)?.let {
-            binding.detailNameValueText.text = it.name
-            binding.detailPhoneNumberValueText.text = it.phoneNumber
-            binding.detailEmailValueText.text = it.email
-            binding.detailGenderValueText.text = it.gender
-            binding.detailRelationValueText.text = it.relation
-            it
-        } ?: run { Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-            finish()
-            Contact(0, "", "", "", "", "")
+        getContactInfoAndUpdateUI()
+    }
+
+    private fun getContactInfoAndUpdateUI() {
+        BackgroundHelper.execute {
+            try {
+                contact = contactDAO.getItemById(id)
+                handler.post {
+                    binding.detailNameValueText.text = contact.name
+                    binding.detailPhoneNumberValueText.text = contact.phoneNumber
+                    binding.detailEmailValueText.text = contact.email
+                    binding.detailGenderValueText.text = contact.gender
+                    binding.detailRelationValueText.text = contact.relation
+                    setBottomNavItemListener(contact)
+                }
+            } catch (err: Exception) {
+                Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
         }
     }
 
@@ -110,13 +110,19 @@ class ContactDetailActivity : AppCompatActivity() {
     }
 
     private fun deleteContact() {
-        contactDAO.deleteById(id).let {
-            it?.let {
-                Toast.makeText(this, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-            } ?: run {
-                Toast.makeText(this, "삭제가 실패했습니다.", Toast.LENGTH_SHORT).show()
+        BackgroundHelper.execute {
+            try {
+                contactDAO.deleteById(id)
+                handler.post {
+                    Toast.makeText(this, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+            } catch (err: Exception) {
+                handler.post {
+                    Toast.makeText(this, "삭제가 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            } finally {
+                handler.post { finish() }
             }
-            finish()
         }
     }
 }

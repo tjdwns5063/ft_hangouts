@@ -151,6 +151,7 @@ class ContactDatabaseDAO {
             val selectionArgs = arrayOf("$rowId")
             val deletedRows =
                 db.delete(ContactContract.ContactEntry.TABLE_NAME, selection, selectionArgs)
+            if (deletedRows < 0) throw IllegalStateException("can't delete this rowId $rowId")
             return deletedRows
         }
     }
