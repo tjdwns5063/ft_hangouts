@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -23,45 +24,54 @@ import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val contactDAO = ContactDatabaseDAO()
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
+    private val viewModel = MainViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
 
         setAppBarColor()
-        val adapter = ContactRecyclerAdapter {
-            val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
-            val position = binding.contactRecyclerView.getChildLayoutPosition(it)
-            goToDetailActivity(adapter.getIdByPosition(position))
+        setRecyclerView()
+        binding.button.setOnClickListener { goToAddActivity() }
+        binding.settingButton.setOnClickListener { setPopUpMenu(it) }
+    }
+
+    private fun goToAddActivity() {
+        startActivity(Intent(this, ContactAddActivity::class.java))
+    }
+
+    private fun setPopUpMenu(view: View) {
+        val popupMenu = PopupMenu(this, view)
+
+        popupMenu.setOnMenuItemClickListener { menu ->
+            when (menu.itemId) {
+                R.id.main_header_color_change_menu -> {
+                    goToAppBarChangeActivity()
+                    true
+                }
+                else -> false
+            }
         }
+
+        popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
+        popupMenu.show()
+    }
+
+    private fun setRecyclerView() {
+        val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }
+
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        updateRecyclerView(adapter)
+    }
 
-        getAllContactAndUpdateRecyclerView(adapter)
+    private fun contactRecyclerItemOnClick(view: View) {
+        val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
+        val position = binding.contactRecyclerView.getChildLayoutPosition(view)
 
-        binding.button.setOnClickListener {
-            startActivity(Intent(this, ContactAddActivity::class.java))
-        }
-
-        binding.settingButton.setOnClickListener {
-            val popupMenu = PopupMenu(this, it)
-
-            popupMenu.setOnMenuItemClickListener { menu ->
-                when (menu.itemId) {
-                    R.id.main_header_color_change_menu -> {
-                        goToAppBarChangeActivity()
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
-            popupMenu.show()
-        }
+        goToDetailActivity(adapter.getIdByPosition(position))
     }
 
     private fun goToAppBarChangeActivity() {
@@ -70,28 +80,14 @@ class MainActivity : BaseActivity() {
         startActivity(intent)
     }
 
-    override fun onResume() {
-        super.onResume()
-        val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
-
-        setAppBarColor()
-        getAllContactAndUpdateRecyclerView(adapter)
-    }
-
     private fun setAppBarColor() {
-        val color = with(SharedPreferenceUtils.getAppbarColor()) {
-            if (this == Int.MIN_VALUE)
-                getColor(R.color.main_background)
-            else
-                this
-        }
-        binding.mainLayout.backgroundTintList = ColorStateList.valueOf(color)
+        binding.mainLayout.backgroundTintList = ColorStateList.valueOf(viewModel.getAppbarColor())
     }
 
-    private fun getAllContactAndUpdateRecyclerView(adapter: ContactRecyclerAdapter) {
+    private fun updateRecyclerView(adapter: ContactRecyclerAdapter) {
         BackgroundHelper.execute {
             try {
-                val list = contactDAO.getAllItems()
+                val list = viewModel.getAllContact()
                 handler.post { adapter.addItem(list) }
             } catch (err: Exception) {
                 Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
@@ -106,8 +102,16 @@ class MainActivity : BaseActivity() {
         startActivity(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
+
+        setAppBarColor()
+        updateRecyclerView(adapter)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-        contactDAO.closeDatabase()
+        viewModel.closeDatabase()
     }
 }

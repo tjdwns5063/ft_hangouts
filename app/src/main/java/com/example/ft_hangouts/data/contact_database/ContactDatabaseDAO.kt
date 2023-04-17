@@ -6,56 +6,6 @@ import com.example.ft_hangouts.BackgroundHelper
 
 class ContactDatabaseDAO {
     private val dbHelper: ContactHelper = ContactHelper.createDatabase()
-    private val backgroundHelper = BackgroundHelper
-//    fun getAllItems(): List<Contact>? {
-//        return try {
-//            backgroundHelper.execute {
-//                dbHelper.getAllItems()
-//            }
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//
-//    fun getItemById(rowId: Long): Contact? {
-//        return try {
-//            backgroundHelper.execute {
-//                dbHelper.getItemById(rowId)
-//            }
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//
-//    fun addItem(contact: Contact): Long? {
-//        return try {
-//            backgroundHelper.execute {
-//                dbHelper.addItem(contact)
-//            }
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//
-//    fun deleteById(rowId: Long): Int? {
-//        return try {
-//            backgroundHelper.execute {
-//                dbHelper.deleteById(rowId)
-//            }
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
-//
-//    fun updateById(rowId: Long, contact: Contact): Int? {
-//        return try {
-//            backgroundHelper.execute {
-//                dbHelper.updateById(rowId, contact)
-//            }
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
 
     fun closeDatabase() {
         dbHelper.close()
