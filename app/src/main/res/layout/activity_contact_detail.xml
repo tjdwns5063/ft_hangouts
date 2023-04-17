@@ -1,232 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/main_background"
-    tools:context=".ui.detail.ContactDetailActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/detail_bottom_nav"
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.ft_hangouts.ui.detail.ContactDetailViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/contact_detail_bottom_menu"/>
+        android:layout_height="match_parent"
+        android:background="@color/main_background"
+        tools:context=".ui.detail.ContactDetailActivity">
 
-    <TextView
-        android:id="@+id/contact_detail_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/contact_detail_title_text"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        style="@style/title_style" />
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/detail_bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/contact_detail_bottom_menu" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/detail_name_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/contact_detail_title"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="0dp">
-        <LinearLayout
+        <TextView
+            android:id="@+id/contact_detail_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/contact_detail_title_text"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            style="@style/title_style" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/detail_name_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-            <ImageView
-                android:id="@+id/detail_name_image"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/baseline_person_24"/>
+            app:layout_constraintTop_toBottomOf="@id/contact_detail_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="0dp">
 
-            <TextView
-                android:id="@+id/detail_name_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_name_text"
-                style="@style/detail_item_text_style"/>
-
-            <TextView
-                android:id="@+id/detail_name_value_text"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_name_text"
-                style="@style/detail_item_text_style" />
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/detail_phone_number_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/detail_name_card"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="0dp">
-        <LinearLayout
+                <ImageView
+                    android:id="@+id/detail_name_image"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/baseline_person_24" />
+
+                <TextView
+                    android:id="@+id/detail_name_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_name_text"
+                    style="@style/detail_item_text_style" />
+
+                <TextView
+                    android:id="@+id/detail_name_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.contact.name}"
+                    style="@style/detail_item_text_style" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/detail_phone_number_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-            <ImageView
-                android:id="@+id/detail_phone_number_image"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/baseline_call_24" />
+            app:layout_constraintTop_toBottomOf="@id/detail_name_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="0dp">
 
-            <TextView
-                android:id="@+id/detail_phone_number_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_phone_number_text"
-                style="@style/detail_item_text_style"/>
-
-            <TextView
-                android:id="@+id/detail_phone_number_value_text"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_phone_number_text"
-                style="@style/detail_item_text_style"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/detail_email_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/detail_phone_number_card"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="0dp">
-        <LinearLayout
+                <ImageView
+                    android:id="@+id/detail_phone_number_image"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/baseline_call_24" />
+
+                <TextView
+                    android:id="@+id/detail_phone_number_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_phone_number_text"
+                    style="@style/detail_item_text_style" />
+
+                <TextView
+                    android:id="@+id/detail_phone_number_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.contact.phoneNumber}"
+                    style="@style/detail_item_text_style" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/detail_email_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-            <ImageView
-                android:id="@+id/detail_email_image"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/baseline_email_32" />
+            app:layout_constraintTop_toBottomOf="@id/detail_phone_number_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="0dp">
 
-            <TextView
-                android:id="@+id/detail_email_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_email_text"
-                style="@style/detail_item_text_style"/>
-
-            <TextView
-                android:id="@+id/detail_email_value_text"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_email_text"
-                style="@style/detail_item_text_style"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/detail_gender_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/detail_email_card"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="0dp">
-        <LinearLayout
+                <ImageView
+                    android:id="@+id/detail_email_image"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/baseline_email_32" />
+
+                <TextView
+                    android:id="@+id/detail_email_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_email_text"
+                    style="@style/detail_item_text_style" />
+
+                <TextView
+                    android:id="@+id/detail_email_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.contact.email}"
+                    style="@style/detail_item_text_style" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/detail_gender_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-            <ImageView
-                android:id="@+id/detail_gender_image"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/baseline_man_4_32" />
+            app:layout_constraintTop_toBottomOf="@id/detail_email_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="0dp">
 
-            <TextView
-                android:id="@+id/detail_gender_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_gender_text"
-                style="@style/detail_item_text_style"/>
-
-            <TextView
-                android:id="@+id/detail_gender_value_text"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_gender_text"
-                style="@style/detail_item_text_style"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/detail_relation_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/detail_gender_card"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginVertical="16dp"
-        android:layout_marginHorizontal="16dp"
-        app:cardCornerRadius="15dp"
-        app:cardElevation="0dp">
-        <LinearLayout
+                <ImageView
+                    android:id="@+id/detail_gender_image"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/baseline_man_4_32" />
+
+                <TextView
+                    android:id="@+id/detail_gender_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_gender_text"
+                    style="@style/detail_item_text_style" />
+
+                <TextView
+                    android:id="@+id/detail_gender_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.contact.gender}"
+                    style="@style/detail_item_text_style" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/detail_relation_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:gravity="center_vertical">
-            <ImageView
-                android:id="@+id/detail_relation_image"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="12dp"
-                android:src="@drawable/baseline_diversity_3_32" />
+            app:layout_constraintTop_toBottomOf="@id/detail_gender_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginVertical="16dp"
+            android:layout_marginHorizontal="16dp"
+            app:cardCornerRadius="15dp"
+            app:cardElevation="0dp">
 
-            <TextView
-                android:id="@+id/detail_relation_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_relation_text"
-                style="@style/detail_item_text_style"/>
-
-            <TextView
-                android:id="@+id/detail_relation_value_text"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_relation_text"
-                style="@style/detail_item_text_style"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/detail_relation_image"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/baseline_diversity_3_32" />
+
+                <TextView
+                    android:id="@+id/detail_relation_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_relation_text"
+                    style="@style/detail_item_text_style" />
+
+                <TextView
+                    android:id="@+id/detail_relation_value_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.contact.relation}"
+                    style="@style/detail_item_text_style" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
 
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

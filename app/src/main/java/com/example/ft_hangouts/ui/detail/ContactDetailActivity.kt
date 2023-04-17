@@ -5,7 +5,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.telecom.TelecomManager
@@ -15,7 +14,6 @@ import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
@@ -23,41 +21,19 @@ import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 
 class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
-    private val contactDAO = ContactDatabaseDAO()
     private val id by lazy { intent.getLongExtra("id", -1) }
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private lateinit var contact: Contact
+    private val viewModel by lazy { ContactDetailViewModel(handler, id) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding.viewModel = viewModel
         setContentView(binding.root)
         requestCallPermission()
-
-        getContactInfoAndUpdateUI()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        getContactInfoAndUpdateUI()
-    }
-
-    private fun getContactInfoAndUpdateUI() {
-        BackgroundHelper.execute {
-            try {
-                contact = contactDAO.getItemById(id)
-                handler.post {
-                    binding.detailNameValueText.text = contact.name
-                    binding.detailPhoneNumberValueText.text = contact.phoneNumber
-                    binding.detailEmailValueText.text = contact.email
-                    binding.detailGenderValueText.text = contact.gender
-                    binding.detailRelationValueText.text = contact.relation
-                    setBottomNavItemListener(contact)
-                }
-            } catch (err: Exception) {
-                Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-                finish()
-            }
+        viewModel.contact.observe(this) {
+            it?.let { setBottomNavItemListener(it) }
         }
     }
+
 
     private fun setBottomNavItemListener(contact: Contact) {
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
@@ -66,7 +42,7 @@ class ContactDetailActivity : BaseActivity() {
                     EventDialog.showEventDialog(
                         fragmentManager = supportFragmentManager,
                         message = "연락처를 영구히 삭제하시겠습니까?",
-                        onClick = { _, _ -> deleteContact() })
+                        onClick = { _, _ -> viewModel.deleteContactById(id) })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
                 R.id.detail_bottom_call -> { call(contact.phoneNumber) }
@@ -114,23 +90,6 @@ class ContactDetailActivity : BaseActivity() {
             putExtra("contact", contact)
         }
         startActivity(intent)
-    }
-
-    private fun deleteContact() {
-        BackgroundHelper.execute {
-            try {
-                contactDAO.deleteById(id)
-                handler.post {
-                    Toast.makeText(this, "연락처가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
-                }
-            } catch (err: Exception) {
-                handler.post {
-                    Toast.makeText(this, "삭제가 실패했습니다.", Toast.LENGTH_SHORT).show()
-                }
-            } finally {
-                handler.post { finish() }
-            }
-        }
     }
 }
 
