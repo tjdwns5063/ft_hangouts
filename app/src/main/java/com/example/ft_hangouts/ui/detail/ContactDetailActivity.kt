@@ -28,6 +28,7 @@ class ContactDetailActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.viewModel = viewModel
+        binding.lifecycleOwner = this
 
         setContentView(binding.root)
         requestCallPermission()
@@ -53,7 +54,7 @@ class ContactDetailActivity : BaseActivity() {
                         onClick = { _, _ -> viewModel.deleteContactById(id) })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
-                R.id.detail_bottom_call -> { call(contact.phoneNumber) }
+                R.id.detail_bottom_call -> { call() }
                 R.id.detail_bottom_edit -> { goToContactEditActivity(contact) }
             }
             true
@@ -77,19 +78,13 @@ class ContactDetailActivity : BaseActivity() {
         requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
     }
 
-    private fun call(phoneNumber: String) {
-        val telecomManager = getSystemService(TelecomManager::class.java)
+    private fun call() {
+        try {
+            val telecomManager = getSystemService(TelecomManager::class.java)
 
-        if (telecomManager == null) {
+            viewModel.call(telecomManager, this::checkSelfPermission)
+        } catch (err: Exception) {
             Toast.makeText(this, "전화기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
-            return
-        } else {
-            if (checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                telecomManager.placeCall(Uri.parse("tel: $phoneNumber"), null)
-            }
-            else {
-                Toast.makeText(this, "전화에 필요한 권한이 없습니다. 권한을 설정하고 다시 시도해주세요.", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

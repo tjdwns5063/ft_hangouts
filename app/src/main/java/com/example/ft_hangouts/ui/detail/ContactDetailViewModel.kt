@@ -1,8 +1,14 @@
 package com.example.ft_hangouts.ui.detail
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Handler
+import android.telecom.TelecomManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import com.example.ft_hangouts.App
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
@@ -15,6 +21,21 @@ class ContactDetailViewModel(private val handler: Handler, id: Long, private val
     val contact: LiveData<Contact>
         get() = _contact
     private val _contact = MutableLiveData<Contact>()
+
+    val name: LiveData<String>
+        get() = Transformations.map(contact) { it.name }
+
+    val phoneNumber: LiveData<String>
+        get() = Transformations.map(contact) { it.phoneNumber }
+
+    val email: LiveData<String>
+        get() = Transformations.map(contact) { it.email }
+
+    val gender: LiveData<String>
+        get() = Transformations.map(contact) { it.gender }
+
+    val relation: LiveData<String>
+        get() = Transformations.map(contact) { it.relation }
 
     init {
         getContactById(id)
@@ -48,5 +69,16 @@ class ContactDetailViewModel(private val handler: Handler, id: Long, private val
 
     fun updateContact(id: Long) {
         getContactById(id)
+    }
+
+    fun call(telecomManager: TelecomManager, checkPermission: (String) -> Int) {
+        contact.value?.let {
+            val callUri = Uri.parse("tel: ${it.phoneNumber}")
+
+            if (App.INSTANCE.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED)
+                telecomManager.placeCall(callUri, null)
+        }
+
+
     }
 }
