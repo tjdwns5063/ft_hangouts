@@ -16,11 +16,9 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
-import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.ui.BaseActivity
 
@@ -45,9 +43,8 @@ class ContactSmsActivity : BaseActivity() {
     )
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
-    private val contact by lazy { receiveContact() }
-    private var smsManager: SmsManager? = null
-    private val smsDatabaseDAO by lazy { SmsDatabaseDAO(contentResolver) }
+    private lateinit var smsManager: SmsManager
+    private val viewModel by lazy { ContactSmsViewModel(handler, receiveContact()) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -61,9 +58,8 @@ class ContactSmsActivity : BaseActivity() {
             if (allPermissionGranted) {
                 initSmsManager()
                 registerSmsReceiver()
-                setData()
                 setRecyclerView()
-                binding.smsSendBtn.setOnClickListener { sendMessage() }
+                binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
             } else {
                 finish()
             }
@@ -75,8 +71,9 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun initSmsManager() {
-        smsManager = getSystemService(SmsManager::class.java)
-        smsManager ?: run {
+        try {
+            smsManager = getSystemService(SmsManager::class.java)
+        } catch (err: Exception) {
             Toast.makeText(this, "SMS 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
             finish()
         }
@@ -87,15 +84,12 @@ class ContactSmsActivity : BaseActivity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (resultCode == Activity.RESULT_OK) {
                     val message = binding.sendSmsEditText.text.toString()
-                    val adapter = binding.smsChatRecyclerView.adapter as SmsChatRecyclerAdapter
-                    val curr = adapter.currentList.toMutableList()
 
-                    curr.add(SmsInfo(message, System.currentTimeMillis(),2))
-                    adapter.submitList(curr)
+                    viewModel.addMessage(SmsInfo(message, System.currentTimeMillis(), 2))
                     binding.sendSmsEditText.text.clear()
                 } else {
                     EventDialog("문자 메세지 전송이 실패했습니다. 재전송 하시겠습니까?") { dialog, _ ->
-                        sendMessage()
+                        onClickSmsSendButton()
                     }
                 }
             }
@@ -105,50 +99,37 @@ class ContactSmsActivity : BaseActivity() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.let {
                     val newMessage = parseSmsMessage(it)
-                    val adapter = binding.smsChatRecyclerView.adapter as SmsChatRecyclerAdapter
-                    val curr = adapter.currentList.toMutableList()
-
-                    curr.add(SmsInfo(newMessage, System.currentTimeMillis(), 1))
-                    adapter.submitList(curr)
+                    viewModel.addMessage(SmsInfo(newMessage, System.currentTimeMillis(), 1))
                 }
             }
         }, IntentFilter("android.provider.Telephony.SMS_RECEIVED"))
     }
 
-    private fun setData() {
-        binding.smsProfileName.text = contact.name
-    }
     private fun setRecyclerView() {
         val adapter = SmsChatRecyclerAdapter { len -> binding.smsChatRecyclerView.scrollToPosition(len) }
+
+        viewModel.messageList.observe(this) {
+            it?.let {
+                adapter.submitList(it)
+            }
+        }
 
         binding.smsChatRecyclerView.adapter = adapter
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
-
-        BackgroundHelper.execute {
-            try {
-                val list = smsDatabaseDAO.getMessage(contact.phoneNumber)
-                handler.post { adapter.submitList(list) }
-            } catch (err: Exception) {
-                handler.post {
-                    Toast.makeText(this, "문자메세지를 불러온는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-                    finish()
-                }
-            }
-        }
     }
 
-    private fun sendMessage() {
-        val text = binding.sendSmsEditText.text.toString()
-        val intent = Intent("SEND_SMS_SUCCESS")
-        val sendIntent = PendingIntent.getBroadcast(this, 11, intent, PendingIntent.FLAG_IMMUTABLE)
+    private fun onClickSmsSendButton() {
+        if (!this::smsManager.isInitialized) return
 
-        smsManager?.sendTextMessage(
-            contact.phoneNumber,
-            null,
-            text,
-            sendIntent,
-            null
+        viewModel.sendMessage(
+            smsManager = smsManager,
+            message = binding.sendSmsEditText.text.toString(),
+            sendIntent = PendingIntent.getBroadcast(
+                this,
+                11,
+                Intent("SEND_SMS_SUCCESS"),
+                PendingIntent.FLAG_IMMUTABLE)
         )
     }
 
