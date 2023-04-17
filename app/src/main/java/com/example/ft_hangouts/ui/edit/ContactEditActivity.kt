@@ -1,20 +1,18 @@
 package com.example.ft_hangouts.ui.edit
 
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.widget.Toast
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 import com.example.ft_hangouts.ui.BaseActivity
 
 class ContactEditActivity : BaseActivity() {
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
+    private val viewModel: ContactEditViewModel = ContactEditViewModel()
     private val contact: Contact by lazy { receiveContact() }
-    private val databaseDAO = ContactDatabaseDAO()
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +45,7 @@ class ContactEditActivity : BaseActivity() {
 
         BackgroundHelper.execute {
             try {
-                databaseDAO.updateById(contact.id, newContact)
+                viewModel.updateById(contact.id, newContact)
                 handler.post { Toast.makeText(this, "연락처가 수정되었습니다.", Toast.LENGTH_SHORT).show() }
             } catch (err: Exception) {
                 handler.post { Toast.makeText(this, "연락처 수정에 실패했습니다.", Toast.LENGTH_SHORT).show() }

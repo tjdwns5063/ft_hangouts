@@ -1,6 +1,5 @@
 package com.example.ft_hangouts.ui.main
 
-import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
@@ -8,14 +7,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.PopupMenu
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.SharedPreferenceUtils
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.abb_bar_setting.AppBarSettingActivity
@@ -25,17 +18,25 @@ import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
-    private val viewModel = MainViewModel()
+    private val viewModel by lazy { MainViewModel(handler) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.viewModel = viewModel
         setContentView(binding.root)
 
         setAppBarColor()
         setRecyclerView()
+        setErrorObserver()
         binding.button.setOnClickListener { goToAddActivity() }
         binding.settingButton.setOnClickListener { setPopUpMenu(it) }
+    }
+
+    private fun setErrorObserver() {
+        viewModel.errorHandler.observe(this) {
+            it.handleError(this)
+        }
     }
 
     private fun goToAddActivity() {
@@ -62,9 +63,14 @@ class MainActivity : BaseActivity() {
     private fun setRecyclerView() {
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }
 
+        viewModel.contactList.observe(this) {
+            it?.let {
+                adapter.addItem(it)
+            }
+        }
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        updateRecyclerView(adapter)
+        viewModel.initRecyclerList()
     }
 
     private fun contactRecyclerItemOnClick(view: View) {
@@ -81,17 +87,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setAppBarColor() {
-        binding.mainLayout.backgroundTintList = ColorStateList.valueOf(viewModel.getAppbarColor())
-    }
-
-    private fun updateRecyclerView(adapter: ContactRecyclerAdapter) {
-        BackgroundHelper.execute {
-            try {
-                val list = viewModel.getAllContact()
-                handler.post { adapter.addItem(list) }
-            } catch (err: Exception) {
-                Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-            }
+        viewModel.appBarColor.observe(this) {
+            binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
         }
     }
 
@@ -104,10 +101,10 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
 
         setAppBarColor()
-        updateRecyclerView(adapter)
+        viewModel.updateAppbarColor()
+        viewModel.initRecyclerList()
     }
 
     override fun onDestroy() {
