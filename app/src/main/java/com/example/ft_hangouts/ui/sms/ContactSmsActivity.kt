@@ -23,6 +23,7 @@ import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
+import com.example.ft_hangouts.ui.BaseActivity
 
 /*
     왜 recyclerview.scrollToPosition(idx)가 handler.postDelayed로 딜레이를 줘야만 제대로 동작할까...?
@@ -37,7 +38,7 @@ import com.example.ft_hangouts.data.sms_database.SmsInfo
     브로드캐스트 리시버 따로 빼자...
  */
 
-class ContactSmsActivity : AppCompatActivity() {
+class ContactSmsActivity : BaseActivity() {
     private val permissions = arrayOf(
         Manifest.permission.SEND_SMS,
         Manifest.permission.READ_SMS,

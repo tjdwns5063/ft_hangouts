@@ -9,8 +9,9 @@ import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
+import com.example.ft_hangouts.ui.BaseActivity
 
-class ContactEditActivity : AppCompatActivity() {
+class ContactEditActivity : BaseActivity() {
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
     private val contact: Contact by lazy { receiveContact() }
     private val databaseDAO = ContactDatabaseDAO()

@@ -17,10 +17,11 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
+import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 
-class ContactDetailActivity : AppCompatActivity() {
+class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val contactDAO = ContactDatabaseDAO()
     private val id by lazy { intent.getLongExtra("id", -1) }

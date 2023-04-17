@@ -10,12 +10,12 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.contact_database.*
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
+import com.example.ft_hangouts.ui.BaseActivity
 
-class ContactAddActivity : AppCompatActivity() {
+class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val contactDAO = ContactDatabaseDAO()
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
