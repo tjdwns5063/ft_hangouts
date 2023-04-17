@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.telecom.TelecomManager
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.ft_hangouts.BackgroundHelper
@@ -23,15 +24,22 @@ class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val id by lazy { intent.getLongExtra("id", -1) }
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactDetailViewModel(handler, id) }
+    private val viewModel by lazy { ContactDetailViewModel(handler, id, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.viewModel = viewModel
+
         setContentView(binding.root)
         requestCallPermission()
         viewModel.contact.observe(this) {
             it?.let { setBottomNavItemListener(it) }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.updateContact(id)
     }
 
 

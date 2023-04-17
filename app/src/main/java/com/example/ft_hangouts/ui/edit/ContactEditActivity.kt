@@ -13,7 +13,7 @@ class ContactEditActivity : BaseActivity() {
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
     private val contact: Contact by lazy { receiveContact() }
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactEditViewModel(handler) }
+    private val viewModel by lazy { ContactEditViewModel(handler, super.baseViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

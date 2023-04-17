@@ -8,22 +8,20 @@ import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseDeleteErrorHandler
 import com.example.ft_hangouts.error.DatabaseErrorHandler
+import com.example.ft_hangouts.error.DatabaseSuccessHandler
+import com.example.ft_hangouts.ui.BaseViewModel
 
-class ContactAddViewModel(private val handler: Handler) {
+class ContactAddViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel) {
     private val contactDAO = ContactDatabaseDAO()
-
-    val errorHandler: LiveData<DatabaseErrorHandler>
-        get() = _errorHandler
-    private val _errorHandler = MutableLiveData<DatabaseErrorHandler>()
 
     fun addContact(contact: Contact) {
         BackgroundHelper.execute {
             try {
                 contactDAO.addItem(contact)
             } catch (err: Exception) {
-                handler.post { _errorHandler.value = DatabaseDeleteErrorHandler() }
+                handler.post { baseViewModel.submitHandler(DatabaseDeleteErrorHandler()) }
             } finally {
-                handler.post { _errorHandler.value = null }
+                handler.post { baseViewModel.submitHandler(DatabaseSuccessHandler()) }
             }
         }
     }

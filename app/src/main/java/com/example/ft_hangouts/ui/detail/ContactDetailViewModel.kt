@@ -6,20 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.error.DatabaseDeleteErrorHandler
-import com.example.ft_hangouts.error.DatabaseErrorHandler
-import com.example.ft_hangouts.error.DatabaseReadErrorHandler
+import com.example.ft_hangouts.error.*
+import com.example.ft_hangouts.ui.BaseViewModel
 
-class ContactDetailViewModel(private val handler: Handler, id: Long) {
+class ContactDetailViewModel(private val handler: Handler, id: Long, private val baseViewModel: BaseViewModel) {
     private val contactDatabaseDAO = ContactDatabaseDAO()
 
     val contact: LiveData<Contact>
         get() = _contact
     private val _contact = MutableLiveData<Contact>()
-
-    val errorHandler: LiveData<DatabaseErrorHandler>
-        get() = _errorHandler
-    private val _errorHandler = MutableLiveData<DatabaseErrorHandler>()
 
     init {
         getContactById(id)
@@ -31,11 +26,10 @@ class ContactDetailViewModel(private val handler: Handler, id: Long) {
                 val contact = contactDatabaseDAO.getItemById(id)
 
                 handler.post { _contact.value = contact }
-                println(contact)
             } catch (err: Exception) {
-                handler.post { _errorHandler.value = DatabaseReadErrorHandler() }
+                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
             } finally {
-                handler.post { _errorHandler.value = null }
+                handler.post { baseViewModel.submitHandler(null) }
             }
         }
     }
@@ -45,10 +39,14 @@ class ContactDetailViewModel(private val handler: Handler, id: Long) {
             try {
                 contactDatabaseDAO.deleteById(id)
             } catch (err: Exception) {
-                handler.post { _errorHandler.value = DatabaseDeleteErrorHandler() }
+                handler.post { baseViewModel.submitHandler(DatabaseDeleteErrorHandler()) }
             } finally {
-                handler.post { _errorHandler.value = null }
+                handler.post { baseViewModel.submitHandler(DatabaseSuccessHandler()) }
             }
         }
+    }
+
+    fun updateContact(id: Long) {
+        getContactById(id)
     }
 }

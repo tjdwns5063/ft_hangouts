@@ -44,7 +44,7 @@ class ContactSmsActivity : BaseActivity() {
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private lateinit var smsManager: SmsManager
-    private val viewModel by lazy { ContactSmsViewModel(handler, receiveContact()) }
+    private val viewModel by lazy { ContactSmsViewModel(handler, super.baseViewModel, receiveContact()) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)

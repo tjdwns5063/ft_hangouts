@@ -1,30 +1,24 @@
 package com.example.ft_hangouts.ui.edit
 
 import android.os.Handler
-import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.error.DatabaseErrorHandler
+import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.error.DatabaseUpdateErrorHandler
+import com.example.ft_hangouts.ui.BaseViewModel
 
-class ContactEditViewModel(private val handler: Handler) {
+class ContactEditViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel) {
     private val databaseDAO = ContactDatabaseDAO()
-
-    val errorHandler: LiveData<DatabaseErrorHandler>
-        get() = _errorHandler
-    private val _errorHandler = MutableLiveData<DatabaseErrorHandler>()
 
     fun updateContactById(rowId: Long, newContact: Contact) {
         BackgroundHelper.execute {
             try {
                 databaseDAO.updateById(rowId, newContact)
             } catch (err: Exception) {
-                handler.post { _errorHandler.value = DatabaseUpdateErrorHandler() }
+                handler.post { baseViewModel.submitHandler(DatabaseUpdateErrorHandler()) }
             } finally {
-                handler.post { _errorHandler.value = null }
+                handler.post { baseViewModel.submitHandler(DatabaseSuccessHandler()) }
             }
         }
     }

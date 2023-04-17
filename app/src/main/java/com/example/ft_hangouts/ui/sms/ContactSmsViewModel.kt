@@ -12,8 +12,9 @@ import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.error.DatabaseErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
+import com.example.ft_hangouts.ui.BaseViewModel
 
-class ContactSmsViewModel(private val handler: Handler, contact: Contact) {
+class ContactSmsViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel, contact: Contact) {
     private val smsDatabaseDAO = SmsDatabaseDAO(App.INSTANCE.contentResolver)
 
     val messageList: LiveData<List<SmsInfo>>
@@ -40,9 +41,9 @@ class ContactSmsViewModel(private val handler: Handler, contact: Contact) {
                 val list = smsDatabaseDAO.getMessage(phoneNumber)
                 handler.post { _messageList.value = list }
             } catch (err: Exception) {
-                handler.post { _errorHandler.value = DatabaseReadErrorHandler() }
+                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
             } finally {
-                handler.post { _errorHandler.value = null }
+                handler.post { baseViewModel.submitHandler(null) }
             }
         }
     }

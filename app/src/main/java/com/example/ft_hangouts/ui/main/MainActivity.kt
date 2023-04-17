@@ -18,7 +18,7 @@ import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
-    private val viewModel by lazy { MainViewModel(handler) }
+    private val viewModel by lazy { MainViewModel(handler, super.baseViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,17 +28,8 @@ class MainActivity : BaseActivity() {
 
         setAppBarColor()
         setRecyclerView()
-        setErrorObserver()
         binding.button.setOnClickListener { goToAddActivity() }
         binding.settingButton.setOnClickListener { setPopUpMenu(it) }
-    }
-
-    private fun setErrorObserver() {
-        viewModel.errorHandler.observe(this) {
-            it ?: return@observe
-
-            it.handleError(this)
-        }
     }
 
     private fun goToAddActivity() {

@@ -9,19 +9,16 @@ import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
+import com.example.ft_hangouts.ui.BaseViewModel
 import com.example.ft_hangouts.ui.abb_bar_setting.AppBarSettingActivity
 
 
-class MainViewModel(private val handler: Handler) {
+class MainViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel) {
     private val contactDatabaseDAO: ContactDatabaseDAO = ContactDatabaseDAO()
 
     val contactList: LiveData<List<Contact>>
         get() = _contactList
     private val _contactList = MutableLiveData<List<Contact>>()
-
-    val errorHandler: LiveData<DatabaseErrorHandler>
-        get() = _errorHandler
-    private val _errorHandler = MutableLiveData<DatabaseErrorHandler>()
 
     val appBarColor: LiveData<Int>
         get() = _appBarColor
@@ -37,9 +34,9 @@ class MainViewModel(private val handler: Handler) {
             try {
                 handler.post { _contactList.value = contactDatabaseDAO.getAllItems() }
             } catch (err: Exception) {
-                handler.post { _errorHandler.value = DatabaseReadErrorHandler() }
+                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
             } finally {
-                handler.post { _errorHandler.value = null }
+                handler.post { baseViewModel.submitHandler(null) }
             }
         }
     }

@@ -16,24 +16,14 @@ import com.example.ft_hangouts.ui.BaseActivity
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactAddViewModel(handler) }
+    private val viewModel by lazy { ContactAddViewModel(handler, baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setErrorObserver()
         setFocusChangeListener()
         setClickListener()
-    }
-
-    private fun setErrorObserver() {
-        viewModel.errorHandler.observe(this) {
-            it ?: finish()
-
-            it.handleError(this)
-            finish()
-        }
     }
 
     private fun setClickListener() {
