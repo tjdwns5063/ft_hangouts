@@ -22,21 +22,6 @@ class ContactDetailViewModel(private val handler: Handler, id: Long, private val
         get() = _contact
     private val _contact = MutableLiveData<Contact>()
 
-    val name: LiveData<String>
-        get() = Transformations.map(contact) { it.name }
-
-    val phoneNumber: LiveData<String>
-        get() = Transformations.map(contact) { it.phoneNumber }
-
-    val email: LiveData<String>
-        get() = Transformations.map(contact) { it.email }
-
-    val gender: LiveData<String>
-        get() = Transformations.map(contact) { it.gender }
-
-    val relation: LiveData<String>
-        get() = Transformations.map(contact) { it.relation }
-
     init {
         getContactById(id)
     }

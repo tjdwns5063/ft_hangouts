@@ -71,7 +71,7 @@
                     android:id="@+id/detail_name_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.name}"
+                    android:text="@{viewModel.contact.name}"
                     style="@style/detail_item_text_style" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -113,7 +113,7 @@
                     android:id="@+id/detail_phone_number_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.phoneNumber}"
+                    android:text="@{viewModel.contact.phoneNumber}"
                     style="@style/detail_item_text_style" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -155,7 +155,7 @@
                     android:id="@+id/detail_email_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.email}"
+                    android:text="@{viewModel.contact.email}"
                     style="@style/detail_item_text_style" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -197,7 +197,7 @@
                     android:id="@+id/detail_gender_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.gender}"
+                    android:text="@{viewModel.contact.gender}"
                     style="@style/detail_item_text_style" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -239,7 +239,7 @@
                     android:id="@+id/detail_relation_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.relation}"
+                    android:text="@{viewModel.contact.relation}"
                     style="@style/detail_item_text_style" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
