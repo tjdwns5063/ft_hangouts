@@ -1,4 +1,4 @@
-package com.example.ft_hangouts.sms_database
+package com.example.ft_hangouts.data.sms_database
 import android.content.ContentResolver
 import android.provider.Telephony
 

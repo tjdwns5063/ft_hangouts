@@ -1,4 +1,4 @@
-package com.example.ft_hangouts
+package com.example.ft_hangouts.ui.abb_bar_setting
 
 import android.app.Activity
 import android.content.Intent
@@ -6,8 +6,9 @@ import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.annotation.ColorInt
-import androidx.core.graphics.toColorLong
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityAppBarSettingBinding
+import com.example.ft_hangouts.ui.main.MainActivity
 
 class AppBarSettingActivity : AppCompatActivity() {
     private val binding by lazy { ActivityAppBarSettingBinding.inflate(layoutInflater) }

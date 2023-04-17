@@ -18,24 +18,24 @@
         android:theme="@style/Theme.Ft_hangouts"
         tools:targetApi="31">
         <activity
-            android:name=".AppBarSettingActivity"
+            android:name=".ui.abb_bar_setting.AppBarSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ContactEditActivity"
+            android:name=".ui.edit.ContactEditActivity"
             android:exported="false" />
         <activity
-            android:name=".ContactSmsActivity"
+            android:name=".ui.sms.ContactSmsActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ContactDetailActivity"
+            android:name=".ui.detail.ContactDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".ContactAddActivity"
+            android:name=".ui.add.ContactAddActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

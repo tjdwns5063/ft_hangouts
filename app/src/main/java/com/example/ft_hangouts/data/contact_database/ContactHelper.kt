@@ -1,4 +1,4 @@
-package com.example.ft_hangouts.contact_database
+package com.example.ft_hangouts.data.contact_database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

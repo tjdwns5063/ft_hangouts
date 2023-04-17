@@ -1,13 +1,13 @@
-package com.example.ft_hangouts
+package com.example.ft_hangouts.ui.edit
 
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.text.Editable
 import android.widget.Toast
-import com.example.ft_hangouts.contact_database.Contact
-import com.example.ft_hangouts.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.BackgroundHelper
+import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 
 class ContactEditActivity : AppCompatActivity() {

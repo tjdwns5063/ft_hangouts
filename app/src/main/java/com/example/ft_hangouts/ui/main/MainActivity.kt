@@ -1,26 +1,27 @@
-package com.example.ft_hangouts
+package com.example.ft_hangouts.ui.main
 
 import android.app.Activity
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.util.Log
-import android.view.View
 import android.widget.PopupMenu
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.ft_hangouts.contact_database.*
-import com.example.ft_hangouts.databinding.ActivityAppBarSettingBinding
+import com.example.ft_hangouts.BackgroundHelper
+import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.SharedPreferenceUtils
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityMainBinding
+import com.example.ft_hangouts.ui.BaseActivity
+import com.example.ft_hangouts.ui.abb_bar_setting.AppBarSettingActivity
+import com.example.ft_hangouts.ui.add.ContactAddActivity
+import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val contactDAO = ContactDatabaseDAO()
     private val appbarSettingActivityLauncher = registerChangeAppBarResult()
@@ -66,7 +67,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.i("main", "onresume called")
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
 
         getAllContactAndUpdateRecyclerView(adapter)

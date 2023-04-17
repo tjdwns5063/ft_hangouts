@@ -1,4 +1,4 @@
-package com.example.ft_hangouts
+package com.example.ft_hangouts.ui.sms
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,9 +7,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.databinding.SmsChatRecyclerReceiveItemViewBinding
 import com.example.ft_hangouts.databinding.SmsChatRecyclerSendItemViewBinding
-import com.example.ft_hangouts.sms_database.SmsInfo
+import com.example.ft_hangouts.data.sms_database.SmsInfo
 
-class SmsChatRecyclerAdapter(private val scrollToBottom: (Int) -> Unit): ListAdapter<SmsInfo, RecyclerView.ViewHolder>(callback) {
+class SmsChatRecyclerAdapter(private val scrollToBottom: (Int) -> Unit): ListAdapter<SmsInfo, RecyclerView.ViewHolder>(
+    callback
+) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             1 -> SmsChatRecyclerReceiveViewHolder.from(parent)

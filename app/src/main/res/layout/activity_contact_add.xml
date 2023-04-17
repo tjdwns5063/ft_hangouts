@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@color/main_background"
     android:padding="10dp"
-    tools:context=".ContactAddActivity">
+    tools:context=".ui.add.ContactAddActivity">
 
     <TextView
         android:id="@+id/contact_add_title"

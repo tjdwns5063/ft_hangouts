@@ -1,4 +1,4 @@
-package com.example.ft_hangouts.custom_view
+package com.example.ft_hangouts.ui.custom_view
 
 import android.content.res.Resources
 import android.graphics.*

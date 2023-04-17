@@ -1,4 +1,4 @@
-package com.example.ft_hangouts
+package com.example.ft_hangouts.ui.detail
 
 import android.Manifest
 import android.content.Intent
@@ -11,9 +11,14 @@ import android.os.Handler
 import android.telecom.TelecomManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.ft_hangouts.contact_database.Contact
-import com.example.ft_hangouts.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.BackgroundHelper
+import com.example.ft_hangouts.EventDialog
+import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
+import com.example.ft_hangouts.ui.edit.ContactEditActivity
+import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 
 class ContactDetailActivity : AppCompatActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
@@ -56,10 +61,11 @@ class ContactDetailActivity : AppCompatActivity() {
     private fun setBottomNavItemListener(contact: Contact) {
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
             when(menu.itemId) {
-                R.id.detail_bottom_delete -> { EventDialog.showEventDialog(
-                    fragmentManager = supportFragmentManager,
-                    message = "연락처를 영구히 삭제하시겠습니까?",
-                    onClick = { _, _ -> deleteContact() })
+                R.id.detail_bottom_delete -> {
+                    EventDialog.showEventDialog(
+                        fragmentManager = supportFragmentManager,
+                        message = "연락처를 영구히 삭제하시겠습니까?",
+                        onClick = { _, _ -> deleteContact() })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
                 R.id.detail_bottom_call -> { call(contact.phoneNumber) }
