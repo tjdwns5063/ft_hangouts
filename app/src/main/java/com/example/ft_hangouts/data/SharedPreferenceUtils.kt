@@ -26,6 +26,6 @@ object SharedPreferenceUtils {
             Context.MODE_PRIVATE
         )
 
-        return sharedPreference.getInt("color", 0)
+        return sharedPreference.getInt("color", Int.MIN_VALUE)
     }
 }

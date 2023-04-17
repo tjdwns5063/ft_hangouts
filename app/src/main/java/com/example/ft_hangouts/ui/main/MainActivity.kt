@@ -24,7 +24,6 @@ import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val contactDAO = ContactDatabaseDAO()
-    private val appbarSettingActivityLauncher = registerChangeAppBarResult()
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +32,7 @@ class MainActivity : BaseActivity() {
 
         setContentView(binding.root)
 
+        setAppBarColor()
         val adapter = ContactRecyclerAdapter {
             val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
             val position = binding.contactRecyclerView.getChildLayoutPosition(it)
@@ -53,8 +53,7 @@ class MainActivity : BaseActivity() {
             popupMenu.setOnMenuItemClickListener { menu ->
                 when (menu.itemId) {
                     R.id.main_header_color_change_menu -> {
-                        val intent = Intent(this, AppBarSettingActivity::class.java)
-                        appbarSettingActivityLauncher.launch(intent)
+                        goToAppBarChangeActivity()
                         true
                     }
                     else -> false
@@ -65,11 +64,28 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun goToAppBarChangeActivity() {
+        val intent = Intent(this, AppBarSettingActivity::class.java)
+
+        startActivity(intent)
+    }
+
     override fun onResume() {
         super.onResume()
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
 
+        setAppBarColor()
         getAllContactAndUpdateRecyclerView(adapter)
+    }
+
+    private fun setAppBarColor() {
+        val color = with(SharedPreferenceUtils.getAppbarColor()) {
+            if (this == Int.MIN_VALUE)
+                getColor(R.color.main_background)
+            else
+                this
+        }
+        binding.mainLayout.backgroundTintList = ColorStateList.valueOf(color)
     }
 
     private fun getAllContactAndUpdateRecyclerView(adapter: ContactRecyclerAdapter) {
@@ -79,17 +95,6 @@ class MainActivity : BaseActivity() {
                 handler.post { adapter.addItem(list) }
             } catch (err: Exception) {
                 Toast.makeText(this, "연락처를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun registerChangeAppBarResult(): ActivityResultLauncher<Intent> {
-        return registerForActivityResult(StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                val intent = it.data ?: return@registerForActivityResult
-                val color = intent.getIntExtra("color", 0)
-                println(color)
-                binding.mainLayout.backgroundTintList = ColorStateList.valueOf(color)
             }
         }
     }

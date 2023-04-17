@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.annotation.ColorInt
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.databinding.ActivityAppBarSettingBinding
 import com.example.ft_hangouts.ui.main.MainActivity
 
@@ -23,24 +24,18 @@ class AppBarSettingActivity : AppCompatActivity() {
         }
 
         binding.appbarSettingOkButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-
-            intent.putExtra("color", selectedColor)
-            setResult(Activity.RESULT_OK, intent)
+            SharedPreferenceUtils.setAppbarColor(selectedColor)
             finish()
         }
 
         binding.appbarSettingDefaultButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
             val defaultColor = getColor(R.color.main_background)
 
-            intent.putExtra("color", defaultColor)
-            setResult(Activity.RESULT_OK, intent)
+            SharedPreferenceUtils.setAppbarColor(defaultColor)
             finish()
         }
 
         binding.appbarSettingCancelButton.setOnClickListener {
-            setResult(Activity.RESULT_CANCELED)
             finish()
         }
     }
