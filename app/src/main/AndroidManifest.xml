@@ -22,7 +22,8 @@
             android:exported="false" />
         <activity
             android:name=".ui.edit.ContactEditActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".ui.sms.ContactSmsActivity"
             android:exported="false"

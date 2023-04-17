@@ -11,9 +11,10 @@ import com.example.ft_hangouts.ui.BaseActivity
 
 class ContactEditActivity : BaseActivity() {
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
-    private val viewModel: ContactEditViewModel = ContactEditViewModel()
     private val contact: Contact by lazy { receiveContact() }
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
+    private val viewModel by lazy { ContactEditViewModel(handler) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -43,16 +44,8 @@ class ContactEditActivity : BaseActivity() {
             relation = binding.editRelationEditText.text.toString()
         )
 
-        BackgroundHelper.execute {
-            try {
-                viewModel.updateById(contact.id, newContact)
-                handler.post { Toast.makeText(this, "연락처가 수정되었습니다.", Toast.LENGTH_SHORT).show() }
-            } catch (err: Exception) {
-                handler.post { Toast.makeText(this, "연락처 수정에 실패했습니다.", Toast.LENGTH_SHORT).show() }
-            } finally {
-                handler.post { finish() }
-            }
-        }
+        viewModel.updateContactById(contact.id, newContact)
+        finish()
     }
 
     private fun setData() {
