@@ -2,7 +2,6 @@ package com.example.ft_hangouts.ui.add
 
 import android.content.res.ColorStateList
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.widget.ImageView
@@ -11,21 +10,30 @@ import androidx.activity.OnBackPressedCallback
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 import com.example.ft_hangouts.ui.BaseActivity
 
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
-    private val contactDAO = ContactDatabaseDAO()
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
+    private val viewModel by lazy { ContactAddViewModel(handler) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactAddBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setErrorObserver()
         setFocusChangeListener()
         setClickListener()
+    }
+
+    private fun setErrorObserver() {
+        viewModel.errorHandler.observe(this) {
+            it ?: finish()
+
+            it.handleError(this)
+            finish()
+        }
     }
 
     private fun setClickListener() {
@@ -58,15 +66,8 @@ class ContactAddActivity : BaseActivity() {
             gender = binding.addGenderEditText.text.toString(),
             relation = binding.addRelationEditText.text.toString()
         )
-        BackgroundHelper.execute {
-            try {
-                contactDAO.addItem(contact)
-            } catch (err: Exception) {
-                handler.post { Toast.makeText(this, "연락처 저장에 실패했습니다.", Toast.LENGTH_SHORT).show() }
-            } finally {
-                handler.post { finish() }
-            }
-        }
+
+        viewModel.addContact(contact)
     }
 
     private fun checkEditText(): Boolean {

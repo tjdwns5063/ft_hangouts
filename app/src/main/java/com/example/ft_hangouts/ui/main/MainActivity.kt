@@ -35,6 +35,8 @@ class MainActivity : BaseActivity() {
 
     private fun setErrorObserver() {
         viewModel.errorHandler.observe(this) {
+            it ?: return@observe
+
             it.handleError(this)
         }
     }

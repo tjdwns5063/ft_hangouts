@@ -38,6 +38,8 @@ class MainViewModel(private val handler: Handler) {
                 handler.post { _contactList.value = contactDatabaseDAO.getAllItems() }
             } catch (err: Exception) {
                 handler.post { _errorHandler.value = DatabaseReadErrorHandler() }
+            } finally {
+                handler.post { _errorHandler.value = null }
             }
         }
     }
