@@ -50,7 +50,7 @@ class ContactDetailActivity : BaseActivity() {
                 R.id.detail_bottom_delete -> {
                     EventDialog.showEventDialog(
                         fragmentManager = supportFragmentManager,
-                        message = "연락처를 영구히 삭제하시겠습니까?",
+                        message = getString(R.string.check_delete_message),
                         onClick = { _, _ -> viewModel.deleteContactById(id) })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
@@ -72,7 +72,7 @@ class ContactDetailActivity : BaseActivity() {
     private fun requestCallPermission() {
         val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (!isGranted) {
-                Toast.makeText(this, "권한을 설정을 거절하셨습니다. 몇가지 기능이 작동하지 않을 수 있습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.detail_permission_deny_message), Toast.LENGTH_SHORT).show()
             }
         }
         requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
@@ -84,7 +84,7 @@ class ContactDetailActivity : BaseActivity() {
 
             viewModel.call(telecomManager, this::checkSelfPermission)
         } catch (err: Exception) {
-            Toast.makeText(this, "전화기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.cannot_use_call_feature), Toast.LENGTH_SHORT).show()
         }
     }
 

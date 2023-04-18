@@ -5,9 +5,22 @@
     <string name="add_gender_text">성별</string>
     <string name="add_relation_text">관계</string>
     <string name="add_name_text">이름</string>
-    <string name="add_save_button">저장</string>
-    <string name="add_cancel_button">취소</string>
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
     <string name="contact_detail_title_text">연락처 정보</string>
     <string name="selected_color_text">선택된 색상 :</string>
     <string name="app_bar_setting_default_text">초기화</string>
+    <string name="language_select">언어 변경</string>
+    <string name="header_color_change">앱 바 색상 변경</string>
+    <string name="main_title">연락처</string>
+    <string name="call">통화</string>
+    <string name="sms">문자</string>
+    <string name="edit">편집</string>
+    <string name="delete">삭제</string>
+    <string name="check_delete_message">연락처를 영구히 삭제하시겠습니까?</string>
+    <string name="detail_permission_deny_message">권한을 설정을 거절하셨습니다. 몇가지 기능이 작동하지 않을 수 있습니다.</string>
+    <string name="cannot_use_call_feature">전화기능을 사용할 수 없습니다.</string>
+    <string name="cannot_use_sms_feature">SMS 기능을 사용할 수 없습니다.</string>
+    <string name="message_of_sms_send_failure">문자 메세지 전송이 실패했습니다. 재전송 하시겠습니까?</string>
+    <string name="ok">확인</string>
 </resources>

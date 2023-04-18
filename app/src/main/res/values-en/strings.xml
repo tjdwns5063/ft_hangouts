@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ft_hangouts</string>
+    <string name="add_phone_number_text">Phone Number</string>
+    <string name="add_email_text">E-mail</string>
+    <string name="add_gender_text">Gender</string>
+    <string name="add_relation_text">Relation</string>
+    <string name="add_name_text">Name</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="contact_detail_title_text">Contact Information</string>
+    <string name="selected_color_text">Selected Color :</string>
+    <string name="app_bar_setting_default_text">Initiate</string>
+    <string name="language_select">Language Select</string>
+    <string name="header_color_change">Change Color of App Bar</string>
+    <string name="main_title">Contact</string>
+    <string name="call">Call</string>
+    <string name="sms">Sms</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="check_delete_message">Are you sure you want to permanently delete the contact?</string>
+    <string name="detail_permission_deny_message">You refused to set the permission. Some features may not work.</string>
+    <string name="cannot_use_call_feature">Phone feature is unavailable.</string>
+    <string name="cannot_use_sms_feature">SMS feature is not available.</string>
+    <string name="message_of_sms_send_failure">Text message sending failed. Would you like to resend?</string>
+    <string name="ok">Okay</string>
+</resources>

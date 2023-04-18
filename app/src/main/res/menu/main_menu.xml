@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/main_header_color_change_menu"
-        android:title="앱 바 색상 변경" />
+        android:title="@string/header_color_change" />
+    <item android:id="@+id/main_language_select_menu"
+        android:title="@string/language_select" />
 </menu>

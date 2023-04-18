@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/add_cancel_button" />
+            android:text="@string/cancel" />
 
         <TextView
             android:id="@+id/appbar_setting_default_button"
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="@string/add_save_button" />
+            android:text="@string/save" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

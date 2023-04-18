@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.EventDialog
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
@@ -74,7 +75,7 @@ class ContactSmsActivity : BaseActivity() {
         try {
             smsManager = getSystemService(SmsManager::class.java)
         } catch (err: Exception) {
-            Toast.makeText(this, "SMS 기능을 사용할 수 없습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
             finish()
         }
     }
@@ -88,7 +89,7 @@ class ContactSmsActivity : BaseActivity() {
                     viewModel.addMessage(SmsInfo(message, System.currentTimeMillis(), 2))
                     binding.sendSmsEditText.text.clear()
                 } else {
-                    EventDialog("문자 메세지 전송이 실패했습니다. 재전송 하시겠습니까?") { dialog, _ ->
+                    EventDialog(getString(R.string.message_of_sms_send_failure)) { dialog, _ ->
                         onClickSmsSendButton()
                     }
                 }

@@ -12,8 +12,8 @@ class EventDialog(private val message: String, private val onClick: OnClickListe
         return activity?.let {
             val builder = AlertDialog.Builder(it)
             builder.setMessage(message)
-                .setPositiveButton("확인", onClick)
-                .setNegativeButton("취소") { dialog, _ -> dialog.cancel() }
+                .setPositiveButton(getString(R.string.ok), onClick)
+                .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> dialog.cancel() }
                 .create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
