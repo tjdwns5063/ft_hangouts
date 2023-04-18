@@ -8,7 +8,8 @@ import java.util.*
 object SharedPreferenceUtils {
     enum class SharedPreferenceType {
         APP_BAR_COLOR,
-        BACKGROUND_TIME
+        BACKGROUND_TIME,
+        LANGUAGE
     }
 
     fun setAppbarColor(color: Int) {
@@ -27,5 +28,23 @@ object SharedPreferenceUtils {
         )
 
         return sharedPreference.getInt("color", 16119285)
+    }
+
+    fun setLanguage(localeString: String?) {
+        val sharedPreference = App.INSTANCE.getSharedPreferences(
+            SharedPreferenceType.LANGUAGE.name,
+            Context.MODE_PRIVATE
+        )
+
+        sharedPreference.edit().putString("locale", localeString).apply()
+    }
+
+    fun getLanguage(): String? {
+        val sharedPreference = App.INSTANCE.getSharedPreferences(
+            SharedPreferenceType.LANGUAGE.name,
+            Context.MODE_PRIVATE
+        )
+
+        return sharedPreference.getString("locale", null)
     }
 }

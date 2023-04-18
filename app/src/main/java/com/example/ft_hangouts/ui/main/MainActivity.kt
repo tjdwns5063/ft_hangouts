@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
@@ -9,12 +10,14 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
+import java.util.*
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
