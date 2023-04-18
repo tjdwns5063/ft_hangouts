@@ -75,7 +75,10 @@ class ContactDetailActivity : BaseActivity() {
                 Toast.makeText(this, getString(R.string.detail_permission_deny_message), Toast.LENGTH_SHORT).show()
             }
         }
-        requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+
+        if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+        }
     }
 
     private fun call() {
