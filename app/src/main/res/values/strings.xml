@@ -23,4 +23,10 @@
     <string name="cannot_use_sms_feature">SMS 기능을 사용할 수 없습니다.</string>
     <string name="message_of_sms_send_failure">문자 메세지 전송이 실패했습니다. 재전송 하시겠습니까?</string>
     <string name="ok">확인</string>
+    <string name="language">언어</string>
+    <string name="default_text">기본</string>
+    <string name="system_default_language">시스템 기본 언어</string>
+    <string name="user_settings">사용자 설정</string>
+    <string name="korean">한국어</string>
+    <string name="english">English</string>
 </resources>

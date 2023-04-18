@@ -11,9 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.ui.BaseActivity
-import com.example.ft_hangouts.ui.abb_bar_setting.AppBarSettingActivity
+import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
+import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -45,12 +46,22 @@ class MainActivity : BaseActivity() {
                     goToAppBarChangeActivity()
                     true
                 }
+                R.id.main_language_select_menu -> {
+                    goToLanguageSettingActivity()
+                    true
+                }
                 else -> false
             }
         }
 
         popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
         popupMenu.show()
+    }
+
+    private fun goToLanguageSettingActivity() {
+        val intent = Intent(this, LanguageSettingActivity::class.java)
+
+        startActivity(intent)
     }
 
     private fun setRecyclerView() {

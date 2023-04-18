@@ -1,4 +1,4 @@
-package com.example.ft_hangouts.ui.abb_bar_setting
+package com.example.ft_hangouts.ui.setting.abb_bar_setting
 
 import android.app.Activity
 import android.content.Intent

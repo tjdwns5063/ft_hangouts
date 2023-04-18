@@ -24,4 +24,11 @@
     <string name="cannot_use_sms_feature">SMS feature is not available.</string>
     <string name="message_of_sms_send_failure">Text message sending failed. Would you like to resend?</string>
     <string name="ok">Okay</string>
+    <string name="language">Language</string>
+    <string name="default_text">Default</string>
+    <string name="system_default_language">Default System Language</string>
+    <string name="user_settings">User Settings</string>
+    <string name="korean">한국어</string>
+    <string name="english">English</string>
+
 </resources>

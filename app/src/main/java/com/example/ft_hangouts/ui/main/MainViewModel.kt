@@ -10,7 +10,7 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.ui.BaseViewModel
-import com.example.ft_hangouts.ui.abb_bar_setting.AppBarSettingActivity
+import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 
 
 class MainViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel) {
