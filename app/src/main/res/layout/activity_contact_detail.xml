@@ -15,6 +15,18 @@
         android:background="@color/main_background"
         tools:context=".ui.detail.ContactDetailActivity">
 
+        <ImageView
+            android:id="@+id/detail_profile_image"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:background="@drawable/profile_background"
+            android:backgroundTint="@color/white"
+            android:scaleType="fitXY"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contact_detail_title"
+            app:srcCompat="@drawable/ic_default_profile" />
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/detail_bottom_nav"
             android:layout_width="match_parent"
@@ -38,20 +50,20 @@
             android:id="@+id/detail_name_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/contact_detail_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginVertical="16dp"
             android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
             app:cardCornerRadius="15dp"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detail_profile_image">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="8dp"
-                android:gravity="center_vertical">
+                android:padding="8dp">
 
                 <ImageView
                     android:id="@+id/detail_name_image"
@@ -62,17 +74,17 @@
 
                 <TextView
                     android:id="@+id/detail_name_text"
+                    style="@style/detail_item_text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/add_name_text"
-                    style="@style/detail_item_text_style" />
+                    android:text="@string/add_name_text" />
 
                 <TextView
                     android:id="@+id/detail_name_value_text"
+                    style="@style/detail_item_text_style"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.contact.name}"
-                    style="@style/detail_item_text_style" />
+                    android:text="@{viewModel.contact.name}" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

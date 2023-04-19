@@ -73,7 +73,8 @@ class ContactDatabaseDAO {
                 ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
                 ContactContract.ContactEntry.COLUMN_NAME_GENDER,
                 ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
-                ContactContract.ContactEntry.COLUMN_NAME_RELATION
+                ContactContract.ContactEntry.COLUMN_NAME_RELATION,
+                ContactContract.ContactEntry.COLUMN_PROFILE
             )
 
             val selection = "${BaseColumns._ID} = ?"
@@ -96,7 +97,8 @@ class ContactDatabaseDAO {
                     phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER)),
                     email = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL)),
                     relation = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION)),
-                    gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
+                    gender = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER)),
+                    profile = getBlob(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PROFILE))
                 )
             }
         }

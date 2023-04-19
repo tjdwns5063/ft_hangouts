@@ -15,6 +15,7 @@ import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
@@ -32,6 +33,11 @@ class ContactDetailActivity : BaseActivity() {
 
         setContentView(binding.root)
         requestCallPermission()
+        binding.detailProfileImage.clipToOutline = true
+        viewModel.contact.observe(this) {
+            println(it)
+            it.profile?.let { binding.detailProfileImage.setImageBitmap(it) }
+        }
         viewModel.contact.observe(this) {
             it?.let { setBottomNavItemListener(it) }
         }
@@ -44,7 +50,7 @@ class ContactDetailActivity : BaseActivity() {
     }
 
 
-    private fun setBottomNavItemListener(contact: Contact) {
+    private fun setBottomNavItemListener(contact: ContactDomainModel) {
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
             when(menu.itemId) {
                 R.id.detail_bottom_delete -> {
@@ -61,7 +67,7 @@ class ContactDetailActivity : BaseActivity() {
         }
     }
 
-    private fun goToContactEditActivity(contact: Contact) {
+    private fun goToContactEditActivity(contact: ContactDomainModel) {
         val intent = Intent(this, ContactEditActivity::class.java).apply {
             putExtra("contact", contact)
         }
@@ -91,7 +97,7 @@ class ContactDetailActivity : BaseActivity() {
         }
     }
 
-    private fun goToSmsActivity(contact: Contact) {
+    private fun goToSmsActivity(contact: ContactDomainModel) {
         val intent = Intent(this, ContactSmsActivity::class.java).apply {
             putExtra("contact", contact)
         }

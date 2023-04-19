@@ -12,15 +12,17 @@ import com.example.ft_hangouts.App
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
 import com.example.ft_hangouts.ui.BaseViewModel
 
 class ContactDetailViewModel(private val handler: Handler, id: Long, private val baseViewModel: BaseViewModel) {
     private val contactDatabaseDAO = ContactDatabaseDAO()
 
-    val contact: LiveData<Contact>
+    val contact: LiveData<ContactDomainModel>
         get() = _contact
-    private val _contact = MutableLiveData<Contact>()
+    private val _contact = MutableLiveData<ContactDomainModel>()
 
     init {
         getContactById(id)
@@ -29,7 +31,7 @@ class ContactDetailViewModel(private val handler: Handler, id: Long, private val
     private fun getContactById(id: Long) {
         BackgroundHelper.execute {
             try {
-                val contact = contactDatabaseDAO.getItemById(id)
+                val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
 
                 handler.post { _contact.value = contact }
             } catch (err: Exception) {
