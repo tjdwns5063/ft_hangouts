@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
@@ -39,7 +40,13 @@ class ContactRecyclerAdapter(
         ): RecyclerView.ViewHolder(binding.root) {
         fun bind(contact: ContactDomainModel) {
             binding.idText.text = contact.id.toString()
-            contact.profile?.let { binding.profileImg.setImageBitmap(contact.profile) }
+            binding.profileImg.setImageBitmap(contact.profile)
+            if (contact.profile != null) {
+                binding.profileImg.setImageBitmap(contact.profile)
+            } else {
+                binding.profileImg.setImageResource(R.drawable.ic_default_profile)
+            }
+            binding.profileImg.clipToOutline = true
             binding.nameText.text = contact.name
             binding.root.setOnClickListener(clickListener)
         }

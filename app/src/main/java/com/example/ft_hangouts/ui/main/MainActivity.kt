@@ -69,6 +69,7 @@ class MainActivity : BaseActivity() {
 
         viewModel.contactList.observe(this) {
             it?.let {
+                it.forEach { println(it) }
                 adapter.addItem(it)
             }
         }
