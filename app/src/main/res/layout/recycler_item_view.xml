@@ -20,16 +20,10 @@
         app:srcCompat="@drawable/ic_default_profile" />
 
     <TextView
-        android:id="@+id/id_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
-        style="@style/contact_recycler_style" />
-
-    <TextView
         android:id="@+id/name_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:paddingVertical="16dp"
         android:text="TextView"
         android:background="@drawable/bottom_stroke"

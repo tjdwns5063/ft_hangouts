@@ -39,7 +39,6 @@ class ContactRecyclerAdapter(
             val clickListener: OnClickListener
         ): RecyclerView.ViewHolder(binding.root) {
         fun bind(contact: ContactDomainModel) {
-            binding.idText.text = contact.id.toString()
             binding.profileImg.setImageBitmap(contact.profile)
             if (contact.profile != null) {
                 binding.profileImg.setImageBitmap(contact.profile)
