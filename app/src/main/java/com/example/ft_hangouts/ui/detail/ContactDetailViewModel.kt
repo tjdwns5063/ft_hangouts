@@ -17,7 +17,7 @@ import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
 import com.example.ft_hangouts.ui.BaseViewModel
 
-class ContactDetailViewModel(private val handler: Handler, id: Long, private val baseViewModel: BaseViewModel) {
+class ContactDetailViewModel(private val handler: Handler, private val id: Long, private val baseViewModel: BaseViewModel) {
     private val contactDatabaseDAO = ContactDatabaseDAO()
 
     val contact: LiveData<ContactDomainModel>
@@ -54,7 +54,7 @@ class ContactDetailViewModel(private val handler: Handler, id: Long, private val
         }
     }
 
-    fun updateContact(id: Long) {
+    fun updateContact() {
         getContactById(id)
     }
 

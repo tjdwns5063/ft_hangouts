@@ -143,6 +143,7 @@ class ContactDatabaseDAO {
                 put(ContactContract.ContactEntry.COLUMN_NAME_EMAIL, contact.email)
                 put(ContactContract.ContactEntry.COLUMN_NAME_GENDER, contact.gender)
                 put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, contact.relation)
+                put(ContactContract.ContactEntry.COLUMN_PROFILE, contact.profile)
             }
             val selection = "${BaseColumns._ID} LIKE ?"
             val selectionArgs = arrayOf(rowId.toString())
@@ -152,9 +153,9 @@ class ContactDatabaseDAO {
                 selection,
                 selectionArgs
             )
-
             if (ret == 0)
                 throw IllegalStateException("can't update this rowId $rowId")
+            println("success")
         }
     }
 
@@ -163,7 +164,7 @@ class ContactDatabaseDAO {
             bitmap ?: return null
 
             val stream: ByteArrayOutputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream)
 
             return stream.toByteArray()
         }
