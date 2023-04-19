@@ -32,7 +32,6 @@ class App : Application() {
     }
 
     fun showBackgroundTime(currClassName: String) {
-        println("curr: $currClassName foregroud: $foregroundActivityName")
         if (isForeground(currClassName))
             Toast.makeText(INSTANCE.applicationContext, dateTime, Toast.LENGTH_SHORT).show()
         else

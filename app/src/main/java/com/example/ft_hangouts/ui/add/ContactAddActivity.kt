@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.ui.add
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -7,21 +8,38 @@ import android.os.Handler
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import com.example.ft_hangouts.BackgroundHelper
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.databinding.DataBindingUtil
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 import com.example.ft_hangouts.ui.BaseActivity
 
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactAddViewModel(handler, baseViewModel) }
+    private val viewModel by lazy { ContactAddViewModel(handler, baseViewModel, ImageDatabaseDAO(this)) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityContactAddBinding.inflate(layoutInflater)
+        binding = DataBindingUtil.inflate(layoutInflater, R.layout.activity_contact_add, null, false)
+        binding.lifecycleOwner = this
         setContentView(binding.root)
+        binding.addProfileImage.clipToOutline = true
+        val imageActivityLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+                val uri = result?.data?.data ?: return@registerForActivityResult
 
+                viewModel.updateProfileImage(uri)
+            }
+        viewModel.profileImage.observe(this) {
+            it?.let { binding.addProfileImage.setImageDrawable(it) }
+        }
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        binding.addProfileImage.setOnClickListener { imageActivityLauncher.launch(intent) }
         setFocusChangeListener()
         setClickListener()
     }
