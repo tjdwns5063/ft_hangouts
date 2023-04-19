@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.data.contact_database
 
+import android.graphics.Bitmap
 import java.io.Serializable
 
 data class Contact(
@@ -38,4 +39,38 @@ data class Contact(
         result = 31 * result + gender.hashCode()
         return result
     }
+}
+
+data class ContactDomainModel(
+    val id: Long,
+    val name: String,
+    val phoneNumber: String,
+    val email: String,
+    val relation: String,
+    val gender:String,
+    val profile: Bitmap? = null
+)
+
+fun contactToContactDomainModel(contact: Contact): ContactDomainModel {
+    return ContactDomainModel(
+        id = contact.id,
+        name = contact.name,
+        phoneNumber = contact.phoneNumber,
+        email = contact.email,
+        relation = contact.relation,
+        gender = contact.gender,
+        profile = contact.profile?.let { ContactDatabaseDAO.decodeByteArrayToBitmap(it) }
+    )
+}
+
+fun contactDomainModelToContact(contactDomainModel: ContactDomainModel): Contact {
+    return Contact(
+        id = contactDomainModel.id,
+        name = contactDomainModel.name,
+        phoneNumber = contactDomainModel.phoneNumber,
+        email = contactDomainModel.email,
+        relation = contactDomainModel.relation,
+        gender = contactDomainModel.gender,
+        profile = contactDomainModel.profile?.let { ContactDatabaseDAO.compressBitmapToByteArray(it) }
+    )
 }

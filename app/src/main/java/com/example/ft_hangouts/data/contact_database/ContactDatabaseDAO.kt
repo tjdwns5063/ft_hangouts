@@ -157,17 +157,19 @@ class ContactDatabaseDAO {
         }
     }
 
-    fun compressBitmapToByteArray(bitmap: Bitmap?): ByteArray? {
-        bitmap ?: return null
+    companion object {
+        fun compressBitmapToByteArray(bitmap: Bitmap?): ByteArray? {
+            bitmap ?: return null
 
-        val stream: ByteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            val stream: ByteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
 
-        return stream.toByteArray()
-    }
+            return stream.toByteArray()
+        }
 
-    fun decodeByteArrayToBitmap(blob: ByteArray): Bitmap {
-        return BitmapFactory.decodeByteArray(blob, 0, blob.size)
+        fun decodeByteArrayToBitmap(blob: ByteArray): Bitmap {
+            return BitmapFactory.decodeByteArray(blob, 0, blob.size)
+        }
     }
 }
 

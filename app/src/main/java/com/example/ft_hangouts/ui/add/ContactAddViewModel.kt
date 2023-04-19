@@ -42,7 +42,7 @@ class ContactAddViewModel(
             email = email,
             gender = gender,
             relation = relation,
-            profile = contactDAO.compressBitmapToByteArray(profileBitmap)
+            profile = ContactDatabaseDAO.compressBitmapToByteArray(profileBitmap)
         )
     }
 
