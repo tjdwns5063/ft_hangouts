@@ -59,7 +59,6 @@ class ContactDatabaseDAO {
                     list += Contact(id, name, phoneNumber, email, relation, gender, profile)
                 }
             }
-            println(list)
             return list
         }
     }

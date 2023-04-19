@@ -1,6 +1,5 @@
 package com.example.ft_hangouts.ui.add
 
-import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -15,7 +14,6 @@ import com.example.ft_hangouts.error.DatabaseDeleteErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.ui.BaseViewModel
-import java.io.ByteArrayOutputStream
 
 class ContactAddViewModel(
     private val handler: Handler,

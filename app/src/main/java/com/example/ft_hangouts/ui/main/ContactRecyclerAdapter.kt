@@ -5,12 +5,13 @@ import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 
 class ContactRecyclerAdapter(
         private val clickListener: OnClickListener
     ): RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>() {
-    private var items: List<Contact> = listOf()
+    private var items: List<ContactDomainModel> = listOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, clickListener)
     }
@@ -23,7 +24,7 @@ class ContactRecyclerAdapter(
         return items.size
     }
 
-    fun addItem(contacts: List<Contact>) {
+    fun addItem(contacts: List<ContactDomainModel>) {
         items = contacts
         notifyDataSetChanged()
     }
@@ -36,8 +37,9 @@ class ContactRecyclerAdapter(
             private val binding: RecyclerItemViewBinding,
             val clickListener: OnClickListener
         ): RecyclerView.ViewHolder(binding.root) {
-        fun bind(contact: Contact) {
+        fun bind(contact: ContactDomainModel) {
             binding.idText.text = contact.id.toString()
+            contact.profile?.let { binding.profileImg.setImageBitmap(contact.profile) }
             binding.nameText.text = contact.name
             binding.root.setOnClickListener(clickListener)
         }
