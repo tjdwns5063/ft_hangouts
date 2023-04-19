@@ -20,10 +20,28 @@
         style="@style/title_style" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/add_profile_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="62dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contact_add_title">
+
+        <ImageView
+            android:id="@+id/add_profile_image"
+            android:padding="32dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/baseline_camera_alt_24" />
+    </androidx.cardview.widget.CardView>
+
+
+    <androidx.cardview.widget.CardView
         android:id="@+id/name_add_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/contact_add_title"
+        app:layout_constraintTop_toBottomOf="@id/add_profile_card"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="15dp"
         app:cardElevation="0dp">
@@ -211,6 +229,4 @@
             android:text="@string/save"
             style="@style/contact_add_button_style" />
     </LinearLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
