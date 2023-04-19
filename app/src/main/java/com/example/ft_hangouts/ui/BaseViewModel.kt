@@ -10,6 +10,6 @@ class BaseViewModel {
     private val _errorHandler = MutableLiveData<DatabaseHandler>()
 
     fun submitHandler(handler:DatabaseHandler?) {
-        _errorHandler.value = handler
+        _errorHandler.postValue(handler)
     }
 }

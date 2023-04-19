@@ -6,45 +6,62 @@ import android.telephony.SmsManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.App
-import com.example.ft_hangouts.BackgroundHelper
-import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
-import com.example.ft_hangouts.error.DatabaseErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.ui.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class ContactSmsViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel, contact: Contact) {
+class ContactSmsViewModel(private val id: Long, private val handler: Handler, private val baseViewModel: BaseViewModel) {
     private val smsDatabaseDAO = SmsDatabaseDAO(App.INSTANCE.contentResolver)
+    private val contactDatabaseDAO = ContactDatabaseDAO()
 
     val messageList: LiveData<List<SmsInfo>>
         get() = _messageList
     private val _messageList = MutableLiveData<List<SmsInfo>>()
 
-    val errorHandler: LiveData<DatabaseErrorHandler>
-        get() = _errorHandler
-    private val _errorHandler = MutableLiveData<DatabaseErrorHandler>()
-
-    val contact: LiveData<Contact>
+    val contact: LiveData<ContactDomainModel>
         get() = _contact
-    private val _contact = MutableLiveData<Contact>()
+    private val _contact = MutableLiveData<ContactDomainModel>()
 
     init {
-        getAllMessages()
-        _contact.value = contact
+        CoroutineScope(Dispatchers.Main).launch {
+            initialize()
+        }
     }
 
-    private fun getAllMessages() {
-        BackgroundHelper.execute {
-            try {
-                val phoneNumber = contact.value?.let { it.phoneNumber } ?: return@execute
-                val list = smsDatabaseDAO.getMessage(phoneNumber)
-                handler.post { _messageList.value = list }
-            } catch (err: Exception) {
-                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
-            } finally {
-                handler.post { baseViewModel.submitHandler(null) }
-            }
+    private suspend fun initialize() {
+        getContactById(id)
+        contact.value?.let {
+            getAllMessages(it.phoneNumber)
+        }
+    }
+
+    private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
+        try {
+            val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+            _contact.postValue(contact)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(null)
+        }
+    }
+
+    private suspend fun getAllMessages(phoneNumber: String) = withContext(Dispatchers.IO) {
+        try {
+            val list = smsDatabaseDAO.getMessage(phoneNumber)
+            _messageList.postValue(list)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(null)
         }
     }
 

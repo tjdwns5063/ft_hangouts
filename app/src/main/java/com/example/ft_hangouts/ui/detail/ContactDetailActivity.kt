@@ -59,17 +59,17 @@ class ContactDetailActivity : BaseActivity() {
                         message = getString(R.string.check_delete_message),
                         onClick = { _, _ -> viewModel.deleteContactById(id) })
                 }
-                R.id.detail_bottom_sms -> { goToSmsActivity(contact) }
+                R.id.detail_bottom_sms -> { goToSmsActivity() }
                 R.id.detail_bottom_call -> { call() }
-                R.id.detail_bottom_edit -> { goToContactEditActivity(contact) }
+                R.id.detail_bottom_edit -> { goToContactEditActivity() }
             }
             true
         }
     }
 
-    private fun goToContactEditActivity(contact: ContactDomainModel) {
+    private fun goToContactEditActivity() {
         val intent = Intent(this, ContactEditActivity::class.java).apply {
-            putExtra("contact", contact)
+            putExtra("contactId", id)
         }
 
         startActivity(intent)
@@ -97,9 +97,9 @@ class ContactDetailActivity : BaseActivity() {
         }
     }
 
-    private fun goToSmsActivity(contact: ContactDomainModel) {
+    private fun goToSmsActivity() {
         val intent = Intent(this, ContactSmsActivity::class.java).apply {
-            putExtra("contact", contact)
+            putExtra("contactId", id)
         }
         startActivity(intent)
     }

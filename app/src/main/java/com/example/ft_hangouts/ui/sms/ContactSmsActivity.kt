@@ -42,10 +42,11 @@ class ContactSmsActivity : BaseActivity() {
         Manifest.permission.READ_SMS,
         Manifest.permission.RECEIVE_SMS
     )
+    private val id by lazy { intent.getLongExtra("contactId", -1) }
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private lateinit var smsManager: SmsManager
-    private val viewModel by lazy { ContactSmsViewModel(handler, super.baseViewModel, receiveContact()) }
+    private val viewModel by lazy { ContactSmsViewModel(id, handler, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -132,14 +133,6 @@ class ContactSmsActivity : BaseActivity() {
                 Intent("SEND_SMS_SUCCESS"),
                 PendingIntent.FLAG_IMMUTABLE)
         )
-    }
-
-    private fun receiveContact(): Contact {
-        return if (Build.VERSION.SDK_INT < 33) {
-            intent.getSerializableExtra("contact") as Contact
-        } else {
-            intent.getSerializableExtra("contact", Contact::class.java) as Contact
-        }
     }
 
     private fun parseSmsMessage(intent: Intent): String {

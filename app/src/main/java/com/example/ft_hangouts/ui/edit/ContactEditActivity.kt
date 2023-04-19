@@ -10,16 +10,15 @@ import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 import com.example.ft_hangouts.ui.BaseActivity
 
 class ContactEditActivity : BaseActivity() {
+    private val id by lazy { receiveId() }
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
-    private val contact: Contact by lazy { receiveContact() }
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactEditViewModel(handler, super.baseViewModel) }
+    private val viewModel by lazy { ContactEditViewModel(id, handler, super.baseViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        receiveContact()
         setData()
         binding.editOkButton.setOnClickListener { contactEditLogic() }
         binding.editCancelButton.setOnClickListener { finish() }
@@ -44,22 +43,24 @@ class ContactEditActivity : BaseActivity() {
             relation = binding.editRelationEditText.text.toString()
         )
 
-        viewModel.updateContactById(contact.id, newContact)
+        viewModel.updateContactById(id, newContact)
         finish()
     }
 
     private fun setData() {
-        binding.editNameEditText.setText(contact.name)
-        binding.editPhoneNumberEditText.setText(contact.phoneNumber)
-        binding.editEmailEditText.setText(contact.email)
-        binding.editGenderEditText.setText(contact.gender)
-        binding.editRelationEditText.setText(contact.relation)
+
+        viewModel.contact.observe(this) {
+            it?.let {
+                binding.editNameEditText.setText(it.name)
+                binding.editPhoneNumberEditText.setText(it.phoneNumber)
+                binding.editEmailEditText.setText(it.email)
+                binding.editGenderEditText.setText(it.gender)
+                binding.editRelationEditText.setText(it.relation)
+            }
+        }
     }
 
-    private fun receiveContact(): Contact {
-        return if (Build.VERSION.SDK_INT >= 33)
-            intent.getSerializableExtra("contact", Contact::class.java) as Contact
-        else
-            intent.getSerializableExtra("contact") as Contact
+    private fun receiveId(): Long {
+        return intent.getLongExtra("contactId", -1)
     }
 }

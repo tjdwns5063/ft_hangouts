@@ -49,7 +49,7 @@ data class ContactDomainModel(
     val relation: String,
     val gender:String,
     val profile: Bitmap? = null
-): Serializable
+)
 
 fun contactToContactDomainModel(contact: Contact): ContactDomainModel {
     return ContactDomainModel(
