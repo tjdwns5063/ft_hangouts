@@ -35,6 +35,7 @@ class ContactDetailActivity : BaseActivity() {
         requestCallPermission()
         binding.detailProfileImage.clipToOutline = true
         viewModel.contact.observe(this) {
+            println(it)
             it.profile?.let { binding.detailProfileImage.setImageBitmap(it) }
         }
         viewModel.contact.observe(this) {
@@ -44,7 +45,7 @@ class ContactDetailActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-
+        println("onResume Called")
         viewModel.updateContact()
     }
 

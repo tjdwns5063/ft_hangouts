@@ -55,7 +55,9 @@ class ContactDetailViewModel(private val handler: Handler, private val id: Long,
     }
 
     fun updateContact() {
-        getContactById(id)
+        handler.postDelayed({
+            getContactById(id)
+        }, 100)
     }
 
     fun call(telecomManager: TelecomManager, checkPermission: (String) -> Int) {

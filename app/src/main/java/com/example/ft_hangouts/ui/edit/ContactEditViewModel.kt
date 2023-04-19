@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
@@ -16,6 +15,10 @@ import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.error.DatabaseUpdateErrorHandler
 import com.example.ft_hangouts.ui.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactEditViewModel(
     id: Long,
@@ -34,18 +37,21 @@ class ContactEditViewModel(
     private val _updatedProfile = MutableLiveData<Drawable>()
 
     init {
-        getContactById(id)
+        CoroutineScope(Dispatchers.IO).launch {
+            getContactById(id)
+        }
     }
 
-    private fun createContact(
+    private suspend fun createContact(
         name: String,
         phoneNumber: String,
         email: String,
         gender: String,
         relation: String
-    ): Contact {
+    ): Contact = withContext(Dispatchers.Default) {
         val profileBitmap = (updatedProfile.value as? BitmapDrawable)?.bitmap
-        return Contact(
+
+        Contact(
             id = 0,
             name = name,
             phoneNumber = phoneNumber,
@@ -56,41 +62,41 @@ class ContactEditViewModel(
         )
     }
 
-    private fun getContactById(id: Long) {
-        BackgroundHelper.execute {
-            try {
-                val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+    private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
+        try {
+            val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
 
-                handler.post { _contact.value = contact }
-            } catch (err: Exception) {
-                baseViewModel.submitHandler(DatabaseReadErrorHandler())
-            } finally {
-                baseViewModel.submitHandler(null)
-            }
+            _contact.postValue(contact)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(null)
         }
     }
 
-    private fun updateContactById(rowId: Long, newContact: Contact) {
-        BackgroundHelper.execute {
-            try {
-                contactDatabaseDAO.updateById(rowId, newContact)
-                baseViewModel.submitHandler(DatabaseSuccessHandler())
-            } catch (err: Exception) {
-                baseViewModel.submitHandler(DatabaseUpdateErrorHandler())
-            } finally {
-                baseViewModel.submitHandler(null)
-            }
+    private suspend fun updateContactById(rowId: Long, newContact: Contact) = withContext(Dispatchers.IO) {
+        try {
+            contactDatabaseDAO.updateById(rowId, newContact)
+            baseViewModel.submitHandler(DatabaseSuccessHandler())
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseUpdateErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(null)
+        }
+    }
+
+    private suspend fun updateProfileImageLogic(uri: Uri) = withContext(Dispatchers.IO) {
+        try {
+            val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
+            _updatedProfile.postValue(bitmapDrawable)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
         }
     }
 
     fun updateProfileImage(uri: Uri) {
-        BackgroundHelper.execute {
-            try {
-                val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
-                _updatedProfile.postValue(bitmapDrawable)
-            } catch (err: Exception) {
-                baseViewModel.submitHandler(DatabaseReadErrorHandler())
-            }
+        CoroutineScope(Dispatchers.IO).launch {
+            updateProfileImageLogic(uri)
         }
     }
 
@@ -101,8 +107,10 @@ class ContactEditViewModel(
         gender: String,
         relation: String
     ) {
-        val newContact = createContact(name, phoneNumber, email, gender, relation)
-        println("newContact: $newContact")
-        updateContactById(contact.value!!.id, newContact)
+        CoroutineScope(Dispatchers.IO).launch {
+            val newContact = createContact(name, phoneNumber, email, gender, relation)
+            updateContactById(contact.value!!.id, newContact)
+        }
+
     }
 }
