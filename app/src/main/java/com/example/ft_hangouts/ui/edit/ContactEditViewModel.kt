@@ -49,7 +49,7 @@ class ContactEditViewModel(
         gender: String,
         relation: String
     ): Contact = withContext(Dispatchers.Default) {
-        val profileBitmap = (updatedProfile.value as? BitmapDrawable)?.bitmap
+        val profileBitmap = (updatedProfile.value as? BitmapDrawable)?.bitmap ?: contact.value?.profile
 
         Contact(
             id = 0,
