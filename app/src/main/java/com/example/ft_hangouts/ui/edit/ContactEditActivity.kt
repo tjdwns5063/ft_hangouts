@@ -8,6 +8,7 @@ import android.os.Handler
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.ft_hangouts.BackgroundHelper
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
@@ -34,11 +35,13 @@ class ContactEditActivity : BaseActivity() {
         binding.editProfileImage.clipToOutline = true
 
         viewModel.contact.observe(this) {
-            it?.let { binding.editProfileImage.setImageBitmap(it.profile) }
+            if (it.profile != null) {
+                binding.editProfileImage.setImageBitmap(it.profile)
+            }
         }
 
         viewModel.updatedProfile.observe(this) {
-            it?.let { binding.editProfileImage.setImageDrawable(it) }
+            binding.editProfileImage.setImageDrawable(it)
         }
 
         binding.editProfileImage.setOnClickListener {
