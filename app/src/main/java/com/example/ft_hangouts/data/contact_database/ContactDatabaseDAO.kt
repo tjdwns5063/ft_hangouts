@@ -1,8 +1,11 @@
 package com.example.ft_hangouts.data.contact_database
 
 import android.content.ContentValues
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.provider.BaseColumns
 import com.example.ft_hangouts.BackgroundHelper
+import java.io.ByteArrayOutputStream
 
 class ContactDatabaseDAO {
     private val dbHelper: ContactHelper = ContactHelper.createDatabase()
@@ -21,7 +24,8 @@ class ContactDatabaseDAO {
                 ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
                 ContactContract.ContactEntry.COLUMN_NAME_GENDER,
                 ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
-                ContactContract.ContactEntry.COLUMN_NAME_RELATION
+                ContactContract.ContactEntry.COLUMN_NAME_RELATION,
+                ContactContract.ContactEntry.COLUMN_PROFILE
             )
 
             val cursor = readDb.query(
@@ -47,10 +51,15 @@ class ContactDatabaseDAO {
                         getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
                     val gender =
                         getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
+                    val profile =
+                        getBlob(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PROFILE))
+                    if (profile != null)
+                        println(profile)
 
-                    list += Contact(id, name, phoneNumber, email, relation, gender)
+                    list += Contact(id, name, phoneNumber, email, relation, gender, profile)
                 }
             }
+            println(list)
             return list
         }
     }
@@ -116,6 +125,7 @@ class ContactDatabaseDAO {
                 put(ContactContract.ContactEntry.COLUMN_NAME_GENDER, contact.gender)
                 put(ContactContract.ContactEntry.COLUMN_NAME_RELATION, contact.relation)
                 put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, contact.phoneNumber)
+                put(ContactContract.ContactEntry.COLUMN_PROFILE, contact.profile)
             }
             val newRowId = writeDb.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
             return newRowId
@@ -145,6 +155,19 @@ class ContactDatabaseDAO {
             if (ret == 0)
                 throw IllegalStateException("can't update this rowId $rowId")
         }
+    }
+
+    fun compressBitmapToByteArray(bitmap: Bitmap?): ByteArray? {
+        bitmap ?: return null
+
+        val stream: ByteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+
+        return stream.toByteArray()
+    }
+
+    fun decodeByteArrayToBitmap(blob: ByteArray): Bitmap {
+        return BitmapFactory.decodeByteArray(blob, 0, blob.size)
     }
 }
 

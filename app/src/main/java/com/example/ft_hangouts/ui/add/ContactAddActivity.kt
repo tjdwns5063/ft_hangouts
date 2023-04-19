@@ -2,6 +2,8 @@ package com.example.ft_hangouts.ui.add
 
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -66,15 +68,13 @@ class ContactAddActivity : BaseActivity() {
             return
         }
 
-        val contact = Contact(
-            id = 0,
+        val contact = viewModel.createContact(
             name = binding.addNameEditText.text.toString(),
             email = binding.addEmailEditText.text.toString(),
             phoneNumber = binding.addPhoneNumberEditText.text.toString(),
             gender = binding.addGenderEditText.text.toString(),
             relation = binding.addRelationEditText.text.toString()
         )
-
         viewModel.addContact(contact)
     }
 
