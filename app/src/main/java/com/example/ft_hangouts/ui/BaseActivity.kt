@@ -36,8 +36,6 @@ open class BaseActivity: AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        println("onResume Called ${this.javaClass.name}")
-
         val currClassName = this.javaClass.name
         val app = application as App
 
