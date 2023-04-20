@@ -42,16 +42,16 @@ class ContactEditViewModel(
         }
     }
 
-    private suspend fun createContact(
+    private fun createContact(
         name: String,
         phoneNumber: String,
         email: String,
         gender: String,
         relation: String
-    ): Contact = withContext(Dispatchers.Default) {
+    ): Contact  {
         val profileBitmap = (updatedProfile.value as? BitmapDrawable)?.bitmap ?: contact.value?.profile
 
-        Contact(
+        return Contact(
             id = 0,
             name = name,
             phoneNumber = phoneNumber,
@@ -107,8 +107,9 @@ class ContactEditViewModel(
         gender: String,
         relation: String
     ) {
+        val newContact = createContact(name, phoneNumber, email, gender, relation)
+
         CoroutineScope(Dispatchers.IO).launch {
-            val newContact = createContact(name, phoneNumber, email, gender, relation)
             updateContactById(contact.value!!.id, newContact)
         }
 

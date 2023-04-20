@@ -13,6 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
@@ -22,7 +23,7 @@ import com.example.ft_hangouts.ui.BaseActivity
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactAddViewModel(handler, baseViewModel, ImageDatabaseDAO(this)) }
+    private val viewModel by lazy { ContactAddViewModel(lifecycleScope, baseViewModel, ImageDatabaseDAO(this)) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.activity_contact_add, null, false)
@@ -33,7 +34,7 @@ class ContactAddActivity : BaseActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
                 val uri = result?.data?.data ?: return@registerForActivityResult
 
-                viewModel.updateProfileImage(uri)
+                viewModel.updateProfile(uri)
             }
         viewModel.profileImage.observe(this) {
             it?.let { binding.addProfileImage.setImageDrawable(it) }
@@ -68,14 +69,13 @@ class ContactAddActivity : BaseActivity() {
             return
         }
 
-        val contact = viewModel.createContact(
+        viewModel.addContact(
             name = binding.addNameEditText.text.toString(),
             email = binding.addEmailEditText.text.toString(),
             phoneNumber = binding.addPhoneNumberEditText.text.toString(),
             gender = binding.addGenderEditText.text.toString(),
             relation = binding.addRelationEditText.text.toString()
         )
-        viewModel.addContact(contact)
     }
 
     private fun checkEditText(): Boolean {

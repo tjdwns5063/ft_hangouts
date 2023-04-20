@@ -3,10 +3,8 @@ package com.example.ft_hangouts.ui.add
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
@@ -14,9 +12,13 @@ import com.example.ft_hangouts.error.DatabaseDeleteErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.ui.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactAddViewModel(
-    private val handler: Handler,
+    private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
 ) {
@@ -25,7 +27,7 @@ class ContactAddViewModel(
         get() = _profileImage
     private val _profileImage = MutableLiveData<Drawable>()
 
-    fun createContact(
+    private fun createContact(
         name: String,
         phoneNumber: String,
         email: String,
@@ -44,26 +46,41 @@ class ContactAddViewModel(
         )
     }
 
-    fun addContact(contact: Contact) {
-        BackgroundHelper.execute {
-            try {
-                contactDAO.addItem(contact)
-            } catch (err: Exception) {
-                handler.post { baseViewModel.submitHandler(DatabaseDeleteErrorHandler()) }
-            } finally {
-                handler.post { baseViewModel.submitHandler(DatabaseSuccessHandler()) }
-            }
+    private suspend fun addContactToDatabase(contact: Contact) = withContext(Dispatchers.IO) {
+        try {
+            contactDAO.addItem(contact)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseDeleteErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(DatabaseSuccessHandler())
         }
     }
 
-    fun updateProfileImage(uri: Uri) {
-        BackgroundHelper.execute {
-            try {
-                val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
-                handler.post { _profileImage.value = bitmapDrawable }
-            } catch (err: Exception) {
-                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
-            }
+    fun addContact(name: String,
+                   phoneNumber: String,
+                   email: String,
+                   gender: String,
+                   relation: String
+    ) {
+        val contact = createContact(name, phoneNumber, email, gender, relation)
+
+        lifecycleScope.launch {
+            addContactToDatabase(contact)
+        }
+    }
+
+    private suspend fun updateProfileImage(uri: Uri) = withContext(Dispatchers.IO) {
+        try {
+            val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
+            _profileImage.postValue(bitmapDrawable)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        }
+    }
+
+    fun updateProfile(uri: Uri) {
+        lifecycleScope.launch {
+            updateProfileImage(uri)
         }
     }
 }
