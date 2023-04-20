@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ft_hangouts</string>
-    <string name="add_phone_number_text">Phone Number</string>
+    <string name="add_phone_number_text">Phone</string>
     <string name="add_email_text">E-mail</string>
     <string name="add_gender_text">Gender</string>
     <string name="add_relation_text">Relation</string>
@@ -19,7 +19,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="check_delete_message">Are you sure you want to permanently delete the contact?</string>
-    <string name="detail_permission_deny_message">You refused to set the permission. Some features may not work.</string>
+    <string name="detail_permission_deny_message">You refused to set the permission.\nSome features may not work.</string>
     <string name="cannot_use_call_feature">Phone feature is unavailable.</string>
     <string name="cannot_use_sms_feature">SMS feature is not available.</string>
     <string name="message_of_sms_send_failure">Text message sending failed. Would you like to resend?</string>
@@ -32,5 +32,7 @@
     <string name="english">English</string>
     <string name="permission_request">Permission Required</string>
     <string name="call_permission_request">Permission to access the phone is required to call.</string>
+    <string name="request_sms_permission">Relevant permissions are required to send and read text messages. request?</string>
+    <string name="sms_permission_deny">Your sms permission request has been denied.\nPlease use it again after setting the permission.</string>
 
 </resources>

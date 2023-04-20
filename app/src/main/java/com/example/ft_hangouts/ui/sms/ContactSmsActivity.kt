@@ -2,11 +2,13 @@ package com.example.ft_hangouts.ui.sms
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -22,6 +24,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
+import com.example.ft_hangouts.system.SmsSystemHelper
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
 
@@ -46,40 +49,58 @@ class ContactSmsActivity : BaseActivity() {
     )
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
-    private lateinit var smsManager: SmsManager
+    private val smsSystemHelper = createSmsSystemHelper()
     private val viewModel by lazy { ContactSmsViewModel(id, lifecycleScope, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        smsSystemHelper ?: run { finish() }
         val launcher = registerPermissionActivityResult()
         requestPermission(launcher)
+    }
+
+    private fun createSmsSystemHelper(): SmsSystemHelper? {
+        return try {
+            SmsSystemHelper()
+        } catch (err: Exception) {
+            Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
+            null
+        }
     }
 
     private fun registerPermissionActivityResult(): ActivityResultLauncher<Array<String>> {
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             val allPermissionGranted = it[permissions[0]] == true && it[permissions[1]] == true && it[permissions[2]] == true
             if (allPermissionGranted) {
-                initSmsManager()
                 registerSmsReceiver()
                 setRecyclerView()
                 binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
             } else {
+                Toast.makeText(this, getString(R.string.sms_permission_deny), Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
     }
 
-    private fun requestPermission(permissionLauncher: ActivityResultLauncher<Array<String>>) {
-        permissionLauncher.launch(permissions)
+    private fun showSmsPermissionDialog(permissionLauncher: ActivityResultLauncher<Array<String>>) {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.permission_request))
+            .setMessage(getString(R.string.request_sms_permission))
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                permissionLauncher.launch(permissions)
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 
-    private fun initSmsManager() {
-        try {
-            smsManager = getSystemService(SmsManager::class.java)
-        } catch (err: Exception) {
-            Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
-            finish()
+    private fun requestPermission(permissionLauncher: ActivityResultLauncher<Array<String>>) {
+        for (permission in permissions) {
+            if (shouldShowRequestPermissionRationale(permission)) {
+                showSmsPermissionDialog(permissionLauncher)
+                return
+            }
         }
+        permissionLauncher.launch(permissions)
     }
 
     private fun registerSmsReceiver() {
@@ -123,10 +144,8 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun onClickSmsSendButton() {
-        if (!this::smsManager.isInitialized) return
-
-        viewModel.sendMessage(
-            smsManager = smsManager,
+        smsSystemHelper?.sendSms(
+            phoneNumber = viewModel.contact.value!!.phoneNumber,
             message = binding.sendSmsEditText.text.toString(),
             sendIntent = PendingIntent.getBroadcast(
                 this,

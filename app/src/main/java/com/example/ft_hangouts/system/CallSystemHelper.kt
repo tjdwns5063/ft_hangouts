@@ -6,8 +6,16 @@ import android.net.Uri
 import android.telecom.TelecomManager
 import com.example.ft_hangouts.App
 
-object CallSystemHelper {
-    private val telecomManager = App.INSTANCE.getSystemService(TelecomManager::class.java)
+class CallSystemHelper {
+    private val telecomManager: TelecomManager
+
+    init {
+        try {
+            telecomManager = App.INSTANCE.getSystemService(TelecomManager::class.java)
+        } catch (err: Exception) {
+            throw err
+        }
+    }
 
     private fun parseUri(address: String): Uri {
         return Uri.parse("tel: $address")

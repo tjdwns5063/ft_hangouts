@@ -1,7 +1,5 @@
 package com.example.ft_hangouts.ui.sms
 
-import android.app.PendingIntent
-import android.telephony.SmsManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.App
@@ -66,18 +64,6 @@ class ContactSmsViewModel(
         } finally {
             baseViewModel.submitHandler(null)
         }
-    }
-
-    fun sendMessage(smsManager: SmsManager, message: String, sendIntent: PendingIntent) {
-        val phoneNumber = contact.value?.let { it.phoneNumber } ?: return
-
-        smsManager.sendTextMessage(
-            phoneNumber,
-            null,
-            message,
-            sendIntent,
-            null
-        )
     }
 
     fun addMessage(message: SmsInfo) {

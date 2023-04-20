@@ -114,7 +114,7 @@ class ContactDetailActivity : BaseActivity() {
 
     private fun requestCallToCallSystemHelper() {
         try {
-            CallSystemHelper.callToAddress(viewModel.contact.value!!.phoneNumber)
+            CallSystemHelper().callToAddress(viewModel.contact.value!!.phoneNumber)
         } catch (err: Exception) {
             Toast.makeText(this, getString(R.string.cannot_use_call_feature), Toast.LENGTH_SHORT).show()
         }
