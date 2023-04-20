@@ -14,10 +14,10 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.BaseActivity
+import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 
-const val CONTACT_ID = "contactId"
 
 class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }

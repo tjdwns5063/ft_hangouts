@@ -10,6 +10,9 @@ import com.example.ft_hangouts.ui.main.MainActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
+object ContactActivityContract {
+    const val CONTACT_ID = "contactId"
+}
 open class BaseActivity: AppCompatActivity() {
     protected val baseViewModel by lazy { BaseViewModel() }
 

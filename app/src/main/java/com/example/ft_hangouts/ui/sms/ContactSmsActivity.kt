@@ -23,6 +23,7 @@ import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.ui.BaseActivity
+import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
 
 /*
     왜 recyclerview.scrollToPosition(idx)가 handler.postDelayed로 딜레이를 줘야만 제대로 동작할까...?
@@ -43,7 +44,7 @@ class ContactSmsActivity : BaseActivity() {
         Manifest.permission.READ_SMS,
         Manifest.permission.RECEIVE_SMS
     )
-    private val id by lazy { intent.getLongExtra("contactId", -1) }
+    private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private lateinit var smsManager: SmsManager
     private val viewModel by lazy { ContactSmsViewModel(id, lifecycleScope, super.baseViewModel) }

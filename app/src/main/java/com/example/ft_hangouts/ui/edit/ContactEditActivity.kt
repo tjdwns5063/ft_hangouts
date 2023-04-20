@@ -2,18 +2,14 @@ package com.example.ft_hangouts.ui.edit
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
-import com.example.ft_hangouts.BackgroundHelper
-import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 import com.example.ft_hangouts.ui.BaseActivity
+import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
 
 class ContactEditActivity : BaseActivity() {
     private val id by lazy { receiveId() }
@@ -87,6 +83,6 @@ class ContactEditActivity : BaseActivity() {
     }
 
     private fun receiveId(): Long {
-        return intent.getLongExtra("contactId", -1)
+        return intent.getLongExtra(CONTACT_ID, -1)
     }
 }

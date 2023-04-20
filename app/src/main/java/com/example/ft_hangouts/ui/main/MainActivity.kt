@@ -19,7 +19,6 @@ import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivi
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
     private val viewModel by lazy { MainViewModel(lifecycleScope, super.baseViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
