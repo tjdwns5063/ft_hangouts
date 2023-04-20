@@ -16,8 +16,16 @@ import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
 import com.example.ft_hangouts.ui.BaseViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class ContactDetailViewModel(private val handler: Handler, private val id: Long, private val baseViewModel: BaseViewModel) {
+class ContactDetailViewModel(
+    private val lifecycleScope: CoroutineScope,
+    private val id: Long,
+    private val baseViewModel: BaseViewModel
+    ) {
     private val contactDatabaseDAO = ContactDatabaseDAO()
 
     val contact: LiveData<ContactDomainModel>
@@ -25,39 +33,43 @@ class ContactDetailViewModel(private val handler: Handler, private val id: Long,
     private val _contact = MutableLiveData<ContactDomainModel>()
 
     init {
-        getContactById(id)
-    }
-
-    private fun getContactById(id: Long) {
-        BackgroundHelper.execute {
-            try {
-                val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
-
-                handler.post { _contact.value = contact }
-            } catch (err: Exception) {
-                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
-            } finally {
-                handler.post { baseViewModel.submitHandler(null) }
-            }
+        lifecycleScope.launch {
+            getContactById(id)
         }
     }
 
-    fun deleteContactById(id: Long) {
-        BackgroundHelper.execute {
-            try {
-                contactDatabaseDAO.deleteById(id)
-            } catch (err: Exception) {
-                handler.post { baseViewModel.submitHandler(DatabaseDeleteErrorHandler()) }
-            } finally {
-                handler.post { baseViewModel.submitHandler(DatabaseSuccessHandler()) }
-            }
+    private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
+        try {
+            val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+
+            _contact.postValue(contact)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(null)
+        }
+    }
+
+    private suspend fun deleteContactById(id: Long) = withContext(Dispatchers.IO) {
+        try {
+            contactDatabaseDAO.deleteById(id)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseDeleteErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(DatabaseSuccessHandler())
         }
     }
 
     fun updateContact() {
-        handler.postDelayed({
+        lifecycleScope.launch {
             getContactById(id)
-        }, 100)
+        }
+    }
+
+    fun deleteContact(id: Long) {
+        lifecycleScope.launch {
+            deleteContactById(id)
+        }
     }
 
     fun call(telecomManager: TelecomManager, checkPermission: (String) -> Int) {
@@ -67,7 +79,5 @@ class ContactDetailViewModel(private val handler: Handler, private val id: Long,
             if (App.INSTANCE.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED)
                 telecomManager.placeCall(callUri, null)
         }
-
-
     }
 }

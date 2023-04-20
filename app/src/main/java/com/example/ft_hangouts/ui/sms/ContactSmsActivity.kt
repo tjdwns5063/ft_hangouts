@@ -15,6 +15,7 @@ import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
@@ -43,10 +44,9 @@ class ContactSmsActivity : BaseActivity() {
         Manifest.permission.RECEIVE_SMS
     )
     private val id by lazy { intent.getLongExtra("contactId", -1) }
-    private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private lateinit var smsManager: SmsManager
-    private val viewModel by lazy { ContactSmsViewModel(id, handler, super.baseViewModel) }
+    private val viewModel by lazy { ContactSmsViewModel(id, lifecycleScope, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)

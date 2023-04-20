@@ -19,7 +19,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class MainViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel) {
+class MainViewModel(
+    private val lifecycleScope: CoroutineScope,
+    private val baseViewModel: BaseViewModel
+    ) {
     private val contactDatabaseDAO: ContactDatabaseDAO = ContactDatabaseDAO()
 
     val contactList: LiveData<List<ContactDomainModel>>
@@ -47,7 +50,7 @@ class MainViewModel(private val handler: Handler, private val baseViewModel: Bas
     }
 
     fun initRecyclerList() {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             getContactList()
         }
     }
@@ -57,7 +60,7 @@ class MainViewModel(private val handler: Handler, private val baseViewModel: Bas
     }
 
     fun updateAppbarColor() {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             getAppbarColor()
         }
     }

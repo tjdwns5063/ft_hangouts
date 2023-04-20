@@ -1,7 +1,6 @@
 package com.example.ft_hangouts.ui.sms
 
 import android.app.PendingIntent
-import android.os.Handler
 import android.telephony.SmsManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,7 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ContactSmsViewModel(private val id: Long, private val handler: Handler, private val baseViewModel: BaseViewModel) {
+class ContactSmsViewModel(
+    private val id: Long,
+    private val lifecycleScope: CoroutineScope,
+    private val baseViewModel: BaseViewModel
+    ) {
     private val smsDatabaseDAO = SmsDatabaseDAO(App.INSTANCE.contentResolver)
     private val contactDatabaseDAO = ContactDatabaseDAO()
 
@@ -31,7 +34,7 @@ class ContactSmsViewModel(private val id: Long, private val handler: Handler, pr
     private val _contact = MutableLiveData<ContactDomainModel>()
 
     init {
-        CoroutineScope(Dispatchers.Main).launch {
+        lifecycleScope.launch {
             initialize()
         }
     }

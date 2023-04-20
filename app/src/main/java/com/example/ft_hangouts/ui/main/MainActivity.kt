@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.PopupMenu
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityMainBinding
@@ -19,7 +20,7 @@ import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivi
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val handler by lazy {if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)}
-    private val viewModel by lazy { MainViewModel(handler, super.baseViewModel) }
+    private val viewModel by lazy { MainViewModel(lifecycleScope, super.baseViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

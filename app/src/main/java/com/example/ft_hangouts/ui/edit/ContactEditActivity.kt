@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
@@ -17,8 +18,7 @@ import com.example.ft_hangouts.ui.BaseActivity
 class ContactEditActivity : BaseActivity() {
     private val id by lazy { receiveId() }
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
-    private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactEditViewModel(id, handler, super.baseViewModel, ImageDatabaseDAO(this)) }
+    private val viewModel by lazy { ContactEditViewModel(id, lifecycleScope, super.baseViewModel, ImageDatabaseDAO(this)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

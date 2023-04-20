@@ -3,7 +3,6 @@ package com.example.ft_hangouts.ui.edit
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.data.contact_database.Contact
@@ -22,7 +21,7 @@ import kotlinx.coroutines.withContext
 
 class ContactEditViewModel(
     id: Long,
-    private val handler: Handler,
+    private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
     ) {
@@ -37,7 +36,7 @@ class ContactEditViewModel(
     private val _updatedProfile = MutableLiveData<Drawable>()
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             getContactById(id)
         }
     }
@@ -95,7 +94,7 @@ class ContactEditViewModel(
     }
 
     fun updateProfileImage(uri: Uri) {
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             updateProfileImageLogic(uri)
         }
     }
@@ -109,9 +108,8 @@ class ContactEditViewModel(
     ) {
         val newContact = createContact(name, phoneNumber, email, gender, relation)
 
-        CoroutineScope(Dispatchers.IO).launch {
+        lifecycleScope.launch {
             updateContactById(contact.value!!.id, newContact)
         }
-
     }
 }

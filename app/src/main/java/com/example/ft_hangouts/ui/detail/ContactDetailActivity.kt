@@ -11,6 +11,7 @@ import android.telecom.TelecomManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
@@ -24,8 +25,7 @@ import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val id by lazy { intent.getLongExtra("id", -1) }
-    private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-    private val viewModel by lazy { ContactDetailViewModel(handler, id, super.baseViewModel) }
+    private val viewModel by lazy { ContactDetailViewModel(lifecycleScope, id, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.viewModel = viewModel
@@ -57,7 +57,7 @@ class ContactDetailActivity : BaseActivity() {
                     EventDialog.showEventDialog(
                         fragmentManager = supportFragmentManager,
                         message = getString(R.string.check_delete_message),
-                        onClick = { _, _ -> viewModel.deleteContactById(id) })
+                        onClick = { _, _ -> viewModel.deleteContact(id) })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity() }
                 R.id.detail_bottom_call -> { call() }
