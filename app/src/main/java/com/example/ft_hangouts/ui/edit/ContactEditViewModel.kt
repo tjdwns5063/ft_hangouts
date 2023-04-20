@@ -1,14 +1,12 @@
 package com.example.ft_hangouts.ui.edit
 
+import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
+import com.example.ft_hangouts.data.contact_database.*
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
@@ -20,12 +18,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactEditViewModel(
+    context: Context,
     id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
     ) {
-    private val contactDatabaseDAO = ContactDatabaseDAO()
+    private val contactDatabaseDAO = ContactDatabaseDAO(ContactHelper.createDatabase(context))
 
     val contact: LiveData<ContactDomainModel>
         get() = _contact

@@ -1,24 +1,86 @@
 package com.example.ft_hangouts
 
-import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
+import androidx.test.platform.app.InstrumentationRegistry
+import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
+import com.example.ft_hangouts.ui.BaseViewModel
+import com.example.ft_hangouts.ui.add.ContactAddViewModel
+import com.example.ft_hangouts.ui.main.MainViewModel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.test.*
+import org.junit.After
 import org.junit.Test
-import org.junit.runner.RunWith
-
 import org.junit.Assert.*
+import org.junit.Before
+import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 
 /**
- * Instrumented test, which will execute on an Android device.
+ * Example local unit test, which will execute on the development machine (host).
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
+
+@Config(manifest = Config.NONE)
 @RunWith(AndroidJUnit4::class)
-class ExampleInstrumentedTest {
+internal class MainViewModelTest {
+    private lateinit var mainViewModel: MainViewModel
+    private lateinit var context: Context
+    private lateinit var dao: ContactDatabaseDAO
+    private lateinit var dbHelper: ContactHelper
+    private lateinit var addViewModel: ContactAddViewModel
+    private lateinit var baseViewModel: BaseViewModel
+    @Before
+    @ExperimentalCoroutinesApi
+    fun setupViewModel() = runTest {
+        context = InstrumentationRegistry.getInstrumentation().newApplication(App.INSTANCE.classLoader, App::class.qualifiedName, App.INSTANCE.applicationContext)
+        dbHelper = ContactHelper(context)
+        dao = ContactDatabaseDAO(ContactHelper(context))
+
+        baseViewModel = BaseViewModel()
+        mainViewModel = MainViewModel(dao, TestScope(StandardTestDispatcher()), baseViewModel)
+        addViewModel = ContactAddViewModel(dao, TestScope(StandardTestDispatcher()), baseViewModel, ImageDatabaseDAO(context))
+
+        addViewModel.addContactToDatabase(Contact(2,"John Doe", "01012345678", "john@example.com", "", ""))
+        addViewModel.addContactToDatabase(Contact(3,"Jane Doe", "01056478923", "jane@example.com", "", ""))
+    }
+
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.ft_hangouts", appContext.packageName)
+    @ExperimentalCoroutinesApi
+    fun getContactList() = runTest {
+        // given
+
+
+        // when
+
+        mainViewModel.getContactList()
+
+
+        // then
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            mainViewModel.contactList.collect {
+                assertEquals(it.size, 3)
+                assertEquals(it[0].name, "seongjki")
+                assertEquals(it[0].phoneNumber, "01042005063")
+                assertEquals(it[1].name, "John Doe")
+                assertEquals(it[1].phoneNumber, "01012345678")
+                assertEquals(it[1].email, "john@example.com")
+                assertEquals(it[2].name, "Jane Doe")
+                assertEquals(it[2].phoneNumber, "01056478923")
+                assertEquals(it[2].email, "jane@example.com")
+            }
+        }
+    }
+    @After
+    fun closeDb() {
+        dbHelper.close()
     }
 }
+/*
+
+
+     */

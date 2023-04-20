@@ -1,10 +1,12 @@
 package com.example.ft_hangouts.ui.sms
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
@@ -16,12 +18,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactSmsViewModel(
+    context: Context,
     private val id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
     ) {
     private val smsDatabaseDAO = SmsDatabaseDAO(App.INSTANCE.contentResolver)
-    private val contactDatabaseDAO = ContactDatabaseDAO()
+    private val contactDatabaseDAO = ContactDatabaseDAO(ContactHelper.createDatabase(context))
 
     val messageList: LiveData<List<SmsInfo>>
         get() = _messageList

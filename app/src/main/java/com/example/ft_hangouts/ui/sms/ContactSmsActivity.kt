@@ -50,7 +50,7 @@ class ContactSmsActivity : BaseActivity() {
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private val smsSystemHelper = createSmsSystemHelper()
-    private val viewModel by lazy { ContactSmsViewModel(id, lifecycleScope, super.baseViewModel) }
+    private val viewModel by lazy { ContactSmsViewModel(applicationContext, id, lifecycleScope, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)

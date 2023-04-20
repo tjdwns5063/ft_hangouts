@@ -16,13 +16,15 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 import com.example.ft_hangouts.ui.BaseActivity
 
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
-    private val viewModel by lazy { ContactAddViewModel(lifecycleScope, baseViewModel, ImageDatabaseDAO(this)) }
+    private val viewModel by lazy { ContactAddViewModel(ContactDatabaseDAO(ContactHelper(applicationContext)), lifecycleScope, baseViewModel, ImageDatabaseDAO(this)) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.inflate(layoutInflater, R.layout.activity_contact_add, null, false)

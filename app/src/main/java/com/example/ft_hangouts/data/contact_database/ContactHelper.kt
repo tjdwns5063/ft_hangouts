@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.data.contact_database
 
+import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -42,10 +43,10 @@ class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
         private const val DATABASE_VERSION = 2
         private const val DATABASE_NAME = "contact_db"
 
-        fun createDatabase(): ContactHelper {
+        fun createDatabase(application: Context): ContactHelper {
             synchronized(ContactHelper::class.java) {
                 if (!::INSTANCE.isInitialized) {
-                    INSTANCE = ContactHelper(App.INSTANCE)
+                    INSTANCE = ContactHelper(application)
                 }
             }
             return INSTANCE

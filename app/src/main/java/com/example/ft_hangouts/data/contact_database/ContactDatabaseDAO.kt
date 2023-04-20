@@ -8,8 +8,8 @@ import com.example.ft_hangouts.App
 import com.example.ft_hangouts.BackgroundHelper
 import java.io.ByteArrayOutputStream
 
-class ContactDatabaseDAO {
-    private val dbHelper: ContactHelper = ContactHelper.createDatabase()
+class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
+//    private val dbHelper: ContactHelper = ContactHelper.createDatabase()
 
     fun closeDatabase() {
         dbHelper.close()
