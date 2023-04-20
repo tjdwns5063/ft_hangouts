@@ -1,16 +1,7 @@
 package com.example.ft_hangouts.ui.detail
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Handler
-import android.telecom.TelecomManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import com.example.ft_hangouts.App
-import com.example.ft_hangouts.BackgroundHelper
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
@@ -69,15 +60,6 @@ class ContactDetailViewModel(
     fun deleteContact(id: Long) {
         lifecycleScope.launch {
             deleteContactById(id)
-        }
-    }
-
-    fun call(telecomManager: TelecomManager, checkPermission: (String) -> Int) {
-        contact.value?.let {
-            val callUri = Uri.parse("tel: ${it.phoneNumber}")
-
-            if (App.INSTANCE.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED)
-                telecomManager.placeCall(callUri, null)
         }
     }
 }

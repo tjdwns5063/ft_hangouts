@@ -1,56 +1,68 @@
 package com.example.ft_hangouts.ui.detail
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.telecom.TelecomManager
-import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
-import com.example.ft_hangouts.BackgroundHelper
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
+import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.sms.ContactSmsActivity
+
+const val CONTACT_ID = "contactId"
 
 class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val id by lazy { intent.getLongExtra("id", -1) }
     private val viewModel by lazy { ContactDetailViewModel(lifecycleScope, id, super.baseViewModel) }
+    private lateinit var callPermissionLauncher: ActivityResultLauncher<String>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
         setContentView(binding.root)
-        requestCallPermission()
+        callPermissionLauncher = registerRequestCallPermissionResult()
+        roundProfileBorder()
+        setBottomNavItemListener()
+        setContactObservationForProfileUpdates()
+    }
+
+    private fun roundProfileBorder() {
         binding.detailProfileImage.clipToOutline = true
+    }
+
+    private fun setContactObservationForProfileUpdates() {
         viewModel.contact.observe(this) {
-            println(it)
-            it.profile?.let { binding.detailProfileImage.setImageBitmap(it) }
+            it.profile?.let { profile -> binding.detailProfileImage.setImageBitmap(profile) }
         }
-        viewModel.contact.observe(this) {
-            it?.let { setBottomNavItemListener(it) }
+    }
+
+    private fun registerRequestCallPermissionResult(): ActivityResultLauncher<String> {
+        return registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                requestCallToCallSystemHelper()
+            } else {
+                Toast.makeText(this, getString(R.string.detail_permission_deny_message), Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        println("onResume Called")
         viewModel.updateContact()
     }
 
-
-    private fun setBottomNavItemListener(contact: ContactDomainModel) {
+    private fun setBottomNavItemListener() {
         binding.detailBottomNav.setOnItemSelectedListener { menu ->
             when(menu.itemId) {
                 R.id.detail_bottom_delete -> {
@@ -60,7 +72,7 @@ class ContactDetailActivity : BaseActivity() {
                         onClick = { _, _ -> viewModel.deleteContact(id) })
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity() }
-                R.id.detail_bottom_call -> { call() }
+                R.id.detail_bottom_call -> { requestCallPermission() }
                 R.id.detail_bottom_edit -> { goToContactEditActivity() }
             }
             true
@@ -69,29 +81,40 @@ class ContactDetailActivity : BaseActivity() {
 
     private fun goToContactEditActivity() {
         val intent = Intent(this, ContactEditActivity::class.java).apply {
-            putExtra("contactId", id)
+            putExtra(CONTACT_ID, id)
         }
 
         startActivity(intent)
     }
 
     private fun requestCallPermission() {
-        val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (!isGranted) {
-                Toast.makeText(this, getString(R.string.detail_permission_deny_message), Toast.LENGTH_SHORT).show()
+        when {
+            checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED -> {
+                callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
             }
-        }
-
-        if (checkSelfPermission(Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+            shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE) -> {
+                showCallPermissionDialog()
+            }
+            else -> {
+                callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+            }
         }
     }
 
-    private fun call() {
-        try {
-            val telecomManager = getSystemService(TelecomManager::class.java)
+    private fun showCallPermissionDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.permission_request))
+            .setMessage(getString(R.string.call_permission_request))
+            .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
 
-            viewModel.call(telecomManager, this::checkSelfPermission)
+    private fun requestCallToCallSystemHelper() {
+        try {
+            CallSystemHelper.callToAddress(viewModel.contact.value!!.phoneNumber)
         } catch (err: Exception) {
             Toast.makeText(this, getString(R.string.cannot_use_call_feature), Toast.LENGTH_SHORT).show()
         }
@@ -99,7 +122,7 @@ class ContactDetailActivity : BaseActivity() {
 
     private fun goToSmsActivity() {
         val intent = Intent(this, ContactSmsActivity::class.java).apply {
-            putExtra("contactId", id)
+            putExtra(CONTACT_ID, id)
         }
         startActivity(intent)
     }

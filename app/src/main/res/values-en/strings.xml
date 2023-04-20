@@ -30,5 +30,7 @@
     <string name="user_settings">User Settings</string>
     <string name="korean">한국어</string>
     <string name="english">English</string>
+    <string name="permission_request">Permission Required</string>
+    <string name="call_permission_request">Permission to access the phone is required to call.</string>
 
 </resources>
