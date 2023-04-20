@@ -9,9 +9,10 @@ import androidx.annotation.ColorInt
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.databinding.ActivityAppBarSettingBinding
+import com.example.ft_hangouts.ui.BaseActivity
 import com.example.ft_hangouts.ui.main.MainActivity
 
-class AppBarSettingActivity : AppCompatActivity() {
+class AppBarSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityAppBarSettingBinding.inflate(layoutInflater) }
     @ColorInt private var selectedColor: Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,14 +25,14 @@ class AppBarSettingActivity : AppCompatActivity() {
         }
 
         binding.appbarSettingOkButton.setOnClickListener {
-            SharedPreferenceUtils.setAppbarColor(selectedColor)
+            sharedPreferenceUtils.setAppbarColor(selectedColor)
             finish()
         }
 
         binding.appbarSettingDefaultButton.setOnClickListener {
             val defaultColor = getColor(R.color.main_background)
 
-            SharedPreferenceUtils.setAppbarColor(defaultColor)
+            sharedPreferenceUtils.setAppbarColor(defaultColor)
             finish()
         }
 

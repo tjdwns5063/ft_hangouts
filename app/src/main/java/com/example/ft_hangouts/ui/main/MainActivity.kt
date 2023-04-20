@@ -11,6 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
@@ -25,7 +26,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel by lazy { MainViewModel(ContactDatabaseDAO(ContactHelper(applicationContext)), lifecycleScope, super.baseViewModel) }
+    private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper(applicationContext)), lifecycleScope, super.baseViewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

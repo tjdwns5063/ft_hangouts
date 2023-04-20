@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 
 
 class MainViewModel(
+    private val sharedPreferenceUtils: SharedPreferenceUtils,
     contactDAO: ContactDatabaseDAO,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
@@ -24,9 +25,8 @@ class MainViewModel(
     private val _contactList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
     val contactList: StateFlow<List<ContactDomainModel>> = _contactList.asStateFlow()
 
-    val appBarColor: StateFlow<Int>
-        get() = _appBarColor
     private val _appBarColor = MutableStateFlow<Int>(16119285)
+    val appBarColor: StateFlow<Int> = _appBarColor.asStateFlow()
 
     init {
         initRecyclerList()
@@ -51,7 +51,7 @@ class MainViewModel(
     }
 
     private suspend fun getAppbarColor() = withContext(Dispatchers.IO) {
-        _appBarColor.value = SharedPreferenceUtils.getAppbarColor()
+        _appBarColor.value = sharedPreferenceUtils.getAppbarColor()
     }
 
     fun updateAppbarColor() {

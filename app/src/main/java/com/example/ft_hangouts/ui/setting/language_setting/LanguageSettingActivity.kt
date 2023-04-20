@@ -17,8 +17,6 @@ import java.util.*
 
 class LanguageSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityLanguageSettingBinding.inflate(layoutInflater) }
-    private val handler by lazy { if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper) }
-//    private lateinit var newContext: Context
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -71,13 +69,12 @@ class LanguageSettingActivity : BaseActivity() {
             localManager.applicationLocales = localeList
         } else {
             val localeString = if (localeList.isEmpty) null else localeList[0].language
-            SharedPreferenceUtils.setLanguage(localeString)
+            sharedPreferenceUtils.setLanguage(localeString)
 
             EventDialog.showEventDialog(
                 fragmentManager = supportFragmentManager,
             message = "언어를 변경하려면 앱을 재시작해야합니다. 재시작 하시겠습니까?",
             onClick = { _, _ ->
-//                recreate()
                 val intent = Intent(this, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)

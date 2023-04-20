@@ -12,6 +12,7 @@ object ContactActivityContract {
 }
 open class BaseActivity: AppCompatActivity() {
     protected val baseViewModel by lazy { BaseViewModel() }
+    protected val sharedPreferenceUtils by lazy { SharedPreferenceUtils(App.INSTANCE.applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +46,7 @@ open class BaseActivity: AppCompatActivity() {
     }
 
     private fun createLanguageSettingContext(context: Context): Context {
-        val localeString = SharedPreferenceUtils.getLanguage()
+        val localeString = sharedPreferenceUtils.getLanguage()
         val configuration = context.resources.configuration
         val locale = if (localeString == null) null else Locale(localeString)
 
