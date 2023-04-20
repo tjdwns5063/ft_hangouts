@@ -2,12 +2,9 @@ package com.example.ft_hangouts.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.data.SharedPreferenceUtils
-import com.example.ft_hangouts.ui.main.MainActivity
-import java.text.SimpleDateFormat
 import java.util.*
 
 object ContactActivityContract {
@@ -32,29 +29,27 @@ open class BaseActivity: AppCompatActivity() {
     override fun onPause() {
         super.onPause()
 
-        val app = application as App
-        app.sendResume(System.currentTimeMillis())
+        (application as App).sendResume(System.currentTimeMillis())
     }
 
     override fun onResume() {
         super.onResume()
 
-        val currClassName = this.javaClass.name
-        val app = application as App
-
-        app.showBackgroundTime(currClassName)
+        (application as App).showBackgroundTime(this.javaClass.name)
     }
 
     override fun attachBaseContext(newBase: Context?) {
         newBase?.let {
-            val localeString = SharedPreferenceUtils.getLanguage()
-            println(localeString)
-            val configuration = it.resources.configuration
-            val locale = if (localeString == null) null else Locale(localeString)
-
-            configuration.setLocale(locale)
-            val context = it.createConfigurationContext(configuration)
-            super.attachBaseContext(context)
+            super.attachBaseContext(createLanguageSettingContext(newBase))
         } ?: super.attachBaseContext(null)
+    }
+
+    private fun createLanguageSettingContext(context: Context): Context {
+        val localeString = SharedPreferenceUtils.getLanguage()
+        val configuration = context.resources.configuration
+        val locale = if (localeString == null) null else Locale(localeString)
+
+        configuration.setLocale(locale)
+        return context.createConfigurationContext(configuration)
     }
 }
