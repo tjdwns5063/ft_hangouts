@@ -69,13 +69,12 @@ class MainActivity : BaseActivity() {
 
         viewModel.contactList.observe(this) {
             it?.let {
-                it.forEach { println(it) }
-                adapter.addItem(it)
+                println("change contactList")
+                adapter.submitList(it)
             }
         }
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        viewModel.initRecyclerList()
     }
 
     private fun contactRecyclerItemOnClick(view: View) {

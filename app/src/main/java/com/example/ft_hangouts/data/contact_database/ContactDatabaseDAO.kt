@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.BaseColumns
+import com.example.ft_hangouts.App
 import com.example.ft_hangouts.BackgroundHelper
 import java.io.ByteArrayOutputStream
 
@@ -164,7 +165,11 @@ class ContactDatabaseDAO {
             bitmap ?: return null
 
             val stream: ByteArrayOutputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, stream)
+            val imageViewSize = 64 // dp
+            val imageViewSizeToPixel = (imageViewSize * App.INSTANCE.applicationContext.resources.displayMetrics.density).toInt()
+
+            val newBitmap = Bitmap.createScaledBitmap(bitmap, imageViewSizeToPixel, imageViewSizeToPixel, false)
+            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
 
             return stream.toByteArray()
         }

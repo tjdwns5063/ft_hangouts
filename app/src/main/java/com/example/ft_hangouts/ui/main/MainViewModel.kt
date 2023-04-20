@@ -13,6 +13,10 @@ import com.example.ft_hangouts.error.DatabaseErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.ui.BaseViewModel
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class MainViewModel(private val handler: Handler, private val baseViewModel: BaseViewModel) {
@@ -31,30 +35,31 @@ class MainViewModel(private val handler: Handler, private val baseViewModel: Bas
         updateAppbarColor()
     }
 
-    private fun getContactList() {
-        BackgroundHelper.execute {
-            try {
-                handler.post { _contactList.value = contactDatabaseDAO.getAllItems().map { contactToContactDomainModel(it) } }
-            } catch (err: Exception) {
-                handler.post { baseViewModel.submitHandler(DatabaseReadErrorHandler()) }
-            } finally {
-                handler.post { baseViewModel.submitHandler(null) }
-            }
+    private suspend fun getContactList() = withContext(Dispatchers.IO) {
+        try {
+            val lst = contactDatabaseDAO.getAllItems().map { contactToContactDomainModel(it) }
+            _contactList.postValue(lst)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        } finally {
+            baseViewModel.submitHandler(null)
         }
     }
 
     fun initRecyclerList() {
-        getContactList()
-    }
-
-    private fun getAppbarColor() {
-        BackgroundHelper.execute {
-            handler.post { _appBarColor.value = SharedPreferenceUtils.getAppbarColor() }
+        CoroutineScope(Dispatchers.IO).launch {
+            getContactList()
         }
     }
 
+    private suspend fun getAppbarColor() = withContext(Dispatchers.IO) {
+        _appBarColor.postValue(SharedPreferenceUtils.getAppbarColor())
+    }
+
     fun updateAppbarColor() {
-        getAppbarColor()
+        CoroutineScope(Dispatchers.IO).launch {
+            getAppbarColor()
+        }
     }
 
     fun closeDatabase() {

@@ -3,49 +3,49 @@ package com.example.ft_hangouts.ui.main
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
+import com.example.ft_hangouts.ui.main.ContactRecyclerAdapter.ContactViewHolder.Companion.callback
 
 class ContactRecyclerAdapter(
         private val clickListener: OnClickListener
-    ): RecyclerView.Adapter<ContactRecyclerAdapter.ContactViewHolder>() {
-    private var items: List<ContactDomainModel> = listOf()
+    ): ListAdapter<ContactDomainModel, ContactRecyclerAdapter.ContactViewHolder>(callback) {
+//    private var items: List<ContactDomainModel> = listOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, clickListener)
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(currentList[position])
     }
 
     override fun getItemCount(): Int {
-        return items.size
+        return currentList.size
     }
 
-    fun addItem(contacts: List<ContactDomainModel>) {
-        items = contacts
-        notifyDataSetChanged()
-    }
+//    fun addItem(contacts: List<ContactDomainModel>) {
+//        items = contacts
+//        notifyDataSetChanged()
+//    }
 
     fun getIdByPosition(position: Int): Long {
-        return items[position].id
+        return currentList[position].id
     }
 
     class ContactViewHolder private constructor(
             private val binding: RecyclerItemViewBinding,
-            val clickListener: OnClickListener
+            private val clickListener: OnClickListener
         ): RecyclerView.ViewHolder(binding.root) {
         fun bind(contact: ContactDomainModel) {
-            binding.profileImg.setImageBitmap(contact.profile)
             if (contact.profile != null) {
                 binding.profileImg.setImageBitmap(contact.profile)
             } else {
                 binding.profileImg.setImageResource(R.drawable.ic_default_profile)
             }
-            binding.profileImg.clipToOutline = true
             binding.nameText.text = contact.name
             binding.root.setOnClickListener(clickListener)
         }
@@ -55,7 +55,18 @@ class ContactRecyclerAdapter(
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = RecyclerItemViewBinding.inflate(layoutInflater, parent, false)
 
+                binding.profileImg.clipToOutline = true
                 return ContactViewHolder(binding, clickListener)
+            }
+
+            val callback = object : DiffUtil.ItemCallback<ContactDomainModel>() {
+                override fun areItemsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
+                    return oldItem === newItem
+                }
+
+                override fun areContentsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
+                    return oldItem == newItem
+                }
             }
         }
     }
