@@ -15,6 +15,8 @@ import com.example.ft_hangouts.ui.BaseViewModel
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -25,13 +27,13 @@ class MainViewModel(
     ) {
     private val contactDatabaseDAO: ContactDatabaseDAO = ContactDatabaseDAO()
 
-    val contactList: LiveData<List<ContactDomainModel>>
+    val contactList: StateFlow<List<ContactDomainModel>>
         get() = _contactList
-    private val _contactList = MutableLiveData<List<ContactDomainModel>>()
+    private val _contactList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
 
-    val appBarColor: LiveData<Int>
+    val appBarColor: StateFlow<Int>
         get() = _appBarColor
-    private val _appBarColor = MutableLiveData<Int>()
+    private val _appBarColor = MutableStateFlow<Int>(16119285)
 
     init {
         initRecyclerList()
@@ -41,7 +43,7 @@ class MainViewModel(
     private suspend fun getContactList() = withContext(Dispatchers.IO) {
         try {
             val lst = contactDatabaseDAO.getAllItems().map { contactToContactDomainModel(it) }
-            _contactList.postValue(lst)
+            _contactList.value = lst
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {
@@ -56,7 +58,7 @@ class MainViewModel(
     }
 
     private suspend fun getAppbarColor() = withContext(Dispatchers.IO) {
-        _appBarColor.postValue(SharedPreferenceUtils.getAppbarColor())
+        _appBarColor.value = SharedPreferenceUtils.getAppbarColor()
     }
 
     fun updateAppbarColor() {

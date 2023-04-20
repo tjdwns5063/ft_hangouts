@@ -2,12 +2,12 @@ package com.example.ft_hangouts.ui.main
 
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.PopupMenu
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityMainBinding
@@ -16,6 +16,8 @@ import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -67,10 +69,11 @@ class MainActivity : BaseActivity() {
     private fun setRecyclerView() {
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }
 
-        viewModel.contactList.observe(this) {
-            it?.let {
-                println("change contactList")
-                adapter.submitList(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.contactList.collect {
+                    adapter.submitList(it)
+                }
             }
         }
         binding.contactRecyclerView.adapter = adapter
@@ -91,8 +94,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setAppBarColor() {
-        viewModel.appBarColor.observe(this) {
-            binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.appBarColor.collect {
+                    binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
+                }
+            }
         }
     }
 
@@ -106,7 +113,6 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        setAppBarColor()
         viewModel.updateAppbarColor()
         viewModel.initRecyclerList()
     }
