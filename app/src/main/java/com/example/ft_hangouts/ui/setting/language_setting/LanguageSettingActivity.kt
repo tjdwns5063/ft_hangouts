@@ -6,20 +6,32 @@ import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import android.view.View
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityLanguageSettingBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.main.MainActivity
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 
 class LanguageSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityLanguageSettingBinding.inflate(layoutInflater) }
+    private val viewModel by lazy { LanguageSettingViewModel(lifecycleScope, sharedPreferenceUtils) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        setInitialLanguage()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedLanguage.collect {
+                    setInitialLanguage(it)
+                }
+            }
+        }
 
         binding.languageBackButton.setOnClickListener { finish() }
         binding.languageEnCheckbox.setOnClickListener {
@@ -37,11 +49,7 @@ class LanguageSettingActivity : BaseActivity() {
         }
     }
 
-    private fun setInitialLanguage() {
-        val language = sharedPreferenceUtils.getLanguage()
-
-        println("language : $language")
-
+    private fun setInitialLanguage(language: String?) {
         when(language) {
             "ko" -> binding.languageKrCheckbox.isChecked = true
             "en" -> binding.languageEnCheckbox.isChecked = true
@@ -75,7 +83,7 @@ class LanguageSettingActivity : BaseActivity() {
         val localeList = matchViewToLocaleList(view)
         val localeString = if (localeList.isEmpty) null else localeList[0].language
 
-        sharedPreferenceUtils.setLanguage(localeString)
+        viewModel.updateLanguage(localeString)
         if (Build.VERSION.SDK_INT >= 33) {
             val localManager = getSystemService(LocaleManager::class.java)
 
@@ -83,12 +91,12 @@ class LanguageSettingActivity : BaseActivity() {
         } else {
             EventDialog.showEventDialog(
                 fragmentManager = supportFragmentManager,
-            message = getString(R.string.language_change_message),
-            onClick = { _, _ ->
-                val intent = Intent(this, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
-                finish()
+                message = getString(R.string.language_change_message),
+                onClick = { _, _ ->
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                    finish()
             })
         }
     }
