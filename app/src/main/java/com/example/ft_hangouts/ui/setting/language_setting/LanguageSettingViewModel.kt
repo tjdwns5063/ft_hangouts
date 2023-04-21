@@ -14,10 +14,8 @@ class LanguageSettingViewModel(
     private val _selectedLanguage = MutableStateFlow<String?>(sharedPreferenceUtils.getLanguage())
     val selectedLanguage: StateFlow<String?> = _selectedLanguage.asStateFlow()
 
-    fun updateLanguage(localeString: String?) {
-        lifecycleScope.launch {
-            sharedPreferenceUtils.setLanguage(localeString)
-            _selectedLanguage.value = sharedPreferenceUtils.getLanguage()
-        }
+    fun updateLanguage(localeString: String?) = lifecycleScope.launch {
+        sharedPreferenceUtils.setLanguage(localeString)
+        _selectedLanguage.value = sharedPreferenceUtils.getLanguage()
     }
 }

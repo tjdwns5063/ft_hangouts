@@ -1,7 +1,5 @@
 package com.example.ft_hangouts.ui.base
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.error.DatabaseHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

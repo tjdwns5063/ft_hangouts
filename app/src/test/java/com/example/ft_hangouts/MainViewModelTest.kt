@@ -5,28 +5,46 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.main.MainViewModel
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+class MainDispatcherRule(
+    val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
+) : TestWatcher() {
+    override fun starting(description: Description) {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    override fun finished(description: Description) {
+        Dispatchers.resetMain()
+    }
+}
+
 @RunWith(RobolectricTestRunner::class)
 internal class MainViewModelTest {
+    @get:Rule
+    val mainDispatcherRule = MainDispatcherRule()
     private lateinit var mainViewModel: MainViewModel
     private lateinit var context: Context
     private lateinit var dao: ContactDatabaseDAO
     private lateinit var dbHelper: ContactHelper
     private lateinit var sharedPreferenceUtils: SharedPreferenceUtils
     private lateinit var baseViewModel: BaseViewModel
-    private lateinit var testScope: CoroutineScope
+    private lateinit var testScope: TestScope
+
     @Before
     @ExperimentalCoroutinesApi
     fun setupViewModel() = runTest {
@@ -34,7 +52,7 @@ internal class MainViewModelTest {
         dbHelper = ContactHelper(context)
         dao = ContactDatabaseDAO(ContactHelper(context))
         sharedPreferenceUtils = SharedPreferenceUtils(context)
-        testScope = TestScope(StandardTestDispatcher())
+        testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
         mainViewModel = MainViewModel(sharedPreferenceUtils, dao, testScope, baseViewModel)
     }
@@ -44,77 +62,53 @@ internal class MainViewModelTest {
     @ExperimentalCoroutinesApi
     fun `given database have two item when viewModel create then check initial condition`() = runTest {
         // given
-        val first = Contact(0, "a", "00000000", "abc", "abc", "abc")
-        val second = Contact(1, "b", "11111111", "bcd", "bcd", "bcd")
+        val first = ContactDomainModel(1, "a", "00000000", "abc", "abc", "abc")
+        val second = ContactDomainModel(2, "b", "11111111", "bcd", "bcd", "bcd")
         val defaultColor = 16119285
 
-        dao.addItem(Contact(0, "a", "00000000", "abc", "abc", "abc"))
-        dao.addItem(Contact(1, "b", "11111111", "bcd", "bcd", "bcd"))
+        dao.addItem(Contact(1, "a", "00000000", "abc", "abc", "abc"))
+        dao.addItem(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
 
-        backgroundScope.launch {
-            // when
-            val initMain = backgroundScope.async {
-                MainViewModel(sharedPreferenceUtils, dao, TestScope(StandardTestDispatcher()), baseViewModel)
-            }.await()
+        val initMain = MainViewModel(sharedPreferenceUtils, dao, TestScope(mainDispatcherRule.testDispatcher), baseViewModel)
 
-            // then
-            initMain.contactList.collect(FlowCollector {
-                assertEquals(it.size, 2)
-                assertEquals(it[0], first)
-                assertEquals(it[1], second)
-            })
+        initMain.initRecyclerList().join()
 
-            initMain.appBarColor.collect(FlowCollector {
-                assertEquals(it, defaultColor)
-            })
-        }
+        assertEquals(2, initMain.contactList.value.size)
+        assertEquals(first, initMain.contactList.value[0])
+        assertEquals(second, initMain.contactList.value[1])
+        assertEquals(defaultColor, initMain.appBarColor.value)
     }
-    @OptIn(InternalCoroutinesApi::class)
+
     @Test
     @ExperimentalCoroutinesApi
     fun `given database have two item when viewModel check items then get all item list`() = runTest {
-        // given
-        dao.addItem(Contact(1, "John Doe", "01012345678", "john@example.com", "", ""))
-        dao.addItem(Contact(2, "Jane Doe", "01056478923", "jane@example.com", "", ""))
+        val first = Contact(1, "a", "b", "c", "d", "e")
+        val second = Contact(2, "b", "c", "d", "e", "f")
 
+        dao.addItem(first)
+        dao.addItem(second)
 
-        // when
-        backgroundScope.launch {
-            mainViewModel.initRecyclerList()
-        }
+        mainViewModel.initRecyclerList().join()
 
-        // then
-        backgroundScope.launch {
-            mainViewModel.contactList.collect(FlowCollector {
-                assertEquals(it.size, 2)
-                assertEquals(it[0].name, "John Doe")
-                assertEquals(it[0].phoneNumber, "01012345678")
-                assertEquals(it[0].email, "john@example.com")
-                assertEquals(it[1].name, "Jane Doe")
-                assertEquals(it[1].phoneNumber, "01056478923")
-                assertEquals(it[1].email, "jane@example.com")
-            })
-        }
+        assertEquals(2, mainViewModel.contactList.value.size)
+        assertEquals(
+            ContactDomainModel(1, "a", "b", "c", "d", "e"),
+            mainViewModel.contactList.value[0]
+        )
+        assertEquals(
+            ContactDomainModel(2, "b", "c", "d", "e", "f"),
+            mainViewModel.contactList.value[1]
+        )
     }
 
     @Test
-    @OptIn(InternalCoroutinesApi::class)
     @ExperimentalCoroutinesApi
     fun `given set appbar color when update appbar color expect color is set`() = runTest {
-        //given
-        sharedPreferenceUtils.setAppbarColor(111111)
+        sharedPreferenceUtils.setAppbarColor(1111111)
 
-        // when
-        backgroundScope.launch {
-            mainViewModel.updateAppbarColor()
-        }
+        mainViewModel.updateAppbarColor().join()
 
-        //then
-        backgroundScope.launch {
-            mainViewModel.appBarColor.collect(FlowCollector {
-                assertEquals(it, 111111)
-            })
-        }
+        assertEquals(1111111, mainViewModel.appBarColor.value)
     }
 
     @After

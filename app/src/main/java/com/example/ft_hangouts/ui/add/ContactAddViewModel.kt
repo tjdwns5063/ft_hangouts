@@ -12,10 +12,7 @@ import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.ui.base.BaseViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class ContactAddViewModel(
     contactDatabaseDAO: ContactDatabaseDAO,
@@ -61,10 +58,10 @@ class ContactAddViewModel(
                    email: String,
                    gender: String,
                    relation: String
-    ) {
+    ): Job {
         val contact = createContact(name, phoneNumber, email, gender, relation)
 
-        lifecycleScope.launch {
+        return lifecycleScope.launch {
             addContactToDatabase(contact)
         }
     }
