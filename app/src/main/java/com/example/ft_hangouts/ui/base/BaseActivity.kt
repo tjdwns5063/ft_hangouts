@@ -1,29 +1,39 @@
-package com.example.ft_hangouts.ui
+package com.example.ft_hangouts.ui.base
 
 import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.data.SharedPreferenceUtils
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 
 object ContactActivityContract {
     const val CONTACT_ID = "contactId"
 }
-open class BaseActivity: AppCompatActivity() {
-    protected val baseViewModel by lazy { BaseViewModel() }
+open class BaseActivity : AppCompatActivity() {
+    protected val baseViewModel by lazy { BaseViewModel(lifecycleScope) }
     protected val sharedPreferenceUtils by lazy { SharedPreferenceUtils(App.INSTANCE.applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        baseViewModel.errorHandler.observe(this) {
-            it ?: return@observe
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                baseViewModel.errorHandler.collect {
+                    it ?: return@collect
 
-            if (it.isSuccess()) {
-                finish()
-            } else {
-                it.handle(this)
+                    if (it.isSuccess()) {
+                        finish()
+                    } else {
+                        it.handle(baseContext)
+                        baseViewModel.initiateError()
+                    }
+                }
             }
         }
     }

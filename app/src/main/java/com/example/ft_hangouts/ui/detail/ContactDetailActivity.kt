@@ -13,8 +13,8 @@ import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.system.CallSystemHelper
-import com.example.ft_hangouts.ui.BaseActivity
-import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
+import com.example.ft_hangouts.ui.base.BaseActivity
+import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
 import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 

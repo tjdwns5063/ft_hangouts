@@ -8,12 +8,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Telephony
-import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,12 +17,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.system.SmsSystemHelper
-import com.example.ft_hangouts.ui.BaseActivity
-import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
+import com.example.ft_hangouts.ui.base.BaseActivity
+import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 
 /*
     왜 recyclerview.scrollToPosition(idx)가 handler.postDelayed로 딜레이를 줘야만 제대로 동작할까...?

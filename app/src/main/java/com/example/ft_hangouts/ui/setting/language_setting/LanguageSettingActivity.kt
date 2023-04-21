@@ -1,17 +1,14 @@
 package com.example.ft_hangouts.ui.setting.language_setting
 
 import android.app.LocaleManager
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.os.LocaleList
 import android.view.View
 import com.example.ft_hangouts.EventDialog
-import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.databinding.ActivityLanguageSettingBinding
-import com.example.ft_hangouts.ui.BaseActivity
+import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.main.MainActivity
 import java.util.*
 

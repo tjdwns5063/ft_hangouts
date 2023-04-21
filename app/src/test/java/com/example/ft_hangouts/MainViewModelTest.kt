@@ -6,7 +6,7 @@ import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
-import com.example.ft_hangouts.ui.BaseViewModel
+import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.main.MainViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.FlowCollector
@@ -26,6 +26,7 @@ internal class MainViewModelTest {
     private lateinit var dbHelper: ContactHelper
     private lateinit var sharedPreferenceUtils: SharedPreferenceUtils
     private lateinit var baseViewModel: BaseViewModel
+    private lateinit var testScope: CoroutineScope
     @Before
     @ExperimentalCoroutinesApi
     fun setupViewModel() = runTest {
@@ -33,8 +34,9 @@ internal class MainViewModelTest {
         dbHelper = ContactHelper(context)
         dao = ContactDatabaseDAO(ContactHelper(context))
         sharedPreferenceUtils = SharedPreferenceUtils(context)
-        baseViewModel = BaseViewModel()
-        mainViewModel = MainViewModel(sharedPreferenceUtils, dao, TestScope(StandardTestDispatcher()), baseViewModel)
+        testScope = TestScope(StandardTestDispatcher())
+        baseViewModel = BaseViewModel(testScope)
+        mainViewModel = MainViewModel(sharedPreferenceUtils, dao, testScope, baseViewModel)
     }
 
     @Test

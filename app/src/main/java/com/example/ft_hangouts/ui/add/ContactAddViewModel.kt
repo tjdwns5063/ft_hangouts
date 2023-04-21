@@ -1,6 +1,5 @@
 package com.example.ft_hangouts.ui.add
 
-import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -8,12 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
-import com.example.ft_hangouts.error.DatabaseDeleteErrorHandler
+import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
-import com.example.ft_hangouts.ui.BaseViewModel
+import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,10 +50,9 @@ class ContactAddViewModel(
     private suspend fun addContactToDatabase(contact: Contact) = withContext(Dispatchers.IO) {
         try {
             contactDAO.addItem(contact)
-        } catch (err: Exception) {
-            baseViewModel.submitHandler(DatabaseDeleteErrorHandler())
-        } finally {
             baseViewModel.submitHandler(DatabaseSuccessHandler())
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }
     }
 

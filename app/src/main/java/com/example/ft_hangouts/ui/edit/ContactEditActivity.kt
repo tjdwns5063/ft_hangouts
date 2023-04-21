@@ -6,11 +6,10 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
-import com.example.ft_hangouts.App
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
-import com.example.ft_hangouts.ui.BaseActivity
-import com.example.ft_hangouts.ui.ContactActivityContract.CONTACT_ID
+import com.example.ft_hangouts.ui.base.BaseActivity
+import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 
 class ContactEditActivity : BaseActivity() {
     private val id by lazy { receiveId() }
