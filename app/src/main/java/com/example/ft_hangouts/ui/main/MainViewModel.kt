@@ -33,7 +33,7 @@ class MainViewModel(
         updateAppbarColor()
     }
 
-    suspend fun getContactList() = withContext(Dispatchers.IO) {
+    private suspend fun getContactList() = withContext(Dispatchers.IO) {
         try {
             val lst = contactDatabaseDAO.getAllItems().map { contactToContactDomainModel(it) }
             _contactList.value = lst
