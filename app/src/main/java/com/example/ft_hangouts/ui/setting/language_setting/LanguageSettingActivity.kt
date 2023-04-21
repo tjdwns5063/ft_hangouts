@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.LocaleList
 import android.view.View
 import com.example.ft_hangouts.EventDialog
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityLanguageSettingBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.main.MainActivity
@@ -82,7 +83,7 @@ class LanguageSettingActivity : BaseActivity() {
         } else {
             EventDialog.showEventDialog(
                 fragmentManager = supportFragmentManager,
-            message = "언어를 변경하려면 앱을 재시작해야합니다. 재시작 하시겠습니까?",
+            message = getString(R.string.language_change_message),
             onClick = { _, _ ->
                 val intent = Intent(this, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
