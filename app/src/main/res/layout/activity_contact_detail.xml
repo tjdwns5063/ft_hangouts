@@ -73,13 +73,6 @@
                     android:src="@drawable/baseline_person_24" />
 
                 <TextView
-                    android:id="@+id/detail_name_text"
-                    style="@style/detail_item_text_style"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_name_text" />
-
-                <TextView
                     android:id="@+id/detail_name_value_text"
                     style="@style/detail_item_text_style"
                     android:layout_width="match_parent"
@@ -113,13 +106,6 @@
                     android:layout_height="32dp"
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/baseline_call_24" />
-
-                <TextView
-                    android:id="@+id/detail_phone_number_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_phone_number_text"
-                    style="@style/detail_item_text_style" />
 
                 <TextView
                     android:id="@+id/detail_phone_number_value_text"
@@ -157,13 +143,6 @@
                     android:src="@drawable/baseline_email_32" />
 
                 <TextView
-                    android:id="@+id/detail_email_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_email_text"
-                    style="@style/detail_item_text_style" />
-
-                <TextView
                     android:id="@+id/detail_email_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -199,13 +178,6 @@
                     android:src="@drawable/baseline_man_4_32" />
 
                 <TextView
-                    android:id="@+id/detail_gender_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_gender_text"
-                    style="@style/detail_item_text_style" />
-
-                <TextView
                     android:id="@+id/detail_gender_value_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -239,13 +211,6 @@
                     android:layout_height="32dp"
                     android:layout_marginEnd="12dp"
                     android:src="@drawable/baseline_diversity_3_32" />
-
-                <TextView
-                    android:id="@+id/detail_relation_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_relation_text"
-                    style="@style/detail_item_text_style" />
 
                 <TextView
                     android:id="@+id/detail_relation_value_text"

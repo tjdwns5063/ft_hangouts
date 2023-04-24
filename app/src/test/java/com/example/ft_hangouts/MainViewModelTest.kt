@@ -21,6 +21,7 @@ import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+@ExperimentalCoroutinesApi
 class MainDispatcherRule(
     val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : TestWatcher() {
@@ -36,6 +37,7 @@ class MainDispatcherRule(
 @RunWith(RobolectricTestRunner::class)
 internal class MainViewModelTest {
     @get:Rule
+    @ExperimentalCoroutinesApi
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var mainViewModel: MainViewModel
     private lateinit var context: Context
@@ -58,7 +60,6 @@ internal class MainViewModelTest {
     }
 
     @Test
-    @OptIn(InternalCoroutinesApi::class)
     @ExperimentalCoroutinesApi
     fun `given database have two item when viewModel create then check initial condition`() = runTest {
         // given
