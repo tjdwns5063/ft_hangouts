@@ -27,11 +27,6 @@ class ContactRecyclerAdapter(
         return currentList.size
     }
 
-//    fun addItem(contacts: List<ContactDomainModel>) {
-//        items = contacts
-//        notifyDataSetChanged()
-//    }
-
     fun getIdByPosition(position: Int): Long {
         return currentList[position].id
     }

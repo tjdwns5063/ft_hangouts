@@ -3,13 +3,16 @@ package com.example.ft_hangouts.ui.main
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
@@ -24,7 +27,6 @@ import kotlinx.coroutines.launch
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper(applicationContext)), lifecycleScope, super.baseViewModel) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -69,11 +71,18 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setRecyclerView() {
-        val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }
+        val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }.apply {
+            stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+
+                Log.i("position", "initRecycler Called")
+                viewModel.initRecyclerList()
+
                 viewModel.contactList.collect {
+                    Log.i("position", "submitList Called")
                     adapter.submitList(it)
                 }
             }
@@ -85,8 +94,9 @@ class MainActivity : BaseActivity() {
     private fun contactRecyclerItemOnClick(view: View) {
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
         val position = binding.contactRecyclerView.getChildLayoutPosition(view)
+        val id = adapter.getIdByPosition(position)
 
-        goToDetailActivity(adapter.getIdByPosition(position))
+        goToDetailActivity(id)
     }
 
     private fun goToAppBarChangeActivity() {
@@ -98,6 +108,7 @@ class MainActivity : BaseActivity() {
     private fun setAppBarColor() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.updateAppbarColor()
                 viewModel.appBarColor.collect {
                     binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
                 }
@@ -110,13 +121,6 @@ class MainActivity : BaseActivity() {
             putExtra("id", id)
         }
         startActivity(intent)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        viewModel.updateAppbarColor()
-        viewModel.initRecyclerList()
     }
 
     override fun onDestroy() {
