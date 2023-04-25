@@ -34,44 +34,49 @@ class MainActivity : BaseActivity() {
         binding.viewModel = viewModel
         setContentView(binding.root)
 
-//        binding.toolbar.inflateMenu(R.menu.main_toolbar_menu)
-//        setAppBarColor()
+        setButton()
+        setAppBarColor()
         setRecyclerView()
 //        binding.button.setOnClickListener { goToAddActivity() }
 //        binding.settingButton.setOnClickListener { setPopUpMenu(it) }
     }
 
-    //    private fun goToAddActivity() {
-//        startActivity(Intent(this, ContactAddActivity::class.java))
-//    }
-//
-//    private fun setPopUpMenu(view: View) {
-//        val popupMenu = PopupMenu(this, view)
-//
-//        popupMenu.setOnMenuItemClickListener { menu ->
-//            when (menu.itemId) {
-//                R.id.main_header_color_change_menu -> {
-//                    goToAppBarChangeActivity()
-//                    true
-//                }
-//                R.id.main_language_select_menu -> {
-//                    goToLanguageSettingActivity()
-//                    true
-//                }
-//                else -> false
-//            }
-//        }
-//
-//        popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
-//        popupMenu.show()
-//    }
-//
-//    private fun goToLanguageSettingActivity() {
-//        val intent = Intent(this, LanguageSettingActivity::class.java)
-//
-//        startActivity(intent)
-//    }
-//
+    private fun setButton() {
+        binding.toolbarAddButton.setOnClickListener { goToAddActivity() }
+        binding.toolbarSettingButton.setOnClickListener { setPopUpMenu(it) }
+    }
+
+    private fun goToAddActivity() {
+        startActivity(Intent(this, ContactAddActivity::class.java))
+    }
+
+    private fun setPopUpMenu(view: View) {
+        val popupMenu = PopupMenu(this, view)
+
+        popupMenu.setOnMenuItemClickListener { menu ->
+            when (menu.itemId) {
+                R.id.main_header_color_change_menu -> {
+                    goToAppBarChangeActivity()
+                    true
+                }
+                R.id.main_language_select_menu -> {
+                    goToLanguageSettingActivity()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
+        popupMenu.show()
+    }
+
+    private fun goToLanguageSettingActivity() {
+        val intent = Intent(this, LanguageSettingActivity::class.java)
+
+        startActivity(intent)
+    }
+
     private fun setRecyclerView() {
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -89,7 +94,6 @@ class MainActivity : BaseActivity() {
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
-//
     private fun contactRecyclerItemOnClick(view: View) {
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
         val position = binding.contactRecyclerView.getChildLayoutPosition(view)
@@ -98,32 +102,32 @@ class MainActivity : BaseActivity() {
         goToDetailActivity(id)
     }
 
-//    private fun goToAppBarChangeActivity() {
-//        val intent = Intent(this, AppBarSettingActivity::class.java)
-//
-//        startActivity(intent)
-//    }
-//
-//    private fun setAppBarColor() {
-//        lifecycleScope.launch {
-//            repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.updateAppbarColor()
-//                viewModel.appBarColor.collect {
-////                    binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
-//                }
-//            }
-//        }
-//    }
-//
+    private fun goToAppBarChangeActivity() {
+        val intent = Intent(this, AppBarSettingActivity::class.java)
+
+        startActivity(intent)
+    }
+
+    private fun setAppBarColor() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.updateAppbarColor()
+                viewModel.appBarColor.collect {
+//                    binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
+                }
+            }
+        }
+    }
+
     private fun goToDetailActivity(id: Long) {
         val intent = Intent(this, ContactDetailActivity::class.java).apply {
             putExtra("id", id)
         }
         startActivity(intent)
     }
-//
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        viewModel.closeDatabase()
-//    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.closeDatabase()
+    }
 }
