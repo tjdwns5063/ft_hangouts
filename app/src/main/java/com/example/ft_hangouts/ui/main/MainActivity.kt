@@ -21,29 +21,31 @@ import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
+import com.example.ft_hangouts.ui.search.ContactSearchActivity
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper(applicationContext)), lifecycleScope, super.baseViewModel) }
+    private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
-
         setButton()
         setAppBarColor()
         setRecyclerView()
-//        binding.button.setOnClickListener { goToAddActivity() }
-//        binding.settingButton.setOnClickListener { setPopUpMenu(it) }
     }
 
     private fun setButton() {
         binding.toolbarAddButton.setOnClickListener { goToAddActivity() }
         binding.toolbarSettingButton.setOnClickListener { setPopUpMenu(it) }
+        binding.toolbarSearchButton.setOnClickListener {
+            val intent = Intent(this, ContactSearchActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun goToAddActivity() {

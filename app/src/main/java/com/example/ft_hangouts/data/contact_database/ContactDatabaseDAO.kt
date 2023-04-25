@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.BaseColumns
+import android.util.Log
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.BackgroundHelper
 import java.io.ByteArrayOutputStream
@@ -157,6 +158,56 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
             if (ret == 0)
                 throw IllegalStateException("can't update this rowId $rowId")
             println("success")
+        }
+    }
+
+    fun searchContact(text: String): List<Contact> {
+        with(dbHelper) {
+            val readDb = readableDatabase
+
+            val projection = arrayOf(
+                BaseColumns._ID,
+                ContactContract.ContactEntry.COLUMN_NAME_NAME,
+                ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER,
+                ContactContract.ContactEntry.COLUMN_NAME_GENDER,
+                ContactContract.ContactEntry.COLUMN_NAME_EMAIL,
+                ContactContract.ContactEntry.COLUMN_NAME_RELATION,
+                ContactContract.ContactEntry.COLUMN_PROFILE
+            )
+
+            val selection = "${ContactContract.ContactEntry.COLUMN_NAME_NAME} LIKE ?"
+            val selectionArgs = arrayOf("%$text%")
+
+            val cursor = readDb.query(
+                ContactContract.ContactEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            )
+            val list = mutableListOf<Contact>()
+            with(cursor) {
+                while (moveToNext()) {
+                    val id = getLong(getColumnIndexOrThrow(BaseColumns._ID))
+                    val name =
+                        getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME))
+                    val phoneNumber =
+                        getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER))
+                    val email =
+                        getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_EMAIL))
+                    val relation =
+                        getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_RELATION))
+                    val gender =
+                        getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
+                    val profile =
+                        getBlob(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PROFILE))
+
+                    list += Contact(id, name, phoneNumber, email, relation, gender, profile)
+                }
+                return list
+            }
         }
     }
 
