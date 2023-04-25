@@ -19,7 +19,11 @@ import kotlinx.coroutines.launch
 class ContactSearchActivity : BaseActivity() {
     private lateinit var binding: ActivityContactSearchBinding
     private val viewModel by lazy {
-        ContactSearchViewModel(ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, baseViewModel)
+        ContactSearchViewModel(
+            ContactDatabaseDAO(ContactHelper.createDatabase(this)),
+            lifecycleScope,
+            baseViewModel
+        )
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

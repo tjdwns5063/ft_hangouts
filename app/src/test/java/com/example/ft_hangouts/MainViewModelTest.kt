@@ -16,23 +16,10 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-@ExperimentalCoroutinesApi
-class MainDispatcherRule(
-    val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(),
-) : TestWatcher() {
-    override fun starting(description: Description) {
-        Dispatchers.setMain(testDispatcher)
-    }
 
-    override fun finished(description: Description) {
-        Dispatchers.resetMain()
-    }
-}
 
 @RunWith(RobolectricTestRunner::class)
 internal class MainViewModelTest {
