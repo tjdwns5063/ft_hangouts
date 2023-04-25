@@ -1,13 +1,18 @@
 package com.example.ft_hangouts.ui.search
 
+import android.app.SearchManager
+import android.app.SearchableInfo
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.SearchView.OnQueryTextListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityContactSearchBinding
@@ -30,9 +35,14 @@ class ContactSearchActivity : BaseActivity() {
         binding = ActivityContactSearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setButton()
         setRecyclerView()
         setSearchView()
         updateSearchResult()
+    }
+
+    private fun setButton() {
+        binding.searchBackButton.setOnClickListener { finish() }
     }
 
     private fun setRecyclerView() {
@@ -53,6 +63,8 @@ class ContactSearchActivity : BaseActivity() {
     }
 
     private fun setSearchView() {
+        binding.searchView.onActionViewExpanded()
+        binding.searchView.queryHint = getString(R.string.search_hint)
         binding.searchView.setOnQueryTextListener(ContactQueryTextListener())
     }
 

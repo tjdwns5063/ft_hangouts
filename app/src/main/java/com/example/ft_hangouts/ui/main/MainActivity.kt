@@ -3,8 +3,6 @@ package com.example.ft_hangouts.ui.main
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
-import android.view.Menu
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
@@ -13,7 +11,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
@@ -24,7 +21,6 @@ import com.example.ft_hangouts.ui.base.ContactActivityContract
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.search.ContactSearchActivity
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
@@ -116,7 +112,7 @@ class MainActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.updateAppbarColor()
                 viewModel.appBarColor.collect {
-//                    binding.mainLayout.backgroundTintList = ColorStateList.valueOf(it)
+                    binding.appBar.backgroundTintList = ColorStateList.valueOf(it)
                 }
             }
         }
