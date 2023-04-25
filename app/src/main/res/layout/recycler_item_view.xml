@@ -26,6 +26,7 @@
         android:layout_marginStart="16dp"
         android:paddingVertical="16dp"
         android:text="TextView"
+        android:backgroundTint="@android:color/transparent"
         android:background="@drawable/bottom_stroke"
         style="@style/contact_recycler_style"/>
 
