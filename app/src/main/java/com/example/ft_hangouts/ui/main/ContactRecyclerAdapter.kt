@@ -1,15 +1,45 @@
 package com.example.ft_hangouts.ui.main
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 import com.example.ft_hangouts.ui.main.ContactRecyclerAdapter.ContactViewHolder.Companion.callback
+
+fun interface ItemTouchHelperListener {
+    fun onItemSwipe(position: Int, direction: Int)
+}
+class ContactTouchHelperCallback(private val listener: ItemTouchHelperListener): ItemTouchHelper.Callback() {
+    override fun getMovementFlags(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder
+    ): Int {
+        return makeMovementFlags(
+            0, // drag unused.
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        )
+    }
+
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
+        return false
+    }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        Log.i("swipe", "onSwiped Called")
+        listener.onItemSwipe(viewHolder.absoluteAdapterPosition, direction)
+    }
+}
 
 class ContactRecyclerAdapter(
         private val clickListener: OnClickListener

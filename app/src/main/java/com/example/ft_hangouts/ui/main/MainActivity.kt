@@ -1,19 +1,27 @@
 package com.example.ft_hangouts.ui.main
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
+import com.example.ft_hangouts.system.CallSystemHelper
+import com.example.ft_hangouts.system.registerRequestCallPermissionResult
+import com.example.ft_hangouts.system.requestCallPermission
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
@@ -21,9 +29,11 @@ import com.example.ft_hangouts.ui.base.ContactActivityContract
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.search.ContactSearchActivity
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
+import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
+    private lateinit var callPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +41,7 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
+        requestCallPermission(this, registerRequestCallPermissionResult())
         setButton()
         setAppBarColor()
         setRecyclerView()
@@ -80,6 +91,25 @@ class MainActivity : BaseActivity() {
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
+        val itemTouchHelperCallback = ContactTouchHelperCallback {position, direction ->
+            when (direction) {
+                ItemTouchHelper.RIGHT -> {
+                    CallSystemHelper().callToAddress(adapter.currentList[position].phoneNumber)
+                    Toast.makeText(this, "오른쪽 스와이프", Toast.LENGTH_SHORT).show()
+                }
+                ItemTouchHelper.LEFT -> {
+                    val intent = Intent(this, ContactSmsActivity::class.java)
+                    intent.putExtra(ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
+                    startActivity(intent)
+                    Toast.makeText(this, "왼쪽 스와이프", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        binding.contactRecyclerView.adapter = adapter
+        binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+
+        val helper = ItemTouchHelper(itemTouchHelperCallback)
+        helper.attachToRecyclerView(binding.contactRecyclerView)
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -90,8 +120,6 @@ class MainActivity : BaseActivity() {
                 }
             }
         }
-        binding.contactRecyclerView.adapter = adapter
-        binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
     private fun contactRecyclerItemOnClick(view: View) {
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
