@@ -21,11 +21,21 @@ class ContactSearchViewModel(
     private val _searchedList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
     val searchedList: StateFlow<List<ContactDomainModel>> = _searchedList.asStateFlow()
 
+    private val _text = MutableStateFlow<String>("")
+
     private suspend fun searchContact(text: String) = withContext(Dispatchers.IO) {
         try {
             _searchedList.value = contactDatabaseDAO.searchContact(text).map { contactToContactDomainModel(it) }
+            _text.value = text
         } catch(err: Exception) {
+            _searchedList.value = emptyList()
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
+        }
+    }
+
+    fun update() {
+        if (_text.value != "") {
+            search(_text.value)
         }
     }
 

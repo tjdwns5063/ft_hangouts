@@ -25,6 +25,10 @@ class SearchRecyclerViewAdapter(private val listener: View.OnClickListener):
         return currentList.size
     }
 
+    fun getIdByPosition(position: Int): Long {
+        return currentList[position].id
+    }
+
     class SearchRecyclerViewHolder private constructor(
         private val binding: SearchRecyclerItemViewBinding,
         private val listener: View.OnClickListener

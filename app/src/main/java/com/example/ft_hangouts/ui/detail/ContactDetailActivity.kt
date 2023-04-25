@@ -21,7 +21,7 @@ import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 
 class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
-    private val id by lazy { intent.getLongExtra("id", -1) }
+    private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val viewModel by lazy { ContactDetailViewModel(applicationContext, lifecycleScope, id, super.baseViewModel) }
     private lateinit var callPermissionLauncher: ActivityResultLauncher<String>
 

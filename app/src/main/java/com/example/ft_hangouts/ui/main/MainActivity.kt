@@ -20,6 +20,7 @@ import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
+import com.example.ft_hangouts.ui.base.ContactActivityContract
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
 import com.example.ft_hangouts.ui.search.ContactSearchActivity
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingActivity
@@ -123,7 +124,7 @@ class MainActivity : BaseActivity() {
 
     private fun goToDetailActivity(id: Long) {
         val intent = Intent(this, ContactDetailActivity::class.java).apply {
-            putExtra("id", id)
+            putExtra(ContactActivityContract.CONTACT_ID, id)
         }
         startActivity(intent)
     }
