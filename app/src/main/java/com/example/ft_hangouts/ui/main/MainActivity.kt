@@ -1,14 +1,9 @@
 package com.example.ft_hangouts.ui.main
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -19,7 +14,6 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
-import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.system.registerRequestCallPermissionResult
 import com.example.ft_hangouts.system.requestCallPermission
 import com.example.ft_hangouts.system.requestCallToCallSystemHelper
