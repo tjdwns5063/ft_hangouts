@@ -1,6 +1,7 @@
 package com.example.ft_hangouts.ui.base
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -62,5 +63,18 @@ open class BaseActivity : AppCompatActivity() {
 
         configuration.setLocale(locale)
         return context.createConfigurationContext(configuration)
+    }
+
+    fun <T> goToActivity(activityClass: Class<T>) {
+        val intent = Intent(this, activityClass)
+
+        startActivity(intent)
+    }
+
+    fun <T> goToActivity(activityClass: Class<T>, extraName: String, extra: Long) {
+        val intent = Intent(this, activityClass)
+
+        intent.putExtra(extraName, extra)
+        startActivity(intent)
     }
 }

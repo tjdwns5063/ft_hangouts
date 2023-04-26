@@ -48,16 +48,9 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setButton() {
-        binding.toolbarAddButton.setOnClickListener { goToAddActivity() }
+        binding.toolbarAddButton.setOnClickListener { goToActivity(ContactAddActivity::class.java) }
         binding.toolbarSettingButton.setOnClickListener { setPopUpMenu(it) }
-        binding.toolbarSearchButton.setOnClickListener {
-            val intent = Intent(this, ContactSearchActivity::class.java)
-            startActivity(intent)
-        }
-    }
-
-    private fun goToAddActivity() {
-        startActivity(Intent(this, ContactAddActivity::class.java))
+        binding.toolbarSearchButton.setOnClickListener { goToActivity(ContactSearchActivity::class.java) }
     }
 
     private fun setPopUpMenu(view: View) {
@@ -66,11 +59,11 @@ class MainActivity : BaseActivity() {
         popupMenu.setOnMenuItemClickListener { menu ->
             when (menu.itemId) {
                 R.id.main_header_color_change_menu -> {
-                    goToAppBarChangeActivity()
+                    goToActivity(AppBarSettingActivity::class.java)
                     true
                 }
                 R.id.main_language_select_menu -> {
-                    goToLanguageSettingActivity()
+                    goToActivity(LanguageSettingActivity::class.java)
                     true
                 }
                 else -> false
@@ -79,12 +72,6 @@ class MainActivity : BaseActivity() {
 
         popupMenu.menuInflater.inflate(R.menu.main_menu, popupMenu.menu)
         popupMenu.show()
-    }
-
-    private fun goToLanguageSettingActivity() {
-        val intent = Intent(this, LanguageSettingActivity::class.java)
-
-        startActivity(intent)
     }
 
     private fun setRecyclerView() {
@@ -99,14 +86,8 @@ class MainActivity : BaseActivity() {
                 ItemTouchHelper.RIGHT -> {
                     requestCallPermission(callPermissionLauncher)
                     requestCallToCallSystemHelper(adapter.currentList[position].phoneNumber)
-                    Toast.makeText(this, "오른쪽 스와이프", Toast.LENGTH_SHORT).show()
                 }
-                ItemTouchHelper.LEFT -> {
-                    val intent = Intent(this, ContactSmsActivity::class.java)
-                    intent.putExtra(ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
-                    startActivity(intent)
-                    Toast.makeText(this, "왼쪽 스와이프", Toast.LENGTH_SHORT).show()
-                }
+                ItemTouchHelper.LEFT -> { goToActivity(ContactSmsActivity::class.java) }
             }
         }
         binding.contactRecyclerView.adapter = adapter
@@ -130,13 +111,7 @@ class MainActivity : BaseActivity() {
         val position = binding.contactRecyclerView.getChildLayoutPosition(view)
         val id = adapter.getIdByPosition(position)
 
-        goToDetailActivity(id)
-    }
-
-    private fun goToAppBarChangeActivity() {
-        val intent = Intent(this, AppBarSettingActivity::class.java)
-
-        startActivity(intent)
+        goToActivity(ContactDetailActivity::class.java, ContactActivityContract.CONTACT_ID, id)
     }
 
     private fun setAppBarColor() {
@@ -148,13 +123,6 @@ class MainActivity : BaseActivity() {
                 }
             }
         }
-    }
-
-    private fun goToDetailActivity(id: Long) {
-        val intent = Intent(this, ContactDetailActivity::class.java).apply {
-            putExtra(ContactActivityContract.CONTACT_ID, id)
-        }
-        startActivity(intent)
     }
 
     override fun onDestroy() {

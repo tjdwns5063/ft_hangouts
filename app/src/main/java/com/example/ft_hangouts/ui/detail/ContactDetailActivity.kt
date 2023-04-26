@@ -1,6 +1,5 @@
 package com.example.ft_hangouts.ui.detail
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.EventDialog
@@ -55,7 +54,7 @@ class ContactDetailActivity : BaseActivity() {
                         message = getString(R.string.check_delete_message),
                         onClick = { _, _ -> viewModel.deleteContact(id) })
                 }
-                R.id.detail_bottom_sms -> { goToSmsActivity() }
+                R.id.detail_bottom_sms -> { goToActivity(ContactSmsActivity::class.java, CONTACT_ID, id) }
                 R.id.detail_bottom_call -> {
                     requestCallPermission(callPermissionLauncher)
                     viewModel.contact.value?.let {
@@ -63,25 +62,10 @@ class ContactDetailActivity : BaseActivity() {
                         requestCallToCallSystemHelper(phoneNumber)
                     }
                 }
-                R.id.detail_bottom_edit -> { goToContactEditActivity() }
+                R.id.detail_bottom_edit -> { goToActivity(ContactEditActivity::class.java, CONTACT_ID, id) }
             }
             true
         }
-    }
-
-    private fun goToContactEditActivity() {
-        val intent = Intent(this, ContactEditActivity::class.java).apply {
-            putExtra(CONTACT_ID, id)
-        }
-
-        startActivity(intent)
-    }
-
-    private fun goToSmsActivity() {
-        val intent = Intent(this, ContactSmsActivity::class.java).apply {
-            putExtra(CONTACT_ID, id)
-        }
-        startActivity(intent)
     }
 }
 
