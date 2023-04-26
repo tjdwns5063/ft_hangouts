@@ -41,7 +41,6 @@ private fun showCallPermissionDialog(context: Context, callPermissionLauncher: A
 }
 
 fun BaseActivity.requestCallPermission(
-    context: Context,
     callPermissionLauncher: ActivityResultLauncher<String>,
 ) {
     when {
@@ -49,7 +48,7 @@ fun BaseActivity.requestCallPermission(
             callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
         }
         shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE) -> {
-            showCallPermissionDialog(context, callPermissionLauncher)
+            showCallPermissionDialog(this, callPermissionLauncher)
         }
         else -> {
             callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)

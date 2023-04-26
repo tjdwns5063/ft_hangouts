@@ -2,14 +2,11 @@ package com.example.ft_hangouts.ui.detail
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.system.CallSystemHelper
-import com.example.ft_hangouts.system.registerRequestCallPermissionResult
-import com.example.ft_hangouts.system.requestCallPermission
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
@@ -20,7 +17,6 @@ class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val viewModel by lazy { ContactDetailViewModel(applicationContext, lifecycleScope, id, super.baseViewModel) }
-    private lateinit var callPermissionLauncher: ActivityResultLauncher<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +24,6 @@ class ContactDetailActivity : BaseActivity() {
         binding.lifecycleOwner = this
 
         setContentView(binding.root)
-        callPermissionLauncher = registerRequestCallPermissionResult()
         roundProfileBorder()
         setBottomNavItemListener()
         setContactObservationForProfileUpdates()
@@ -43,8 +38,6 @@ class ContactDetailActivity : BaseActivity() {
             it.profile?.let { profile -> binding.detailProfileImage.setImageBitmap(profile) }
         }
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -62,7 +55,6 @@ class ContactDetailActivity : BaseActivity() {
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity() }
                 R.id.detail_bottom_call -> {
-                    requestCallPermission(this, callPermissionLauncher)
                     CallSystemHelper().callToAddress(viewModel.contact.value!!.phoneNumber)
                 }
                 R.id.detail_bottom_edit -> { goToContactEditActivity() }

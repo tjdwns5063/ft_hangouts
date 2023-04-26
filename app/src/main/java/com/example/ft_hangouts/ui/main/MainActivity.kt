@@ -22,6 +22,7 @@ import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.system.registerRequestCallPermissionResult
 import com.example.ft_hangouts.system.requestCallPermission
+import com.example.ft_hangouts.system.requestCallToCallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
@@ -33,15 +34,14 @@ import com.example.ft_hangouts.ui.sms.ContactSmsActivity
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
-    private lateinit var callPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
+    private val callPermissionLauncher = registerRequestCallPermissionResult()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
-        requestCallPermission(this, registerRequestCallPermissionResult())
         setButton()
         setAppBarColor()
         setRecyclerView()
@@ -97,7 +97,8 @@ class MainActivity : BaseActivity() {
         val itemTouchHelperCallback = ContactTouchHelperCallback(notifyItemChanged) { position, direction ->
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
-                    CallSystemHelper().callToAddress(adapter.currentList[position].phoneNumber)
+                    requestCallPermission(callPermissionLauncher)
+                    requestCallToCallSystemHelper(adapter.currentList[position].phoneNumber)
                     Toast.makeText(this, "오른쪽 스와이프", Toast.LENGTH_SHORT).show()
                 }
                 ItemTouchHelper.LEFT -> {
