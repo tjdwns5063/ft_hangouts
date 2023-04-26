@@ -6,7 +6,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
-import com.example.ft_hangouts.system.CallSystemHelper
+import com.example.ft_hangouts.system.registerRequestCallPermissionResult
+import com.example.ft_hangouts.system.requestCallPermission
+import com.example.ft_hangouts.system.requestCallToCallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
@@ -17,7 +19,7 @@ class ContactDetailActivity : BaseActivity() {
     private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val viewModel by lazy { ContactDetailViewModel(applicationContext, lifecycleScope, id, super.baseViewModel) }
-
+    private val callPermissionLauncher = registerRequestCallPermissionResult()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.viewModel = viewModel
@@ -55,7 +57,11 @@ class ContactDetailActivity : BaseActivity() {
                 }
                 R.id.detail_bottom_sms -> { goToSmsActivity() }
                 R.id.detail_bottom_call -> {
-                    CallSystemHelper().callToAddress(viewModel.contact.value!!.phoneNumber)
+                    requestCallPermission(callPermissionLauncher)
+                    viewModel.contact.value?.let {
+                        val phoneNumber = it.phoneNumber
+                        requestCallToCallSystemHelper(phoneNumber)
+                    }
                 }
                 R.id.detail_bottom_edit -> { goToContactEditActivity() }
             }
