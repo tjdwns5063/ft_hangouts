@@ -12,8 +12,13 @@ import com.example.ft_hangouts.ui.pixelToDp
 fun interface ItemTouchHelperListener {
     fun onItemSwipe(position: Int, direction: Int)
 }
-class ContactTouchHelperCallback(private val listener: ItemTouchHelperListener): ItemTouchHelper.Callback() {
+class ContactTouchHelperCallback(
+    private val notifyItemChanged: (Int)->Unit,
+    private val listener: ItemTouchHelperListener
+    ): ItemTouchHelper.Callback() {
     private val paint =  Paint()
+    private var startX: Float = 0f
+    private var startY: Float = 0f
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -35,6 +40,7 @@ class ContactTouchHelperCallback(private val listener: ItemTouchHelperListener):
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         listener.onItemSwipe(viewHolder.absoluteAdapterPosition, direction)
+        notifyItemChanged(viewHolder.absoluteAdapterPosition)
     }
 
     override fun onChildDraw(
@@ -47,6 +53,10 @@ class ContactTouchHelperCallback(private val listener: ItemTouchHelperListener):
         isCurrentlyActive: Boolean
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        if (startX == 0f && startY == 0f) {
+            startX = viewHolder.itemView.x
+            startY = viewHolder.itemView.y
+        }
         val isRightSwipe = dX < 0
         val width = viewHolder.itemView.width
 

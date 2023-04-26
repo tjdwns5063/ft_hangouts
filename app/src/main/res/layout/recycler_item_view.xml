@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:paddingHorizontal="8dp"
-    android:background="@drawable/bottom_stroke"
+    android:background="@color/white"
     android:orientation="horizontal">
 
 
@@ -26,6 +26,7 @@
         android:layout_marginStart="16dp"
         android:paddingVertical="16dp"
         android:text="TextView"
+        android:background="@drawable/bottom_stroke"
         style="@style/contact_recycler_style"/>
 
 </LinearLayout>

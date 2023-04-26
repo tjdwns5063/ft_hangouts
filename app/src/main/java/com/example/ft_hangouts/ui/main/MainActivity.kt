@@ -91,7 +91,10 @@ class MainActivity : BaseActivity() {
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
-        val itemTouchHelperCallback = ContactTouchHelperCallback { position, direction ->
+        val notifyItemChanged = { pos: Int ->
+            adapter.notifyItemChanged(pos)
+        }
+        val itemTouchHelperCallback = ContactTouchHelperCallback(notifyItemChanged) { position, direction ->
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     CallSystemHelper().callToAddress(adapter.currentList[position].phoneNumber)
