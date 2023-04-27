@@ -81,7 +81,10 @@ class MainActivity : BaseActivity() {
                     requestCallPermission(callPermissionLauncher)
                     requestCallToCallSystemHelper(adapter.currentList[position].phoneNumber)
                 }
-                ItemTouchHelper.LEFT -> { goToActivity(ContactSmsActivity::class.java) }
+                ItemTouchHelper.LEFT -> {
+                    goToActivity(
+                        ContactSmsActivity::class.java, ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
+                }
             }
         }
         binding.contactRecyclerView.adapter = adapter
