@@ -30,6 +30,11 @@ class ContactRecyclerAdapter(
         return currentList[position].id
     }
 
+    fun redrawViewHolder(position: Int) {
+        notifyItemChanged(position)
+    }
+
+
     class ContactViewHolder private constructor(
             private val binding: RecyclerItemViewBinding,
             private val clickListener: OnClickListener

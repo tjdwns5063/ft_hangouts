@@ -3,6 +3,7 @@ package com.example.ft_hangouts.ui.main
 import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -10,15 +11,12 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.ui.pixelToDp
 
 fun interface ItemTouchHelperListener {
-    fun onItemSwipe(position: Int, direction: Int)
+    fun onItemSwipe(position: Int, direction: Int, viewHolder: RecyclerView.ViewHolder)
 }
 class ContactTouchHelperCallback(
-    private val notifyItemChanged: (Int)->Unit,
     private val listener: ItemTouchHelperListener
     ): ItemTouchHelper.Callback() {
     private val paint =  Paint()
-    private var startX: Float = 0f
-    private var startY: Float = 0f
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -39,8 +37,7 @@ class ContactTouchHelperCallback(
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        listener.onItemSwipe(viewHolder.absoluteAdapterPosition, direction)
-        notifyItemChanged(viewHolder.absoluteAdapterPosition)
+        listener.onItemSwipe(viewHolder.absoluteAdapterPosition, direction, viewHolder)
     }
 
     override fun onChildDraw(
@@ -53,10 +50,9 @@ class ContactTouchHelperCallback(
         isCurrentlyActive: Boolean
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-        if (startX == 0f && startY == 0f) {
-            startX = viewHolder.itemView.x
-            startY = viewHolder.itemView.y
-        }
+
+        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
+            return
         val isRightSwipe = dX < 0
         val width = viewHolder.itemView.width
 
@@ -72,6 +68,18 @@ class ContactTouchHelperCallback(
         val progress = dX / width
 
         viewHolder.itemView.alpha = 1f - progress
+    }
+
+    override fun onChildDrawOver(
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder?,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
     private fun drawSms(

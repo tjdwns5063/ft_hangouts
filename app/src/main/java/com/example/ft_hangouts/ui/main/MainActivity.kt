@@ -2,6 +2,7 @@ package com.example.ft_hangouts.ui.main
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
@@ -31,8 +32,10 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
     private val callPermissionLauncher = registerRequestCallPermissionResult()
+    private lateinit var handler: Handler
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handler = Handler.createAsync(mainLooper)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
@@ -72,21 +75,20 @@ class MainActivity : BaseActivity() {
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
-        val notifyItemChanged = { pos: Int ->
-            adapter.notifyItemChanged(pos)
-        }
-        val itemTouchHelperCallback = ContactTouchHelperCallback(notifyItemChanged) { position, direction ->
+        val itemTouchHelperCallback = ContactTouchHelperCallback { position, direction, viewHolder ->
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     requestCallPermission(callPermissionLauncher)
                     requestCallToCallSystemHelper(adapter.currentList[position].phoneNumber)
                 }
                 ItemTouchHelper.LEFT -> {
+                    adapter.redrawViewHolder(position)
                     goToActivity(
                         ContactSmsActivity::class.java, ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
                 }
             }
         }
+
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
@@ -128,8 +130,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        viewModel.closeDatabase()
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        viewModel.closeDatabase()
+//    }
 }
