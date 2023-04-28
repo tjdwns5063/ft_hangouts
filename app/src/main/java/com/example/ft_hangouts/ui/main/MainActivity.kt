@@ -32,10 +32,8 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
     private val callPermissionLauncher = registerRequestCallPermissionResult()
-    private lateinit var handler: Handler
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handler = Handler.createAsync(mainLooper)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
@@ -82,11 +80,11 @@ class MainActivity : BaseActivity() {
                     requestCallToCallSystemHelper(adapter.currentList[position].phoneNumber)
                 }
                 ItemTouchHelper.LEFT -> {
-                    adapter.redrawViewHolder(position)
                     goToActivity(
                         ContactSmsActivity::class.java, ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
                 }
             }
+            adapter.redrawViewHolder(position)
         }
 
         binding.contactRecyclerView.adapter = adapter
@@ -129,9 +127,4 @@ class MainActivity : BaseActivity() {
             }
         }
     }
-
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        viewModel.closeDatabase()
-//    }
 }
