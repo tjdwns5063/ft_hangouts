@@ -95,7 +95,6 @@ class MainActivity : BaseActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.initRecyclerList()
 
                 viewModel.contactList.collect {
                     adapter.submitList(it)
@@ -103,6 +102,14 @@ class MainActivity : BaseActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.initRecyclerList()
+        viewModel.updateAppbarColor()
+    }
+
     private fun contactRecyclerItemOnClick(view: View) {
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
         val position = binding.contactRecyclerView.getChildLayoutPosition(view)
@@ -114,7 +121,6 @@ class MainActivity : BaseActivity() {
     private fun setAppBarColor() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.updateAppbarColor()
                 viewModel.appBarColor.collect {
                     binding.appBar.backgroundTintList = ColorStateList.valueOf(it)
                 }

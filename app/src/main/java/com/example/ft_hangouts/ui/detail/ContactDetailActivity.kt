@@ -46,12 +46,17 @@ class ContactDetailActivity : BaseActivity() {
     private fun setContactObservationForProfileUpdates() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.updateContact()
                 viewModel.contact.collect {
                     it.profile?.let { profile -> binding.detailProfileImage.setImageBitmap(profile) }
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.updateContact()
     }
 
     private fun setBottomNavItemListener() {
