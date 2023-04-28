@@ -20,21 +20,23 @@ import kotlinx.coroutines.launch
 
 
 class ContactDetailActivity : BaseActivity() {
-    private val binding: ActivityContactDetailBinding by lazy { ActivityContactDetailBinding.inflate(layoutInflater) }
+    private lateinit var binding: ActivityContactDetailBinding
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val viewModel by lazy {
-        ContactDetailViewModel(lifecycleScope, id, baseViewModel, ContactDatabaseDAO(ContactHelper(this)))
+        ContactDetailViewModel(lifecycleScope, id, baseViewModel, ContactDatabaseDAO(ContactHelper.createDatabase(this)))
     }
     private val callPermissionLauncher = registerRequestCallPermissionResult()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityContactDetailBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        setContentView(binding.root)
         roundProfileBorder()
         setBottomNavItemListener()
         setContactObservationForProfileUpdates()
+        setContentView(binding.root)
+
     }
 
     private fun roundProfileBorder() {

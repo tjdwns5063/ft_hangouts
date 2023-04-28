@@ -10,8 +10,6 @@ import com.example.ft_hangouts.BackgroundHelper
 import java.io.ByteArrayOutputStream
 
 class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
-//    private val dbHelper: ContactHelper = ContactHelper.createDatabase()
-
     fun closeDatabase() {
         dbHelper.close()
     }
@@ -55,8 +53,6 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                         getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_GENDER))
                     val profile =
                         getBlob(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PROFILE))
-                    if (profile != null)
-                        println(profile)
 
                     list += Contact(id, name, phoneNumber, email, relation, gender, profile)
                 }

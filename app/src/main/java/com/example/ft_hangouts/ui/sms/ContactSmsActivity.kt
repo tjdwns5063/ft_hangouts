@@ -17,6 +17,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.system.SmsSystemHelper
@@ -45,7 +47,7 @@ class ContactSmsActivity : BaseActivity() {
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private val smsSystemHelper = createSmsSystemHelper()
-    private val viewModel by lazy { ContactSmsViewModel(applicationContext, id, lifecycleScope, super.baseViewModel) }
+    private val viewModel by lazy { ContactSmsViewModel(ContactDatabaseDAO(ContactHelper.createDatabase(this)), id, lifecycleScope, super.baseViewModel) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
