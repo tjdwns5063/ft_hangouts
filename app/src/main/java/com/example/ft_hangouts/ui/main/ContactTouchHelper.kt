@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.ft_hangouts.App
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.ui.pixelToDp
 
@@ -81,7 +82,7 @@ class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
         viewHolder: RecyclerView.ViewHolder
     ) {
         drawBackground(c, viewHolder, Color.CYAN)
-        val drawable = ResourcesCompat.getDrawable(viewHolder.itemView.resources, R.drawable.baseline_email_32, null) ?: return
+        val drawable = ResourcesCompat.getDrawable(App.INSTANCE.resources, R.drawable.baseline_email_32, null) ?: return
         val drawableBounds = Rect(
             viewHolder.itemView.right - pixelToDp(32),
             viewHolder.itemView.top + pixelToDp(8),
@@ -100,7 +101,7 @@ class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
         viewHolder: RecyclerView.ViewHolder
     ) {
         drawBackground(c, viewHolder, Color.GREEN)
-        val drawable = ResourcesCompat.getDrawable(viewHolder.itemView.resources, R.drawable.baseline_call_24, null) ?: return
+        val drawable = ResourcesCompat.getDrawable(App.INSTANCE.resources, R.drawable.baseline_call_24, null) ?: return
         val bounds = Rect(
             viewHolder.itemView.left + pixelToDp(16),
             viewHolder.itemView.top + pixelToDp(8),
