@@ -11,12 +11,12 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.ui.pixelToDp
 
 fun interface ItemTouchHelperListener {
-    fun onItemSwipe(position: Int, direction: Int, viewHolder: RecyclerView.ViewHolder)
+    fun onItemSwipe(position: Int, direction: Int)
 }
-class ContactTouchHelperCallback(
-    private val listener: ItemTouchHelperListener
-    ): ItemTouchHelper.Callback() {
+class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
+    private var listener: ItemTouchHelperListener = ItemTouchHelperListener { position: Int, direction: Int -> }
     private val paint =  Paint()
+    private var startX: Float = 0f
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
@@ -37,7 +37,7 @@ class ContactTouchHelperCallback(
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        listener.onItemSwipe(viewHolder.absoluteAdapterPosition, direction, viewHolder)
+        listener.onItemSwipe(viewHolder.absoluteAdapterPosition, direction)
     }
 
     override fun onChildDraw(
@@ -50,6 +50,8 @@ class ContactTouchHelperCallback(
         isCurrentlyActive: Boolean
     ) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+        if (startX == 0f)
+            startX = dX
 
         if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE)
             return
@@ -70,16 +72,8 @@ class ContactTouchHelperCallback(
         viewHolder.itemView.alpha = 1f - progress
     }
 
-    override fun onChildDrawOver(
-        c: Canvas,
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder?,
-        dX: Float,
-        dY: Float,
-        actionState: Int,
-        isCurrentlyActive: Boolean
-    ) {
-        super.onChildDrawOver(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+    fun setSwipeListener(_listener: ItemTouchHelperListener) {
+        listener = _listener
     }
 
     private fun drawSms(

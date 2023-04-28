@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
@@ -12,7 +13,7 @@ import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 import com.example.ft_hangouts.ui.main.ContactRecyclerAdapter.ContactViewHolder.Companion.callback
 
 class ContactRecyclerAdapter(
-        private val clickListener: OnClickListener
+    private val clickListener: OnClickListener,
     ): ListAdapter<ContactDomainModel, ContactRecyclerAdapter.ContactViewHolder>(callback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, clickListener)
@@ -30,8 +31,15 @@ class ContactRecyclerAdapter(
         return currentList[position].id
     }
 
-    fun redrawViewHolder(position: Int) {
-        notifyItemChanged(position)
+    fun redraw() {
+        notifyDataSetChanged()
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<ContactDomainModel>,
+        currentList: MutableList<ContactDomainModel>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
     }
 
 
@@ -60,7 +68,7 @@ class ContactRecyclerAdapter(
 
             val callback = object : DiffUtil.ItemCallback<ContactDomainModel>() {
                 override fun areItemsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
-                    return true
+                    return false
                 }
 
                 override fun areContentsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {

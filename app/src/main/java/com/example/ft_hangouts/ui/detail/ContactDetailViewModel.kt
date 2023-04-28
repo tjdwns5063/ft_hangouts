@@ -1,6 +1,8 @@
 package com.example.ft_hangouts.ui.detail
 
 import android.content.Context
+import android.util.Log
+import android.util.LogPrinter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO

@@ -1,6 +1,7 @@
 package com.example.ft_hangouts.ui.main
 
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -32,8 +33,10 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
     private val callPermissionLauncher = registerRequestCallPermissionResult()
+//    private lateinit var handler: Handler
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        handler = if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
@@ -70,10 +73,17 @@ class MainActivity : BaseActivity() {
     }
 
     private fun setRecyclerView() {
+        val itemTouchHelperCallback = ContactTouchHelperCallback()
+
+        val helper = ItemTouchHelper(itemTouchHelperCallback)
+        helper.attachToRecyclerView(binding.contactRecyclerView)
+
         val adapter = ContactRecyclerAdapter { contactRecyclerItemOnClick(it) }.apply {
             stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         }
-        val itemTouchHelperCallback = ContactTouchHelperCallback { position, direction, viewHolder ->
+
+        itemTouchHelperCallback.setSwipeListener { position, direction ->
+            adapter.redraw()
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     requestCallPermission(callPermissionLauncher)
@@ -84,14 +94,11 @@ class MainActivity : BaseActivity() {
                         ContactSmsActivity::class.java, ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
                 }
             }
-            adapter.redrawViewHolder(position)
         }
 
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-        val helper = ItemTouchHelper(itemTouchHelperCallback)
-        helper.attachToRecyclerView(binding.contactRecyclerView)
+        binding.contactRecyclerView.itemAnimator = null
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -127,4 +134,5 @@ class MainActivity : BaseActivity() {
             }
         }
     }
+
 }
