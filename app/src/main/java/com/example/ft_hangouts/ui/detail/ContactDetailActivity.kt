@@ -1,8 +1,6 @@
 package com.example.ft_hangouts.ui.detail
 
 import android.os.Bundle
-import android.util.Log
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -25,7 +23,7 @@ class ContactDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityContactDetailBinding
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val viewModel by lazy {
-        ContactDetailViewModel(lifecycleScope, id, baseViewModel, ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)))
+        ContactDetailViewModel(lifecycleScope, id, baseViewModel, ContactDatabaseDAO(ContactHelper.createDatabase(this)))
     }
     private val callPermissionLauncher = registerRequestCallPermissionResult()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,10 +32,11 @@ class ContactDetailActivity : BaseActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        setContentView(binding.root)
         roundProfileBorder()
         setBottomNavItemListener()
         setContactObservationForProfileUpdates()
+        setContentView(binding.root)
+
     }
 
     private fun roundProfileBorder() {
@@ -48,11 +47,7 @@ class ContactDetailActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.contact.collect {
-                    if (it.profile == null) {
-                        binding.detailProfileImage.setImageResource(R.drawable.ic_default_profile)
-                    } else {
-                        binding.detailProfileImage.setImageBitmap(it.profile)
-                    }
+                    it.profile?.let { profile -> binding.detailProfileImage.setImageBitmap(profile) }
                 }
             }
         }
@@ -76,7 +71,7 @@ class ContactDetailActivity : BaseActivity() {
                 R.id.detail_bottom_sms -> { goToActivity(ContactSmsActivity::class.java, CONTACT_ID, id) }
                 R.id.detail_bottom_call -> {
                     requestCallPermission(callPermissionLauncher)
-                    requestCallToCallSystemHelper(viewModel.contact.value!!.phoneNumber)
+                    requestCallToCallSystemHelper(viewModel.contact.value.phoneNumber)
                 }
                 R.id.detail_bottom_edit -> { goToActivity(ContactEditActivity::class.java, CONTACT_ID, id) }
             }
