@@ -2,13 +2,9 @@ package com.example.ft_hangouts
 
 import android.app.Application
 import android.content.Context
-import android.os.Handler
 import android.widget.Toast
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class App : Application() {
     private var foregroundActivityName: String? = null
@@ -19,23 +15,19 @@ class App : Application() {
         INSTANCE = this
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
-    private fun updateForeground(foreground: String) {
-        foregroundActivityName = foreground
+    private fun updateForeground(foregroundActivityName: String) {
+        this.foregroundActivityName = foregroundActivityName
     }
 
     private fun isForeground(currClassName: String): Boolean {
         return foregroundActivityName == currClassName
     }
 
-    fun showBackgroundTime(currClassName: String) {
-        if (isForeground(currClassName))
-            Toast.makeText(INSTANCE.applicationContext, dateTime, Toast.LENGTH_SHORT).show()
+    fun showBackgroundTime(context: Context) {
+        if (isForeground(context.javaClass.name))
+            Toast.makeText(context, dateTime, Toast.LENGTH_SHORT).show()
         else
-            updateForeground(currClassName)
+            updateForeground(context.javaClass.name)
     }
 
     fun sendResume(currentTime: Long) {
@@ -44,14 +36,5 @@ class App : Application() {
 
     companion object {
         lateinit var INSTANCE: App
-    }
-}
-
-object BackgroundHelper {
-    private val executor: ExecutorService = Executors.newFixedThreadPool(8)
-    fun <T> execute(callable: Callable<T>) {
-        executor.execute {
-            callable.call()
-        }
     }
 }

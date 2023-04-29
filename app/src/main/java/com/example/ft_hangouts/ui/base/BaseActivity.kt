@@ -3,6 +3,7 @@ package com.example.ft_hangouts.ui.base
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -47,7 +48,7 @@ open class BaseActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        (application as App).showBackgroundTime(this.javaClass.name)
+        (application as App).showBackgroundTime(this)
     }
 
     override fun attachBaseContext(newBase: Context?) {
