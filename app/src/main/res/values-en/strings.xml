@@ -37,5 +37,8 @@
     <string name="contact_edit_title">Edit Contact</string>
     <string name="language_change_message">You need to restart the app to change the language.\nWould you like to restart?</string>
     <string name="search_hint">search</string>
-
+    <string name="database_read_error">Failed to load data.</string>
+    <string name="database_create_error">Failed to save data.</string>
+    <string name="database_update_error">Failed to update data.</string>
+    <string name="database_delete_error">Failed to delete data.</string>
 </resources>
