@@ -13,30 +13,21 @@ import android.provider.Telephony
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.system.SmsSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
-
-/*
-    왜 recyclerview.scrollToPosition(idx)가 handler.postDelayed로 딜레이를 줘야만 제대로 동작할까...?
-
-    추측 1. DiffUtil의 비교과정이 비동기로 이루어지는데 그게 끝나기 전에 scrollToPosition이 호출돼서 씹힘.
-    (맞는지 아닌지 DiffUtil 제거하고 체크해보자..)
-    진심 맞는듯? 제거하니까 딜레이 안줘도 됨;;;
- */
-
-/*
-    권한 설정만 해주는 클래스 만들면 좋을듯
-    브로드캐스트 리시버 따로 빼자...
- */
+import kotlinx.coroutines.launch
 
 class ContactSmsActivity : BaseActivity() {
     private val permissions = arrayOf(
@@ -47,7 +38,15 @@ class ContactSmsActivity : BaseActivity() {
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private val smsSystemHelper by lazy { createSmsSystemHelper() }
-    private val viewModel by lazy { ContactSmsViewModel(ContactDatabaseDAO(ContactHelper.createDatabase(this)), id, lifecycleScope, super.baseViewModel) }
+    private val viewModel by lazy {
+        ContactSmsViewModel(
+            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+            id,
+            lifecycleScope,
+            super.baseViewModel,
+            SmsDatabaseDAO(contentResolver)
+        )
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -67,8 +66,7 @@ class ContactSmsActivity : BaseActivity() {
 
     private fun registerPermissionActivityResult(): ActivityResultLauncher<Array<String>> {
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            val allPermissionGranted = it[permissions[0]] == true && it[permissions[1]] == true && it[permissions[2]] == true
-            if (allPermissionGranted) {
+            if (anyPermissionNotGranted(it)) {
                 registerSmsReceiver()
                 setRecyclerView()
                 binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
@@ -77,6 +75,10 @@ class ContactSmsActivity : BaseActivity() {
                 finish()
             }
         }
+    }
+
+    private fun anyPermissionNotGranted(result: Map<String, Boolean>): Boolean {
+        return result.containsValue(false)
     }
 
     private fun showSmsPermissionDialog(permissionLauncher: ActivityResultLauncher<Array<String>>) {
@@ -101,6 +103,11 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun registerSmsReceiver() {
+        registerSendSmsReceiver()
+        registerReceiveSmsReceiver()
+    }
+
+    private fun registerSendSmsReceiver() {
         registerReceiver(object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (resultCode == Activity.RESULT_OK) {
@@ -109,13 +116,15 @@ class ContactSmsActivity : BaseActivity() {
                     viewModel.addMessage(SmsInfo(message, System.currentTimeMillis(), 2))
                     binding.sendSmsEditText.text.clear()
                 } else {
-                    EventDialog(getString(R.string.message_of_sms_send_failure)) { dialog, _ ->
+                    EventDialog(getString(R.string.message_of_sms_send_failure)) { _, _ ->
                         onClickSmsSendButton()
                     }
                 }
             }
         }, IntentFilter("SEND_SMS_SUCCESS"))
+    }
 
+    private fun registerReceiveSmsReceiver() {
         registerReceiver(object: BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 intent?.let {
@@ -129,12 +138,13 @@ class ContactSmsActivity : BaseActivity() {
     private fun setRecyclerView() {
         val adapter = SmsChatRecyclerAdapter { len -> binding.smsChatRecyclerView.scrollToPosition(len) }
 
-        viewModel.messageList.observe(this) {
-            it?.let {
-                adapter.submitList(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.messageList.collect {
+                    adapter.submitList(it)
+                }
             }
         }
-
         binding.smsChatRecyclerView.adapter = adapter
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
@@ -142,7 +152,7 @@ class ContactSmsActivity : BaseActivity() {
 
     private fun onClickSmsSendButton() {
         smsSystemHelper?.sendSms(
-            phoneNumber = viewModel.contact.value!!.phoneNumber,
+            phoneNumber = viewModel.contact.value.phoneNumber,
             message = binding.sendSmsEditText.text.toString(),
             sendIntent = PendingIntent.getBroadcast(
                 this,
