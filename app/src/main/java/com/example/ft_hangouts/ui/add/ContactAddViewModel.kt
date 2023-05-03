@@ -1,29 +1,26 @@
 package com.example.ft_hangouts.ui.add
 
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ContactAddViewModel(
-    contactDatabaseDAO: ContactDatabaseDAO,
+    private val contactDatabaseDAO: ContactDatabaseDAO,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
 ) {
-    private val contactDAO = contactDatabaseDAO
-    val profileImage: LiveData<Drawable>
-        get() = _profileImage
-    private val _profileImage = MutableLiveData<Drawable>()
+    private val _profileImage = MutableStateFlow<Profile>(Profile(null))
+    val profileImage: StateFlow<Profile> = _profileImage.asStateFlow()
 
     private fun createContact(
         name: String,
@@ -32,7 +29,7 @@ class ContactAddViewModel(
         gender: String,
         relation: String
     ): Contact {
-        val profileBitmap = (profileImage.value as? BitmapDrawable)?.bitmap
+        val profileBitmapDrawable = profileImage.value.bitmapDrawable
         return Contact(
             id = 0,
             name = name,
@@ -40,13 +37,13 @@ class ContactAddViewModel(
             email = email,
             gender = gender,
             relation = relation,
-            profile = ContactDatabaseDAO.compressBitmapToByteArray(profileBitmap)
+            profile = ContactDatabaseDAO.compressBitmapToByteArray(profileBitmapDrawable?.bitmap)
         )
     }
 
     private suspend fun addContactToDatabase(contact: Contact) = withContext(Dispatchers.IO) {
         try {
-            contactDAO.addItem(contact)
+            contactDatabaseDAO.addItem(contact)
             baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseCreateErrorHandler())
@@ -66,18 +63,17 @@ class ContactAddViewModel(
         }
     }
 
-    private suspend fun updateProfileImage(uri: Uri) = withContext(Dispatchers.IO) {
+    private suspend fun updateProfileImage(uriString: String) = withContext(Dispatchers.IO) {
         try {
-//            val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
-//            _profileImage.postValue(bitmapDrawable)
+            _profileImage.value = imageDatabaseDAO.getImageFromUri(uriString)
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         }
     }
 
-    fun updateProfile(uri: Uri) {
+    fun updateProfile(uriString: String) {
         lifecycleScope.launch {
-            updateProfileImage(uri)
+            updateProfileImage(uriString)
         }
     }
 }
