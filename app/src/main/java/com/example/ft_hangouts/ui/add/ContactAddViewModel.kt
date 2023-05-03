@@ -68,8 +68,8 @@ class ContactAddViewModel(
 
     private suspend fun updateProfileImage(uri: Uri) = withContext(Dispatchers.IO) {
         try {
-            val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
-            _profileImage.postValue(bitmapDrawable)
+//            val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
+//            _profileImage.postValue(bitmapDrawable)
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         }

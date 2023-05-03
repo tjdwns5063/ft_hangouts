@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import android.provider.BaseColumns
 import android.util.Log
 import com.example.ft_hangouts.App
-import com.example.ft_hangouts.BackgroundHelper
 import java.io.ByteArrayOutputStream
 
 class ContactDatabaseDAO(private val dbHelper: ContactHelper) {

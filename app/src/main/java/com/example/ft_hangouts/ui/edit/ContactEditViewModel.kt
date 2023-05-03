@@ -1,38 +1,35 @@
 package com.example.ft_hangouts.ui.edit
 
-import android.content.Context
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
-import android.net.Uri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.data.contact_database.*
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.error.DatabaseUpdateErrorHandler
+import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactEditViewModel(
-    context: Context,
+    private val contactDatabaseDAO: ContactDatabaseDAO,
     id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
     ) {
-    private val contactDatabaseDAO = ContactDatabaseDAO(ContactHelper.createDatabase(context))
 
-    val contact: LiveData<ContactDomainModel>
-        get() = _contact
-    private val _contact = MutableLiveData<ContactDomainModel>()
+    private val _contact = MutableStateFlow<ContactDomainModel>(
+        ContactDomainModel(-1, "", "", "", "", "")
+    )
+    val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
 
-    val updatedProfile: LiveData<Drawable>
-        get() = _updatedProfile
-    private val _updatedProfile = MutableLiveData<Drawable>()
+    private val _updatedProfile = MutableStateFlow<Profile>(Profile(null))
+    val updatedProfile: StateFlow<Profile> = _updatedProfile.asStateFlow()
 
     init {
         lifecycleScope.launch {
@@ -47,7 +44,7 @@ class ContactEditViewModel(
         gender: String,
         relation: String
     ): Contact  {
-        val profileBitmap = (updatedProfile.value as? BitmapDrawable)?.bitmap ?: contact.value?.profile
+        val profileBitmapDrawable= updatedProfile.value.bitmapDrawable
 
         return Contact(
             id = 0,
@@ -56,15 +53,13 @@ class ContactEditViewModel(
             email = email,
             gender = gender,
             relation = relation,
-            profile = ContactDatabaseDAO.compressBitmapToByteArray(profileBitmap)
+            profile = ContactDatabaseDAO.compressBitmapToByteArray(profileBitmapDrawable?.bitmap)
         )
     }
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
-
-            _contact.postValue(contact)
+            _contact.value = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {
@@ -83,18 +78,17 @@ class ContactEditViewModel(
         }
     }
 
-    private suspend fun updateProfileImageLogic(uri: Uri) = withContext(Dispatchers.IO) {
+    private suspend fun updateProfileImageLogic(uriString: String) = withContext(Dispatchers.IO) {
         try {
-            val bitmapDrawable = imageDatabaseDAO.getImageFromUri(uri)
-            _updatedProfile.postValue(bitmapDrawable)
+            _updatedProfile.value = imageDatabaseDAO.getImageFromUri(uriString)
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         }
     }
 
-    fun updateProfileImage(uri: Uri) {
+    fun updateProfileImage(uriString: String) {
         lifecycleScope.launch {
-            updateProfileImageLogic(uri)
+            updateProfileImageLogic(uriString)
         }
     }
 
@@ -108,7 +102,7 @@ class ContactEditViewModel(
         val newContact = createContact(name, phoneNumber, email, gender, relation)
 
         lifecycleScope.launch {
-            updateContactById(contact.value!!.id, newContact)
+            updateContactById(contact.value.id, newContact)
         }
     }
 }

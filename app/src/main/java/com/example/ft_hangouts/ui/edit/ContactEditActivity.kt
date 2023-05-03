@@ -2,20 +2,33 @@ package com.example.ft_hangouts.ui.edit
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
+import kotlinx.coroutines.launch
 
 class ContactEditActivity : BaseActivity() {
     private val id by lazy { receiveId() }
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
-    private val viewModel by lazy { ContactEditViewModel(applicationContext, id, lifecycleScope, super.baseViewModel, ImageDatabaseDAO(this)) }
+    private val viewModel by lazy {
+        ContactEditViewModel(
+            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+            id,
+            lifecycleScope,
+            super.baseViewModel,
+            ImageDatabaseDAO(this)
+        ) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,22 +36,22 @@ class ContactEditActivity : BaseActivity() {
 
         val imageSelectLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
-                val uri = it.data?.data ?: return@registerForActivityResult
+                val uriString = it.data?.dataString ?: return@registerForActivityResult
 
-                viewModel.updateProfileImage(uri)
+                viewModel.updateProfileImage(uriString)
             }
         }
 
         binding.editProfileImage.clipToOutline = true
 
-        viewModel.contact.observe(this) {
-            if (it.profile != null) {
-                binding.editProfileImage.setImageBitmap(it.profile)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.updatedProfile.collect {
+                    it.bitmapDrawable?.let { bitmapDrawable ->
+                        binding.editProfileImage.setImageDrawable(bitmapDrawable)
+                    } ?: run { binding.editProfileImage.setImageResource(R.drawable.ic_default_profile) }
+                }
             }
-        }
-
-        viewModel.updatedProfile.observe(this) {
-            binding.editProfileImage.setImageDrawable(it)
         }
 
         binding.editProfileImage.setOnClickListener {
@@ -71,14 +84,16 @@ class ContactEditActivity : BaseActivity() {
     }
 
     private fun setData() {
-
-        viewModel.contact.observe(this) {
-            it?.let {
+        lifecycleScope.launch {
+            viewModel.contact.collect {
                 binding.editNameEditText.setText(it.name)
                 binding.editPhoneNumberEditText.setText(it.phoneNumber)
                 binding.editEmailEditText.setText(it.email)
                 binding.editGenderEditText.setText(it.gender)
                 binding.editRelationEditText.setText(it.relation)
+                it.profile?.let { bitmap ->
+                    binding.editProfileImage.setImageBitmap(bitmap)
+                } ?: run { binding.editProfileImage.setImageResource(R.drawable.ic_default_profile) }
             }
         }
     }
