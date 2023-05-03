@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
+import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
@@ -55,7 +56,7 @@ class ContactEditActivity : BaseActivity() {
 
     private fun contactEditLogic() {
         if (!checkEditText()) {
-            Toast.makeText(this, "이름과 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.empty_name_or_phone), Toast.LENGTH_SHORT).show()
             return
         }
 

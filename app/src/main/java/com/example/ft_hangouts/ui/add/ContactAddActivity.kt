@@ -61,7 +61,7 @@ class ContactAddActivity : BaseActivity() {
 
     private fun onOkButtonClick() {
         if (!checkEditText()) {
-            Toast.makeText(this, "이름과 전화번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.empty_name_or_phone), Toast.LENGTH_SHORT).show()
             return
         }
 
