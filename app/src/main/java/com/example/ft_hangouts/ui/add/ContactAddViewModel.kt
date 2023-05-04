@@ -44,7 +44,7 @@ class ContactAddViewModel(
     private suspend fun addContactToDatabase(contact: Contact) = withContext(Dispatchers.IO) {
         try {
             contactDatabaseDAO.addItem(contact)
-            baseViewModel.submitHandler(DatabaseSuccessHandler())
+            baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }

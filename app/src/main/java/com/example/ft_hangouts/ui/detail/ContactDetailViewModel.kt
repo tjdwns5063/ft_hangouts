@@ -32,22 +32,19 @@ class ContactDetailViewModel(
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
             val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
-
             _contact.value = contact
+            baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
-        } finally {
-            baseViewModel.submitHandler(null)
         }
     }
 
     private suspend fun deleteContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
             contactDatabaseDAO.deleteById(id)
+            baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseDeleteErrorHandler())
-        } finally {
-            baseViewModel.submitHandler(DatabaseSuccessHandler())
         }
     }
 

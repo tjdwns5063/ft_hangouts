@@ -80,7 +80,6 @@ class ContactEditActivity : BaseActivity() {
             gender = binding.editGenderEditText.text.toString(),
             relation = binding.editRelationEditText.text.toString()
         )
-        finish()
     }
 
     private fun setData() {

@@ -60,21 +60,18 @@ class ContactEditViewModel(
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
             _contact.value = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+            baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
-            baseViewModel.submitHandler(DatabaseReadErrorHandler())
-        } finally {
-            baseViewModel.submitHandler(null)
+            baseViewModel.submitHandler(DatabaseReadErrorHandler().apply { this.updateTerminated(true) })
         }
     }
 
     private suspend fun updateContactById(rowId: Long, newContact: Contact) = withContext(Dispatchers.IO) {
         try {
             contactDatabaseDAO.updateById(rowId, newContact)
-            baseViewModel.submitHandler(DatabaseSuccessHandler())
+            baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseUpdateErrorHandler())
-        } finally {
-            baseViewModel.submitHandler(null)
         }
     }
 

@@ -14,6 +14,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
+import com.example.ft_hangouts.error.CallSystemErrorHandler
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
@@ -27,26 +28,34 @@ import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel by lazy {
-        MainViewModel(
-            sharedPreferenceUtils,
-            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
-            CallSystemHelper.createCallSystemHelper(this),
-            lifecycleScope,
-            super.baseViewModel
-        )
-    }
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        createViewModel()
         binding.viewModel = viewModel
         setContentView(binding.root)
-        viewModel.requestPermission()
+        if (this::viewModel.isInitialized)
+            viewModel.requestPermission()
         setButton()
         setAppBarColor()
         setRecyclerView()
         observeAndUpdateContactList()
+    }
+
+    private fun createViewModel() {
+        try {
+            viewModel = MainViewModel(
+                sharedPreferenceUtils,
+                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+                CallSystemHelper.createCallSystemHelper(this),
+                lifecycleScope,
+                super.baseViewModel
+            )
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(CallSystemErrorHandler())
+        }
     }
 
     private fun setButton() {

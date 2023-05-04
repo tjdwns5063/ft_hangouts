@@ -19,6 +19,7 @@ import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
+import com.example.ft_hangouts.error.SmsSystemErrorHandler
 import com.example.ft_hangouts.system.SmsSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
@@ -31,12 +32,13 @@ class ContactSmsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createViewModel()
-        if (this::viewModel.isInitialized)
-            viewModel.requestPermission()
         setContentView(binding.root)
-        registerSmsReceiver()
-        setRecyclerView()
-        binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
+        if (this::viewModel.isInitialized) {
+            viewModel.requestPermission()
+            registerSmsReceiver()
+            setRecyclerView()
+            binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
+        }
     }
 
     private fun createViewModel() {
@@ -50,19 +52,11 @@ class ContactSmsActivity : BaseActivity() {
                 SmsSystemHelper.createSmsSystemHelper(this)
             )
         } catch (err: Exception) {
-            // baseViewModel.submitHandler(SystemError)
-            finish()
+            baseViewModel.submitHandler(SmsSystemErrorHandler().apply {
+                this.updateTerminated(true)
+            })
         }
     }
-
-//    private fun createSmsSystemHelper(): SmsSystemHelper? {
-//        return try {
-//            SmsSystemHelper.createSmsSystemHelper(applicationContext)
-//        } catch (err: Exception) {
-//            Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
-//            null
-//        }
-//    }
 
     private fun registerSmsReceiver() {
         registerSendSmsReceiver()

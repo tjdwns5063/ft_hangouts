@@ -29,12 +29,13 @@ open class BaseActivity : AppCompatActivity() {
                 baseViewModel.errorHandler.collect {
                     it ?: return@collect
 
-                    if (it.isSuccess()) {
+                    if (it.checkTerminated()) {
+                        it.handle(baseContext)
                         finish()
                     } else {
                         it.handle(baseContext)
-                        baseViewModel.initiateError()
                     }
+                    baseViewModel.initiateError()
                 }
             }
         }

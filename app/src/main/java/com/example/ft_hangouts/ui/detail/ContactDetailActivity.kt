@@ -9,6 +9,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
+import com.example.ft_hangouts.error.CallSystemErrorHandler
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
@@ -20,26 +21,32 @@ import kotlinx.coroutines.launch
 class ContactDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityContactDetailBinding
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
-    private val viewModel by lazy {
-        ContactDetailViewModel(
-            lifecycleScope,
-            id,
-            baseViewModel,
-            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
-            CallSystemHelper.createCallSystemHelper(this)
-        )
-    }
+    private lateinit var viewModel: ContactDetailViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
+        createViewModel()
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-//        viewModel.requestRegisterPermissionLauncher()
         roundProfileBorder()
         setBottomNavItemListener()
         setContactObservationForProfileUpdates()
         setContentView(binding.root)
+    }
+
+    private fun createViewModel() {
+        try {
+            viewModel = ContactDetailViewModel(
+                lifecycleScope,
+                id,
+                baseViewModel,
+                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+                CallSystemHelper.createCallSystemHelper(this)
+            )
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(CallSystemErrorHandler())
+        }
     }
 
     private fun roundProfileBorder() {
