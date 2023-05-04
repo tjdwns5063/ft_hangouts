@@ -33,16 +33,15 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
     private val callPermissionLauncher = registerRequestCallPermissionResult()
-    private lateinit var handler: Handler
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handler = if (Build.VERSION.SDK_INT >= 28) Handler.createAsync(mainLooper) else Handler(mainLooper)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
         setButton()
         setAppBarColor()
         setRecyclerView()
+        observeAndUpdateContactList()
     }
 
     private fun setButton() {
@@ -83,7 +82,7 @@ class MainActivity : BaseActivity() {
         }
 
         itemTouchHelperCallback.setSwipeListener { position, direction ->
-            adapter.redraw()
+            adapter.redraw(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     requestCallPermission(callPermissionLauncher)
@@ -98,15 +97,6 @@ class MainActivity : BaseActivity() {
 
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        binding.contactRecyclerView.itemAnimator = null
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-
-                viewModel.contactList.collect {
-                    adapter.submitList(it)
-                }
-            }
-        }
     }
 
     override fun onResume() {
@@ -129,6 +119,17 @@ class MainActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.appBarColor.collect {
                     binding.appBar.backgroundTintList = ColorStateList.valueOf(it)
+                }
+            }
+        }
+    }
+
+    private fun observeAndUpdateContactList() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+
+                viewModel.contactList.collect {
+                    (binding.contactRecyclerView.adapter as ContactRecyclerAdapter).submitList(it)
                 }
             }
         }

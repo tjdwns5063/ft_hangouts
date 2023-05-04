@@ -48,7 +48,8 @@ data class ContactDomainModel(
     val email: String,
     val relation: String,
     val gender:String,
-    val profile: Bitmap? = null
+    val profile: Bitmap? = null,
+    var swiped: Boolean = false
 )
 
 fun contactToContactDomainModel(contact: Contact): ContactDomainModel {
