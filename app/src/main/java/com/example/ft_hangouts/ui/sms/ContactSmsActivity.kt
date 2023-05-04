@@ -1,8 +1,6 @@
 package com.example.ft_hangouts.ui.sms
 
-import android.Manifest
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,10 +8,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.provider.Telephony
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -31,77 +25,44 @@ import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 import kotlinx.coroutines.launch
 
 class ContactSmsActivity : BaseActivity() {
-    private val permissions = arrayOf(
-        Manifest.permission.SEND_SMS,
-        Manifest.permission.READ_SMS,
-        Manifest.permission.RECEIVE_SMS
-    )
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
-    private val smsSystemHelper by lazy { createSmsSystemHelper() }
-    private val viewModel by lazy {
-        ContactSmsViewModel(
-            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
-            id,
-            lifecycleScope,
-            super.baseViewModel,
-            SmsDatabaseDAO(contentResolver)
-        )
-    }
+    private lateinit var viewModel: ContactSmsViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createViewModel()
+        if (this::viewModel.isInitialized)
+            viewModel.requestPermission()
         setContentView(binding.root)
-        smsSystemHelper ?: run { finish() }
-        val launcher = registerPermissionActivityResult()
-        requestPermission(launcher)
+        registerSmsReceiver()
+        setRecyclerView()
+        binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
     }
 
-    private fun createSmsSystemHelper(): SmsSystemHelper? {
-        return try {
-            SmsSystemHelper.createSmsSystemHelper(applicationContext)
+    private fun createViewModel() {
+        try {
+            viewModel = ContactSmsViewModel(
+                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+                id,
+                lifecycleScope,
+                super.baseViewModel,
+                SmsDatabaseDAO(contentResolver),
+                SmsSystemHelper.createSmsSystemHelper(this)
+            )
         } catch (err: Exception) {
-            Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
-            null
+            // baseViewModel.submitHandler(SystemError)
+            finish()
         }
     }
 
-    private fun registerPermissionActivityResult(): ActivityResultLauncher<Array<String>> {
-        return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (allPermissionGranted(it)) {
-                registerSmsReceiver()
-                setRecyclerView()
-                binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
-            } else {
-                Toast.makeText(this, getString(R.string.sms_permission_deny), Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        }
-    }
-
-    private fun allPermissionGranted(result: Map<String, Boolean>): Boolean {
-        return !result.containsValue(false)
-    }
-
-    private fun showSmsPermissionDialog(permissionLauncher: ActivityResultLauncher<Array<String>>) {
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.permission_request))
-            .setMessage(getString(R.string.request_sms_permission))
-            .setPositiveButton(getString(R.string.ok)) { _, _ ->
-                permissionLauncher.launch(permissions)
-            }
-            .setNegativeButton(getString(R.string.cancel), null)
-            .show()
-    }
-
-    private fun requestPermission(permissionLauncher: ActivityResultLauncher<Array<String>>) {
-        for (permission in permissions) {
-            if (shouldShowRequestPermissionRationale(permission)) {
-                showSmsPermissionDialog(permissionLauncher)
-                return
-            }
-        }
-        permissionLauncher.launch(permissions)
-    }
+//    private fun createSmsSystemHelper(): SmsSystemHelper? {
+//        return try {
+//            SmsSystemHelper.createSmsSystemHelper(applicationContext)
+//        } catch (err: Exception) {
+//            Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
+//            null
+//        }
+//    }
 
     private fun registerSmsReceiver() {
         registerSendSmsReceiver()
@@ -152,9 +113,8 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun onClickSmsSendButton() {
-        smsSystemHelper?.sendSms(
-            phoneNumber = viewModel.contact.value.phoneNumber,
-            message = binding.sendSmsEditText.text.toString(),
+        viewModel.sendSms(
+            text = binding.sendSmsEditText.text.toString(),
             sendIntent = PendingIntent.getBroadcast(
                 this,
                 11,

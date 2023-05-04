@@ -1,9 +1,11 @@
 package com.example.ft_hangouts.ui.sms
 
+import android.app.PendingIntent
 import com.example.ft_hangouts.data.contact_database.*
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
+import com.example.ft_hangouts.system.SmsSystemHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +20,8 @@ class ContactSmsViewModel(
     private val id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
-    private val smsDatabaseDAO: SmsDatabaseDAO
+    private val smsDatabaseDAO: SmsDatabaseDAO,
+    private val smsSystemHelper: SmsSystemHelper
 ) {
     private val _messageList = MutableStateFlow<List<SmsInfo>>(emptyList())
     val messageList: StateFlow<List<SmsInfo>> = _messageList.asStateFlow()
@@ -62,5 +65,18 @@ class ContactSmsViewModel(
 
         lst.add(message)
         _messageList.value = lst
+    }
+
+    fun requestPermission() {
+        smsSystemHelper.requestRegisterSmsPermissionLauncher()
+        smsSystemHelper.requestPermission()
+    }
+
+    fun sendSms(text: String, sendIntent: PendingIntent) {
+        smsSystemHelper.sendSms(
+            phoneNumber = contact.value.phoneNumber,
+            message = text,
+            sendIntent = sendIntent
+        )
     }
 }
