@@ -80,7 +80,7 @@ class ContactRecyclerAdapter(
 
             val callback = object : DiffUtil.ItemCallback<ContactDomainModel>() {
                 override fun areItemsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
-                    return oldItem === newItem
+                    return oldItem.id == newItem.id
                 }
 
                 override fun areContentsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
