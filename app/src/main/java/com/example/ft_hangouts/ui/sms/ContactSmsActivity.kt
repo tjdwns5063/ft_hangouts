@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.provider.Telephony
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -66,7 +67,7 @@ class ContactSmsActivity : BaseActivity() {
 
     private fun registerPermissionActivityResult(): ActivityResultLauncher<Array<String>> {
         return registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (anyPermissionNotGranted(it)) {
+            if (allPermissionGranted(it)) {
                 registerSmsReceiver()
                 setRecyclerView()
                 binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
@@ -77,8 +78,8 @@ class ContactSmsActivity : BaseActivity() {
         }
     }
 
-    private fun anyPermissionNotGranted(result: Map<String, Boolean>): Boolean {
-        return result.containsValue(false)
+    private fun allPermissionGranted(result: Map<String, Boolean>): Boolean {
+        return !result.containsValue(false)
     }
 
     private fun showSmsPermissionDialog(permissionLauncher: ActivityResultLauncher<Array<String>>) {
