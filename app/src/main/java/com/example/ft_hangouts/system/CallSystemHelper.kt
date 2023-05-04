@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.telecom.TelecomManager
+import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,7 +16,7 @@ import com.example.ft_hangouts.ui.base.BaseActivity
 
 fun BaseActivity.requestCallToCallSystemHelper(phoneNumber: String) {
     try {
-        CallSystemHelper().callToAddress(phoneNumber)
+        CallSystemHelper(applicationContext).callToAddress(phoneNumber)
     } catch (err: Exception) {
         Toast.makeText(this, getString(R.string.cannot_use_call_feature), Toast.LENGTH_SHORT).show()
     }
@@ -56,15 +57,17 @@ fun BaseActivity.requestCallPermission(
     }
 }
 
-class CallSystemHelper {
-    private val telecomManager: TelecomManager
+class CallSystemHelper(applicationContext: Context) {
+    companion object {
+        lateinit var telecomManager: TelecomManager
 
-    init {
-        try {
-            telecomManager = App.INSTANCE.getSystemService(TelecomManager::class.java)
-        } catch (err: Exception) {
-            throw err
+        fun createSmsManager(applicationContext: Context) {
+            if (!this::telecomManager.isInitialized)
+                telecomManager = applicationContext.getSystemService(TelecomManager::class.java)
         }
+    }
+    init {
+        createSmsManager(applicationContext)
     }
 
     private fun parseUri(address: String): Uri {

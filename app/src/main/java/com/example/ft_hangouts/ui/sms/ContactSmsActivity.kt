@@ -58,7 +58,7 @@ class ContactSmsActivity : BaseActivity() {
 
     private fun createSmsSystemHelper(): SmsSystemHelper? {
         return try {
-            SmsSystemHelper()
+            SmsSystemHelper(applicationContext)
         } catch (err: Exception) {
             Toast.makeText(this, getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
             null

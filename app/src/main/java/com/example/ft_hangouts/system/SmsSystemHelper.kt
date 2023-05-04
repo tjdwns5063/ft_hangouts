@@ -1,18 +1,20 @@
 package com.example.ft_hangouts.system
 
 import android.app.PendingIntent
+import android.content.Context
 import android.telephony.SmsManager
-import com.example.ft_hangouts.App
 
-class SmsSystemHelper {
-    private val smsManager: SmsManager
+class SmsSystemHelper(applicationContext: Context) {
+    companion object {
+        lateinit var smsManager: SmsManager
 
-    init {
-        try {
-            smsManager = App.INSTANCE.getSystemService(SmsManager::class.java)
-        } catch (err: Exception) {
-            throw err
+        fun createSmsManager(applicationContext: Context) {
+            if (!this::smsManager.isInitialized)
+                smsManager = applicationContext.getSystemService(SmsManager::class.java)
         }
+    }
+    init {
+        createSmsManager(applicationContext)
     }
 
     fun sendSms(phoneNumber: String, message: String, sendIntent: PendingIntent) {
