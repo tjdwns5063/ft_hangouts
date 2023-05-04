@@ -9,9 +9,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
-import com.example.ft_hangouts.system.registerRequestCallPermissionResult
-import com.example.ft_hangouts.system.requestCallPermission
-import com.example.ft_hangouts.system.requestCallToCallSystemHelper
+import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
 import com.example.ft_hangouts.ui.edit.ContactEditActivity
@@ -23,20 +21,25 @@ class ContactDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityContactDetailBinding
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val viewModel by lazy {
-        ContactDetailViewModel(lifecycleScope, id, baseViewModel, ContactDatabaseDAO(ContactHelper.createDatabase(this)))
+        ContactDetailViewModel(
+            lifecycleScope,
+            id,
+            baseViewModel,
+            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+            CallSystemHelper.createCallSystemHelper(this)
+        )
     }
-    private val callPermissionLauncher = registerRequestCallPermissionResult()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
+//        viewModel.requestRegisterPermissionLauncher()
         roundProfileBorder()
         setBottomNavItemListener()
         setContactObservationForProfileUpdates()
         setContentView(binding.root)
-
     }
 
     private fun roundProfileBorder() {
@@ -70,8 +73,7 @@ class ContactDetailActivity : BaseActivity() {
                 }
                 R.id.detail_bottom_sms -> { goToActivity(ContactSmsActivity::class.java, CONTACT_ID, id) }
                 R.id.detail_bottom_call -> {
-                    requestCallPermission(callPermissionLauncher)
-                    requestCallToCallSystemHelper(viewModel.contact.value.phoneNumber)
+                    viewModel.call(viewModel.contact.value.phoneNumber)
                 }
                 R.id.detail_bottom_edit -> { goToActivity(ContactEditActivity::class.java, CONTACT_ID, id) }
             }

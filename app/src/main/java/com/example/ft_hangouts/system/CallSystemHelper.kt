@@ -6,68 +6,26 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.telecom.TelecomManager
-import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.ui.base.BaseActivity
 
-fun BaseActivity.requestCallToCallSystemHelper(phoneNumber: String) {
-    try {
-        CallSystemHelper(applicationContext).callToAddress(phoneNumber)
-    } catch (err: Exception) {
-        Toast.makeText(this, getString(R.string.cannot_use_call_feature), Toast.LENGTH_SHORT).show()
-    }
-}
+class CallSystemHelper private constructor(private val activity: AppCompatActivity) {
+    private lateinit var callPermissionLauncher: ActivityResultLauncher<String>
+    private val telecomManager: TelecomManager = activity.getSystemService(TelecomManager::class.java)
 
-fun BaseActivity.registerRequestCallPermissionResult(): ActivityResultLauncher<String> {
-    return registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (!isGranted) {
-            Toast.makeText(this, getString(R.string.detail_permission_deny_message), Toast.LENGTH_SHORT).show()
-        }
-    }
-}
-
-private fun showCallPermissionDialog(context: Context, callPermissionLauncher: ActivityResultLauncher<String>) {
-    AlertDialog.Builder(context)
-        .setTitle(context.getString(R.string.permission_request))
-        .setMessage(context.getString(R.string.call_permission_request))
-        .setPositiveButton(context.getString(R.string.ok)) { _, _ ->
-            callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
-        }
-        .setNegativeButton(context.getString(R.string.cancel), null)
-        .show()
-}
-
-fun BaseActivity.requestCallPermission(
-    callPermissionLauncher: ActivityResultLauncher<String>,
-) {
-    when {
-        checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED -> {
-            callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
-        }
-        shouldShowRequestPermissionRationale(Manifest.permission.CALL_PHONE) -> {
-            showCallPermissionDialog(this, callPermissionLauncher)
-        }
-        else -> {
-            callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
-        }
-    }
-}
-
-class CallSystemHelper(applicationContext: Context) {
     companion object {
-        lateinit var telecomManager: TelecomManager
+        private lateinit var INSTANCE: CallSystemHelper
 
-        fun createSmsManager(applicationContext: Context) {
-            if (!this::telecomManager.isInitialized)
-                telecomManager = applicationContext.getSystemService(TelecomManager::class.java)
+        fun createCallSystemHelper(activity: AppCompatActivity): CallSystemHelper {
+            if (!this::INSTANCE.isInitialized)
+                INSTANCE = CallSystemHelper(activity)
+            return INSTANCE
         }
-    }
-    init {
-        createSmsManager(applicationContext)
     }
 
     private fun parseUri(address: String): Uri {
@@ -78,6 +36,52 @@ class CallSystemHelper(applicationContext: Context) {
         if (App.INSTANCE.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
             telecomManager.placeCall(address, null)
         }
+    }
+
+    private fun registerRequestCallPermissionResult() {
+        if (this::callPermissionLauncher.isInitialized)
+            return
+
+        callPermissionLauncher = activity.registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (!isGranted) {
+                Toast.makeText(
+                    activity.applicationContext,
+                    activity.getString(R.string.detail_permission_deny_message),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun showCallPermissionDialog(context: Context, callPermissionLauncher: ActivityResultLauncher<String>) {
+        AlertDialog.Builder(context)
+            .setTitle(context.getString(R.string.permission_request))
+            .setMessage(context.getString(R.string.call_permission_request))
+            .setPositiveButton(context.getString(R.string.ok)) { _, _ ->
+                callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+            }
+            .setNegativeButton(context.getString(R.string.cancel), null)
+            .show()
+    }
+
+    fun requestCallPermission() {
+        when {
+            activity.checkSelfPermission(Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED -> {
+                callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+            }
+            shouldShowRequestPermissionRationale(activity, Manifest.permission.CALL_PHONE) -> {
+                showCallPermissionDialog(activity, callPermissionLauncher)
+            }
+            else -> {
+                callPermissionLauncher.launch(Manifest.permission.CALL_PHONE)
+            }
+        }
+    }
+
+    fun requestRegisterCallPermissionLauncher() {
+        registerRequestCallPermissionResult()
     }
 
     fun callToAddress(address: String) {

@@ -1,9 +1,7 @@
 package com.example.ft_hangouts.ui.main
 
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
@@ -16,9 +14,7 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
-import com.example.ft_hangouts.system.registerRequestCallPermissionResult
-import com.example.ft_hangouts.system.requestCallPermission
-import com.example.ft_hangouts.system.requestCallToCallSystemHelper
+import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
@@ -31,13 +27,22 @@ import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel by lazy { MainViewModel(sharedPreferenceUtils, ContactDatabaseDAO(ContactHelper.createDatabase(this)), lifecycleScope, super.baseViewModel) }
-    private val callPermissionLauncher = registerRequestCallPermissionResult()
+    private val viewModel by lazy {
+        MainViewModel(
+            sharedPreferenceUtils,
+            ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+            CallSystemHelper.createCallSystemHelper(this),
+            lifecycleScope,
+            super.baseViewModel
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.viewModel = viewModel
         setContentView(binding.root)
+        viewModel.requestPermission()
         setButton()
         setAppBarColor()
         setRecyclerView()
@@ -85,8 +90,7 @@ class MainActivity : BaseActivity() {
             adapter.redraw(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
-                    requestCallPermission(callPermissionLauncher)
-                    requestCallToCallSystemHelper(adapter.currentList[position].phoneNumber)
+                    viewModel.call(adapter.currentList[position].phoneNumber)
                 }
                 ItemTouchHelper.LEFT -> {
                     goToActivity(

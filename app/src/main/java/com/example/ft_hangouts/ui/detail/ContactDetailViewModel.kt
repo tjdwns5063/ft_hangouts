@@ -1,13 +1,10 @@
 package com.example.ft_hangouts.ui.detail
 
-import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
+import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,12 +18,14 @@ class ContactDetailViewModel(
     private val lifecycleScope: CoroutineScope,
     private val id: Long,
     private val baseViewModel: BaseViewModel,
-    private val contactDatabaseDAO: ContactDatabaseDAO
+    private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val callSystemHelper: CallSystemHelper?
     ) {
     private val _contact = MutableStateFlow<ContactDomainModel>(ContactDomainModel(-1, "", "", "", "", ""))
     val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
 
     init {
+        callSystemHelper ?: baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         updateContact()
     }
 
@@ -60,5 +59,12 @@ class ContactDetailViewModel(
         lifecycleScope.launch {
             deleteContactById(id)
         }
+    }
+
+    fun call(phoneNumber: String) {
+        callSystemHelper ?: return
+
+        callSystemHelper.requestCallPermission()
+        callSystemHelper.callToAddress(phoneNumber)
     }
 }

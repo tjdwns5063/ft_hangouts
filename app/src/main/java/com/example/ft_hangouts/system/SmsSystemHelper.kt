@@ -4,17 +4,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.telephony.SmsManager
 
-class SmsSystemHelper(applicationContext: Context) {
+class SmsSystemHelper private constructor(applicationContext: Context) {
+    val smsManager: SmsManager = applicationContext.getSystemService(SmsManager::class.java)
     companion object {
-        lateinit var smsManager: SmsManager
+        private lateinit var INSTANCE: SmsSystemHelper
 
-        fun createSmsManager(applicationContext: Context) {
-            if (!this::smsManager.isInitialized)
-                smsManager = applicationContext.getSystemService(SmsManager::class.java)
+        fun createSmsSystemHelper(applicationContext: Context): SmsSystemHelper {
+            if (!this::INSTANCE.isInitialized)
+                INSTANCE = SmsSystemHelper(applicationContext)
+            return INSTANCE
         }
-    }
-    init {
-        createSmsManager(applicationContext)
     }
 
     fun sendSms(phoneNumber: String, message: String, sendIntent: PendingIntent) {

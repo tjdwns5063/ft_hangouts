@@ -2,7 +2,9 @@ package com.example.ft_hangouts.ui.main
 
 import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.*
+import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
+import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +18,7 @@ import kotlinx.coroutines.withContext
 class MainViewModel(
     private val sharedPreferenceUtils: SharedPreferenceUtils,
     private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val callSystemHelper: CallSystemHelper?,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
     ) {
@@ -26,6 +29,8 @@ class MainViewModel(
     val appBarColor: StateFlow<Int> = _appBarColor.asStateFlow()
 
     init {
+        callSystemHelper ?: baseViewModel.submitHandler(DatabaseCreateErrorHandler())
+
         lifecycleScope.launch {
             initRecyclerList()
             updateAppbarColor()
@@ -56,5 +61,19 @@ class MainViewModel(
 
     fun closeDatabase() {
         contactDatabaseDAO.closeDatabase()
+    }
+
+    fun requestPermission() {
+        callSystemHelper ?: return
+
+        callSystemHelper.requestRegisterCallPermissionLauncher()
+        callSystemHelper.requestCallPermission()
+    }
+
+    fun call(phoneNumber: String) {
+        callSystemHelper ?: return
+
+        callSystemHelper.requestCallPermission()
+        callSystemHelper.callToAddress(phoneNumber)
     }
 }
