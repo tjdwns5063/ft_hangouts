@@ -20,8 +20,7 @@ class ContactSmsViewModel(
     private val id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
-    private val smsDatabaseDAO: SmsDatabaseDAO,
-    private val smsSystemHelper: SmsSystemHelper
+    private val smsDatabaseDAO: SmsDatabaseDAO
 ) {
     private val _messageList = MutableStateFlow<List<SmsInfo>>(emptyList())
     val messageList: StateFlow<List<SmsInfo>> = _messageList.asStateFlow()
@@ -65,18 +64,5 @@ class ContactSmsViewModel(
 
         lst.add(message)
         _messageList.value = lst
-    }
-
-    fun requestPermission() {
-        smsSystemHelper.requestRegisterSmsPermissionLauncher()
-        smsSystemHelper.requestPermission()
-    }
-
-    fun sendSms(text: String, sendIntent: PendingIntent) {
-        smsSystemHelper.sendSms(
-            phoneNumber = contact.value.phoneNumber,
-            message = text,
-            sendIntent = sendIntent
-        )
     }
 }

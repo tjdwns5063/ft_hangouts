@@ -19,6 +19,7 @@ import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
+import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.SmsSystemErrorHandler
 import com.example.ft_hangouts.system.SmsSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
@@ -29,12 +30,15 @@ class ContactSmsActivity : BaseActivity() {
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
     private lateinit var viewModel: ContactSmsViewModel
+    private lateinit var smsSystemHelper: SmsSystemHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         createViewModel()
         setContentView(binding.root)
-        if (this::viewModel.isInitialized) {
-            viewModel.requestPermission()
+        initSmsSystemHelper()
+        if (this::viewModel.isInitialized && this::smsSystemHelper.isInitialized) {
+            smsSystemHelper.requestRegisterSmsPermissionLauncher()
+            smsSystemHelper.requestPermission()
             registerSmsReceiver()
             setRecyclerView()
             binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
@@ -48,9 +52,18 @@ class ContactSmsActivity : BaseActivity() {
                 id,
                 lifecycleScope,
                 super.baseViewModel,
-                SmsDatabaseDAO(contentResolver),
-                SmsSystemHelper.createSmsSystemHelper(this)
+                SmsDatabaseDAO(contentResolver)
             )
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(DatabaseReadErrorHandler().apply {
+                this.updateTerminated(true)
+            })
+        }
+    }
+
+    private fun initSmsSystemHelper() {
+        try {
+            smsSystemHelper = SmsSystemHelper.createSmsSystemHelper(this)
         } catch (err: Exception) {
             baseViewModel.submitHandler(SmsSystemErrorHandler().apply {
                 this.updateTerminated(true)
@@ -107,8 +120,9 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun onClickSmsSendButton() {
-        viewModel.sendSms(
-            text = binding.sendSmsEditText.text.toString(),
+        smsSystemHelper.sendSms(
+            phoneNumber = viewModel.contact.value.phoneNumber,
+            message = binding.sendSmsEditText.text.toString(),
             sendIntent = PendingIntent.getBroadcast(
                 this,
                 11,
