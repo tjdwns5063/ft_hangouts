@@ -15,6 +15,7 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
+import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
@@ -29,19 +30,29 @@ import kotlinx.coroutines.launch
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
+    private lateinit var callSystemHelper: CallSystemHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        initCallSystemHelper()
         createViewModel()
         binding.viewModel = viewModel
         setContentView(binding.root)
-        if (this::viewModel.isInitialized)
-            viewModel.requestPermission()
+        callSystemHelper.requestRegisterCallPermissionLauncher()
+        callSystemHelper.requestCallPermission()
         setButton()
         setAppBarColor()
         setRecyclerView()
         observeAndUpdateContactList()
+    }
+
+    private fun initCallSystemHelper() {
+        try {
+            callSystemHelper = CallSystemHelper.createCallSystemHelper(this)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(CallSystemErrorHandler())
+        }
     }
 
     private fun createViewModel() {
@@ -49,12 +60,11 @@ class MainActivity : BaseActivity() {
             viewModel = MainViewModel(
                 sharedPreferenceUtils,
                 ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
-                CallSystemHelper.createCallSystemHelper(this),
                 lifecycleScope,
                 super.baseViewModel
             )
         } catch (err: Exception) {
-            baseViewModel.submitHandler(CallSystemErrorHandler())
+            baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }
     }
 
@@ -99,7 +109,8 @@ class MainActivity : BaseActivity() {
             adapter.redraw(position)
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
-                    viewModel.call(adapter.currentList[position].phoneNumber)
+                    callSystemHelper.requestCallPermission()
+                    callSystemHelper.callToAddress(adapter.currentList[position].phoneNumber)
                 }
                 ItemTouchHelper.LEFT -> {
                     goToActivity(

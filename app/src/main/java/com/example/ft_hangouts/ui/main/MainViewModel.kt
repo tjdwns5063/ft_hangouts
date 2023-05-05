@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 class MainViewModel(
     private val sharedPreferenceUtils: SharedPreferenceUtils,
     private val contactDatabaseDAO: ContactDatabaseDAO,
-    private val callSystemHelper: CallSystemHelper?,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
     ) {
@@ -29,8 +28,6 @@ class MainViewModel(
     val appBarColor: StateFlow<Int> = _appBarColor.asStateFlow()
 
     init {
-        callSystemHelper ?: baseViewModel.submitHandler(DatabaseCreateErrorHandler())
-
         lifecycleScope.launch {
             initRecyclerList()
             updateAppbarColor()
@@ -61,19 +58,5 @@ class MainViewModel(
 
     fun closeDatabase() {
         contactDatabaseDAO.closeDatabase()
-    }
-
-    fun requestPermission() {
-        callSystemHelper ?: return
-
-        callSystemHelper.requestRegisterCallPermissionLauncher()
-        callSystemHelper.requestCallPermission()
-    }
-
-    fun call(phoneNumber: String) {
-        callSystemHelper ?: return
-
-        callSystemHelper.requestCallPermission()
-        callSystemHelper.callToAddress(phoneNumber)
     }
 }
