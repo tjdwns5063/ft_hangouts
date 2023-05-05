@@ -18,14 +18,12 @@ class ContactDetailViewModel(
     private val lifecycleScope: CoroutineScope,
     private val id: Long,
     private val baseViewModel: BaseViewModel,
-    private val contactDatabaseDAO: ContactDatabaseDAO,
-    private val callSystemHelper: CallSystemHelper?
+    private val contactDatabaseDAO: ContactDatabaseDAO
     ) {
     private val _contact = MutableStateFlow<ContactDomainModel>(ContactDomainModel(-1, "", "", "", "", ""))
     val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
 
     init {
-        callSystemHelper ?: baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         updateContact()
     }
 
@@ -56,12 +54,5 @@ class ContactDetailViewModel(
         lifecycleScope.launch {
             deleteContactById(id)
         }
-    }
-
-    fun call(phoneNumber: String) {
-        callSystemHelper ?: return
-
-        callSystemHelper.requestCallPermission()
-        callSystemHelper.callToAddress(phoneNumber)
     }
 }

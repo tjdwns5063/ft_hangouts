@@ -10,6 +10,7 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
+import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
@@ -22,17 +23,26 @@ class ContactDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityContactDetailBinding
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private lateinit var viewModel: ContactDetailViewModel
+    private lateinit var callSystemHelper: CallSystemHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
         createViewModel()
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
-
+        initCallSystemHelper()
         roundProfileBorder()
         setBottomNavItemListener()
         setContactObservationForProfileUpdates()
         setContentView(binding.root)
+    }
+
+    private fun initCallSystemHelper() {
+        try {
+            callSystemHelper = CallSystemHelper.createCallSystemHelper(this)
+        } catch (err: Exception) {
+            baseViewModel.submitHandler(CallSystemErrorHandler())
+        }
     }
 
     private fun createViewModel() {
@@ -41,11 +51,10 @@ class ContactDetailActivity : BaseActivity() {
                 lifecycleScope,
                 id,
                 baseViewModel,
-                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
-                CallSystemHelper.createCallSystemHelper(this)
+                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext))
             )
         } catch (err: Exception) {
-            baseViewModel.submitHandler(CallSystemErrorHandler())
+            baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }
     }
 
@@ -80,7 +89,10 @@ class ContactDetailActivity : BaseActivity() {
                 }
                 R.id.detail_bottom_sms -> { goToActivity(ContactSmsActivity::class.java, CONTACT_ID, id) }
                 R.id.detail_bottom_call -> {
-                    viewModel.call(viewModel.contact.value.phoneNumber)
+                    if (!this::callSystemHelper.isInitialized)
+                        baseViewModel.submitHandler(CallSystemErrorHandler())
+                    else
+                        callSystemHelper.callToAddress(viewModel.contact.value.phoneNumber)
                 }
                 R.id.detail_bottom_edit -> { goToActivity(ContactEditActivity::class.java, CONTACT_ID, id) }
             }
