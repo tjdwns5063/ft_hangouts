@@ -39,7 +39,7 @@ class MainActivity : BaseActivity() {
         createViewModel()
         binding.viewModel = viewModel
         setContentView(binding.root)
-        callSystemHelper.requestRegisterCallPermissionLauncher()
+        callSystemHelper.registerCallPermissionLauncher()
         callSystemHelper.requestCallPermission()
         setButton()
         setAppBarColor()
@@ -49,7 +49,7 @@ class MainActivity : BaseActivity() {
 
     private fun initCallSystemHelper() {
         try {
-            callSystemHelper = CallSystemHelper.createCallSystemHelper(this)
+            callSystemHelper = CallSystemHelper(this)
         } catch (err: Exception) {
             baseViewModel.submitHandler(CallSystemErrorHandler())
         }
@@ -110,7 +110,7 @@ class MainActivity : BaseActivity() {
             when (direction) {
                 ItemTouchHelper.RIGHT -> {
                     callSystemHelper.requestCallPermission()
-                    callSystemHelper.callToAddress(adapter.currentList[position].phoneNumber)
+                    callSystemHelper.call(adapter.currentList[position].phoneNumber)
                 }
                 ItemTouchHelper.LEFT -> {
                     goToActivity(

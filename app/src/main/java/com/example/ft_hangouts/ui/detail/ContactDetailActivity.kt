@@ -39,7 +39,7 @@ class ContactDetailActivity : BaseActivity() {
 
     private fun initCallSystemHelper() {
         try {
-            callSystemHelper = CallSystemHelper.createCallSystemHelper(this)
+            callSystemHelper = CallSystemHelper(this)
         } catch (err: Exception) {
             baseViewModel.submitHandler(CallSystemErrorHandler())
         }
@@ -92,7 +92,7 @@ class ContactDetailActivity : BaseActivity() {
                     if (!this::callSystemHelper.isInitialized)
                         baseViewModel.submitHandler(CallSystemErrorHandler())
                     else
-                        callSystemHelper.callToAddress(viewModel.contact.value.phoneNumber)
+                        callSystemHelper.call(viewModel.contact.value.phoneNumber)
                 }
                 R.id.detail_bottom_edit -> { goToActivity(ContactEditActivity::class.java, CONTACT_ID, id) }
             }
@@ -100,7 +100,3 @@ class ContactDetailActivity : BaseActivity() {
         }
     }
 }
-
-/*
-    배운점: 권한 설정은 반드시 OnCreate에서 해야함.... (정확히는 액티비티가 STARTED 상태 전에!)
- */

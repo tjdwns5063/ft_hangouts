@@ -33,16 +33,20 @@ class ContactSmsActivity : BaseActivity() {
     private lateinit var smsSystemHelper: SmsSystemHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        createViewModel()
         setContentView(binding.root)
         initSmsSystemHelper()
-        if (this::viewModel.isInitialized && this::smsSystemHelper.isInitialized) {
-            smsSystemHelper.requestRegisterSmsPermissionLauncher()
-            smsSystemHelper.requestPermission()
-            registerSmsReceiver()
-            setRecyclerView()
-            binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
+        if (this::smsSystemHelper.isInitialized) {
+            smsSystemHelper.setCallback { updateActivity() }
+            smsSystemHelper.registerSmsPermissionLauncher()
+            smsSystemHelper.requestSmsPermission()
         }
+    }
+
+    private fun updateActivity() {
+        createViewModel()
+        registerSmsReceiver()
+        setRecyclerView()
+        binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
     }
 
     private fun createViewModel() {
@@ -63,7 +67,7 @@ class ContactSmsActivity : BaseActivity() {
 
     private fun initSmsSystemHelper() {
         try {
-            smsSystemHelper = SmsSystemHelper.createSmsSystemHelper(this)
+            smsSystemHelper = SmsSystemHelper(this)
         } catch (err: Exception) {
             baseViewModel.submitHandler(SmsSystemErrorHandler().apply {
                 this.updateTerminated(true)
