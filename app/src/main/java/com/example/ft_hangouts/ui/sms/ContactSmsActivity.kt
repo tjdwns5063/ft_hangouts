@@ -28,12 +28,14 @@ import kotlinx.coroutines.launch
 
 class ContactSmsActivity : BaseActivity() {
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
-    private val binding by lazy { ActivitySmsBinding.inflate(layoutInflater) }
+    private lateinit var binding: ActivitySmsBinding
     private lateinit var viewModel: ContactSmsViewModel
     private lateinit var smsSystemHelper: SmsSystemHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivitySmsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.smsProfileImg.clipToOutline = true
         initSmsSystemHelper()
         if (this::smsSystemHelper.isInitialized) {
             smsSystemHelper.setCallback { updateActivity() }
@@ -46,7 +48,18 @@ class ContactSmsActivity : BaseActivity() {
         createViewModel()
         registerSmsReceiver()
         setRecyclerView()
-        binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
+        setClickListener()
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.contact.collect {
+                    binding.smsProfileName.text = it.name
+                    if  (it.profile == null)
+                        binding.smsProfileImg.setImageResource(R.drawable.ic_default_profile)
+                    else
+                        binding.smsProfileImg.setImageBitmap(it.profile)
+                }
+            }
+        }
     }
 
     private fun createViewModel() {
@@ -121,6 +134,11 @@ class ContactSmsActivity : BaseActivity() {
         binding.smsChatRecyclerView.adapter = adapter
         binding.smsChatRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         binding.smsChatRecyclerView.scrollToPosition(adapter.itemCount - 1)
+    }
+
+    private fun setClickListener() {
+        binding.smsSendBtn.setOnClickListener { onClickSmsSendButton() }
+        binding.smsBackBtn.setOnClickListener { finish() }
     }
 
     private fun onClickSmsSendButton() {

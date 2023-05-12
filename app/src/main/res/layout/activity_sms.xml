@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-        <variable
-            name="viewModel"
-            type="com.example.ft_hangouts.ui.sms.ContactSmsViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,6 +12,8 @@
             android:id="@+id/sms_back_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/baseline_arrow_back_ios_32" />
@@ -26,6 +22,9 @@
             android:id="@+id/sms_profile_img"
             android:layout_width="32dp"
             android:layout_height="32dp"
+            android:scaleType="fitXY"
+            android:background="@drawable/profile_background"
+            app:layout_constraintBottom_toBottomOf="@+id/sms_back_btn"
             app:layout_constraintStart_toEndOf="@+id/sms_back_btn"
             app:layout_constraintTop_toTopOf="@+id/sms_back_btn"
             tools:srcCompat="@tools:sample/avatars" />
@@ -34,16 +33,18 @@
             android:id="@+id/sms_profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.contact.name}"
+            android:layout_marginStart="8dp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/sms_profile_img"
             app:layout_constraintStart_toEndOf="@+id/sms_profile_img"
-            app:layout_constraintTop_toTopOf="@+id/sms_profile_img" />
+            app:layout_constraintTop_toTopOf="@+id/sms_profile_img"
+            tools:text="seongjki" />
 
         <EditText
             android:id="@+id/send_sms_edit_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TextView"
+            android:inputType="text"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sms_send_btn"
             app:layout_constraintStart_toStartOf="parent" />
@@ -63,6 +64,7 @@
             android:id="@+id/sms_chat_recycler_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toTopOf="@+id/send_sms_edit_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

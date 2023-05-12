@@ -211,7 +211,7 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
             bitmap ?: return null
 
             val stream: ByteArrayOutputStream = ByteArrayOutputStream()
-            val imageViewSize = 64 // dp
+            val imageViewSize = 128 // dp
             val imageViewSizeToPixel = (imageViewSize * App.INSTANCE.applicationContext.resources.displayMetrics.density).toInt()
 
             val newBitmap = Bitmap.createScaledBitmap(bitmap, imageViewSizeToPixel, imageViewSizeToPixel, false)
