@@ -61,13 +61,13 @@
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
                     android:layout_gravity="bottom"
                     app:layout_collapseMode="pin">
                     <androidx.appcompat.widget.LinearLayoutCompat
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:gravity="end">
+                        android:gravity="end|center">
 
                         <ImageView
                             android:id="@+id/toolbar_add_button"

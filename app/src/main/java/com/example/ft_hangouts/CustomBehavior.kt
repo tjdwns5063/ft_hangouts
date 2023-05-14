@@ -2,17 +2,18 @@ package com.example.ft_hangouts
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.max
 
-class CustomBehavior(context: Context, attrs: AttributeSet?) :
+class CustomBehavior(private val context: Context, attrs: AttributeSet?) :
     CoordinatorLayout.Behavior<TextView?>(context, attrs) {
-    private var startHeight = 0f
     private var startToolbarHeight = 0f
-    private val finalToolbarHeight = 249f
+    private var finalToolbarHeight = 0f
     private var initialized = false
 
     override fun layoutDependsOn(
@@ -31,12 +32,12 @@ class CustomBehavior(context: Context, attrs: AttributeSet?) :
         if (dependency is AppBarLayout) {
             initProperties(child, dependency)
 
-            val currentToolbarHeight = max(finalToolbarHeight - dependency.getY(), finalToolbarHeight)
+            val currentToolbarHeight = max(finalToolbarHeight - dependency.y * 2, finalToolbarHeight)
             val totalMoved = startToolbarHeight - finalToolbarHeight
             val moved = startToolbarHeight - currentToolbarHeight
-            val progress = (moved / totalMoved * 100).toInt()
+            val progress = moved / totalMoved
 
-            child.alpha = progress * 0.01f
+            child.alpha = progress
             return true
         }
         return super.onDependentViewChanged(parent, child, dependency)
@@ -47,7 +48,9 @@ class CustomBehavior(context: Context, attrs: AttributeSet?) :
         dependency: View
     ) {
         if (!initialized) {
-            startHeight = child.height.toFloat()
+            val tv = TypedValue()
+            context.theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)
+            finalToolbarHeight = TypedValue.complexToDimension(tv.data, context.resources.displayMetrics) + (16 * context.resources.displayMetrics.density)
             startToolbarHeight = dependency.height.toFloat()
             initialized = true
         }
@@ -56,9 +59,8 @@ class CustomBehavior(context: Context, attrs: AttributeSet?) :
 
 class ReverseCustomBehavior(private val context: Context, attrs: AttributeSet?) :
     CoordinatorLayout.Behavior<TextView?>(context, attrs) {
-    private var startHeight = 0f
     private var startToolbarHeight = 0f
-    private val finalToolbarHeight = 249f
+    private var finalToolbarHeight = 0f
     private var initialized = false
 
     override fun layoutDependsOn(
@@ -81,7 +83,7 @@ class ReverseCustomBehavior(private val context: Context, attrs: AttributeSet?) 
             val moved = startToolbarHeight - currentToolbarHeight
             val progress = moved / totalMoved
 
-            child.translationY = -(moved - (16 * context.resources.displayMetrics.density))
+            child.translationY = 16 * context.resources.displayMetrics.density
             child.alpha = 1f - progress
 
             return true
@@ -94,8 +96,9 @@ class ReverseCustomBehavior(private val context: Context, attrs: AttributeSet?) 
         dependency: View
     ) {
         if (!initialized) {
-            startHeight = child.height.toFloat()
-
+            val tv = TypedValue()
+            context.theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)
+            finalToolbarHeight = TypedValue.complexToDimension(tv.data, context.resources.displayMetrics) + (16 * context.resources.displayMetrics.density)
             startToolbarHeight = dependency.height.toFloat()
             initialized = true
         }
