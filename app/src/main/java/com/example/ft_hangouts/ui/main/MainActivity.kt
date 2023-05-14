@@ -7,6 +7,7 @@ import android.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -121,6 +122,7 @@ class MainActivity : BaseActivity() {
 
         binding.contactRecyclerView.adapter = adapter
         binding.contactRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.contactRecyclerView.itemAnimator = DefaultItemAnimator()
     }
 
     override fun onResume() {
