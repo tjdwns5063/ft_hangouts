@@ -3,7 +3,6 @@ package com.example.ft_hangouts.ui.main
 import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.Drawable
-import android.util.Log
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -84,7 +83,7 @@ class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
         drawBackground(c, viewHolder, Color.CYAN)
         val drawable = ResourcesCompat.getDrawable(App.INSTANCE.resources, R.drawable.baseline_email_32, null) ?: return
         val drawableBounds = Rect(
-            viewHolder.itemView.right - pixelToDp(32),
+            viewHolder.itemView.right - pixelToDp(56),
             viewHolder.itemView.top + pixelToDp(8),
             viewHolder.itemView.right - pixelToDp(16),
             viewHolder.itemView.bottom - pixelToDp(8)
@@ -93,7 +92,7 @@ class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
         drawDrawable(c, drawable, drawableBounds)
 
         val text = viewHolder.itemView.resources.getString(R.string.sms)
-        drawText(c, text, viewHolder.itemView.right - pixelToDp(76f), viewHolder.itemView.bottom - pixelToDp(24f))
+        drawText(c, text, viewHolder.itemView.right - pixelToDp(108f), viewHolder.itemView.bottom - pixelToDp(24f))
     }
 
     private fun drawCall(
@@ -105,13 +104,13 @@ class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
         val bounds = Rect(
             viewHolder.itemView.left + pixelToDp(16),
             viewHolder.itemView.top + pixelToDp(8),
-            viewHolder.itemView.left + pixelToDp(32),
+            viewHolder.itemView.left + pixelToDp(56),
             viewHolder.itemView.bottom - pixelToDp(8)
         )
         drawDrawable(c, drawable, bounds)
 
         val text = viewHolder.itemView.resources.getString(R.string.call)
-        drawText(c, text, viewHolder.itemView.left + pixelToDp(40f), viewHolder.itemView.bottom - pixelToDp(24f))
+        drawText(c, text, viewHolder.itemView.left + pixelToDp(66f), viewHolder.itemView.bottom - pixelToDp(24f))
     }
 
     private fun drawBackground(
@@ -150,7 +149,7 @@ class ContactTouchHelperCallback: ItemTouchHelper.Callback() {
     ) {
         paint.color = Color.WHITE
         paint.isFakeBoldText = true
-        paint.textSize = pixelToDp(20f)
+        paint.textSize = pixelToDp(24f)
         c.drawText(text, x, y, paint)
     }
 }
