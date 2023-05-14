@@ -2,11 +2,11 @@ package com.example.ft_hangouts
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.example.ft_hangouts.ui.dpToPixel
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.max
 
@@ -50,7 +50,7 @@ class CustomBehavior(private val context: Context, attrs: AttributeSet?) :
         if (!initialized) {
             val tv = TypedValue()
             context.theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)
-            finalToolbarHeight = TypedValue.complexToDimension(tv.data, context.resources.displayMetrics) + (16 * context.resources.displayMetrics.density)
+            finalToolbarHeight = TypedValue.complexToDimension(tv.data, context.resources.displayMetrics) + dpToPixel(16f)
             startToolbarHeight = dependency.height.toFloat()
             initialized = true
         }
@@ -83,7 +83,7 @@ class ReverseCustomBehavior(private val context: Context, attrs: AttributeSet?) 
             val moved = startToolbarHeight - currentToolbarHeight
             val progress = moved / totalMoved
 
-            child.translationY = 16 * context.resources.displayMetrics.density
+            child.translationY = dpToPixel(16f)
             child.alpha = 1f - progress
 
             return true
@@ -98,7 +98,7 @@ class ReverseCustomBehavior(private val context: Context, attrs: AttributeSet?) 
         if (!initialized) {
             val tv = TypedValue()
             context.theme.resolveAttribute(androidx.appcompat.R.attr.actionBarSize, tv, true)
-            finalToolbarHeight = TypedValue.complexToDimension(tv.data, context.resources.displayMetrics) + (16 * context.resources.displayMetrics.density)
+            finalToolbarHeight = TypedValue.complexToDimension(tv.data, context.resources.displayMetrics) + dpToPixel(16f)
             startToolbarHeight = dependency.height.toFloat()
             initialized = true
         }
