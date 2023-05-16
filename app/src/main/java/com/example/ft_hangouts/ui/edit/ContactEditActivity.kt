@@ -3,6 +3,7 @@ package com.example.ft_hangouts.ui.edit
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,7 +59,11 @@ class ContactEditActivity : BaseActivity() {
             imageSelectLauncher.launch(Intent(Intent.ACTION_PICK).apply { type = "image/*" })
         }
 
-        binding.editProfileDeleteImage.setOnClickListener { viewModel.clearProfileImage() }
+        binding.editProfileDeleteImage.setOnClickListener {
+            viewModel.clearProfileImage()
+            binding.editProfileImage.scaleType = ImageView.ScaleType.CENTER
+            binding.editProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
+        }
 
         binding.editOkButton.setOnClickListener { contactEditLogic() }
         binding.editCancelButton.setOnClickListener { finish() }

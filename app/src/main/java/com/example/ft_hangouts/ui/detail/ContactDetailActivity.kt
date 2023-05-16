@@ -8,6 +8,7 @@ import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
 import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
@@ -66,7 +67,7 @@ class ContactDetailActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.contact.collect {
-                    it.profile?.let { profile -> binding.detailProfileImage.setImageBitmap(profile) }
+                    Profile.changeScaleType(binding.detailProfileImage, it.profile)
                 }
             }
         }
