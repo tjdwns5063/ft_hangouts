@@ -29,13 +29,12 @@ class ContactAddActivity : BaseActivity() {
             baseViewModel,
             ImageDatabaseDAO(this))
     }
-    private val imageActivityLauncher: ActivityResultLauncher<Intent> by lazy {
-        registerImageActivityLauncher()
-    }
+    private lateinit var imageActivityLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setDataBinding()
         setContentView(binding.root)
+        imageActivityLauncher = registerImageActivityLauncher()
         binding.addProfileImage.clipToOutline = true
         collectAndInitiateProfileImage()
         setFocusChangeListener()
@@ -53,7 +52,10 @@ class ContactAddActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.profileImage.collect {
                     it.bitmapDrawable?.let { bitmapDrawable ->
+                        binding.addProfileImage.scaleType = ImageView.ScaleType.FIT_XY
                         binding.addProfileImage.setImageDrawable(bitmapDrawable)
+                    } ?: run {
+                        binding.addProfileImage.scaleType = ImageView.ScaleType.CENTER
                     }
                 }
             }
@@ -69,23 +71,23 @@ class ContactAddActivity : BaseActivity() {
     }
 
     private fun setFocusChangeListener() {
-        binding.addNameEditText.setOnFocusChangeListener { view, b ->
+        binding.addNameEditText.setOnFocusChangeListener { _, b ->
             tintRelateImage(binding.addNameImage, b)
         }
 
-        binding.addPhoneNumberEditText.setOnFocusChangeListener { view, b ->
+        binding.addPhoneNumberEditText.setOnFocusChangeListener { _, b ->
             tintRelateImage(binding.addPhoneNumberImage, b)
         }
 
-        binding.addEmailEditText.setOnFocusChangeListener { view, b ->
+        binding.addEmailEditText.setOnFocusChangeListener { _, b ->
             tintRelateImage(binding.addEmailImage, b)
         }
 
-        binding.addGenderEditText.setOnFocusChangeListener { view, b ->
+        binding.addGenderEditText.setOnFocusChangeListener { _, b ->
             tintRelateImage(binding.addGenderImage, b)
         }
 
-        binding.addRelationEditText.setOnFocusChangeListener { view, b ->
+        binding.addRelationEditText.setOnFocusChangeListener { _, b ->
             tintRelateImage(binding.addRelationImage, b)
         }
     }
