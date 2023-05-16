@@ -76,4 +76,13 @@ class ContactAddViewModel(
             updateProfileImage(uriString)
         }
     }
+
+    fun clearProfileImage() {
+        if (profileImage.value.bitmapDrawable == null)
+            return
+
+        lifecycleScope.launch {
+            _profileImage.value = Profile(null)
+        }
+    }
 }

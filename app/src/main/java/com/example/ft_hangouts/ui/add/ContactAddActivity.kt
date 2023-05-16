@@ -55,6 +55,7 @@ class ContactAddActivity : BaseActivity() {
                         binding.addProfileImage.scaleType = ImageView.ScaleType.FIT_XY
                         binding.addProfileImage.setImageDrawable(bitmapDrawable)
                     } ?: run {
+                        binding.addProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
                         binding.addProfileImage.scaleType = ImageView.ScaleType.CENTER
                     }
                 }
@@ -109,6 +110,8 @@ class ContactAddActivity : BaseActivity() {
         binding.addOkButton.setOnClickListener { onOkButtonClick() }
 
         binding.addCancelButton.setOnClickListener { onCancelButtonClick() }
+
+        binding.deleteProfileImage.setOnClickListener { viewModel.clearProfileImage() }
     }
 
     private fun onProfileImageClick() {
