@@ -102,4 +102,10 @@ class ContactEditViewModel(
             updateContactById(contact.value.id, newContact)
         }
     }
+
+    fun clearProfileImage() {
+        lifecycleScope.launch {
+            _updatedProfile.value = Profile(null)
+        }
+    }
 }
