@@ -43,4 +43,5 @@
     <string name="database_update_error">Failed to update data.</string>
     <string name="database_delete_error">Failed to delete data.</string>
     <string name="empty_name_or_phone">Write name and phone number.</string>
+    <string name="contact_add_title">Add Contact</string>
 </resources>

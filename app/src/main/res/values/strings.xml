@@ -42,4 +42,5 @@
     <string name="database_update_error">데이터 수정에 실패했습니다.</string>
     <string name="database_delete_error">데이터 삭제에 실패했습니다.</string>
     <string name="empty_name_or_phone">이름과 전화번호를 입력해주세요.</string>
+    <string name="contact_add_title">연락처 추가</string>
 </resources>
