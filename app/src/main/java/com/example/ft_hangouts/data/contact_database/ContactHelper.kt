@@ -1,11 +1,9 @@
 package com.example.ft_hangouts.data.contact_database
 
-import android.app.Application
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.provider.BaseColumns
-import com.example.ft_hangouts.App
 
 
 private const val SQL_CREATE_ENTRIES =
@@ -21,9 +19,8 @@ private const val SQL_CREATE_ENTRIES =
 private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${ContactContract.ContactEntry.TABLE_NAME}"
 private const val SQL_ALTER_VERSION_2 = "ALTER TABLE ${ContactContract.ContactEntry.TABLE_NAME} ADD COLUMN ${ContactContract.ContactEntry.COLUMN_PROFILE} BLOB"
 
-private lateinit var INSTANCE: ContactHelper
 
-class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION)  {
+class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(SQL_CREATE_ENTRIES)
@@ -42,6 +39,7 @@ class ContactHelper(context: Context): SQLiteOpenHelper(context, DATABASE_NAME, 
     companion object {
         private const val DATABASE_VERSION = 2
         private const val DATABASE_NAME = "contact_db"
+        private lateinit var INSTANCE: ContactHelper
 
         fun createDatabase(application: Context): ContactHelper {
             synchronized(ContactHelper::class.java) {

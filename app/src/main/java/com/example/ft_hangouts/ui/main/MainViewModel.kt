@@ -55,8 +55,4 @@ class MainViewModel(
     fun updateAppbarColor() = lifecycleScope.launch {
         getAppbarColor()
     }
-
-    fun closeDatabase() {
-        contactDatabaseDAO.closeDatabase()
-    }
 }

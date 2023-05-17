@@ -9,10 +9,6 @@ import com.example.ft_hangouts.App
 import java.io.ByteArrayOutputStream
 
 class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
-    fun closeDatabase() {
-        dbHelper.close()
-    }
-
     fun getAllItems(): List<Contact> {
         with(dbHelper) {
             val readDb = readableDatabase
@@ -125,8 +121,7 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                 put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, contact.phoneNumber)
                 put(ContactContract.ContactEntry.COLUMN_PROFILE, contact.profile)
             }
-            val newRowId = writeDb.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
-            return newRowId
+            return writeDb.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
         }
     }
 
@@ -152,7 +147,6 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
             )
             if (ret == 0)
                 throw IllegalStateException("can't update this rowId $rowId")
-            println("success")
         }
     }
 
@@ -203,25 +197,6 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                 }
                 return list
             }
-        }
-    }
-
-    companion object {
-        fun compressBitmapToByteArray(bitmap: Bitmap?): ByteArray? {
-            bitmap ?: return null
-
-            val stream: ByteArrayOutputStream = ByteArrayOutputStream()
-            val imageViewSize = 128 // dp
-            val imageViewSizeToPixel = (imageViewSize * App.INSTANCE.applicationContext.resources.displayMetrics.density).toInt()
-
-            val newBitmap = Bitmap.createScaledBitmap(bitmap, imageViewSizeToPixel, imageViewSizeToPixel, false)
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-
-            return stream.toByteArray()
-        }
-
-        fun decodeByteArrayToBitmap(blob: ByteArray): Bitmap {
-            return BitmapFactory.decodeByteArray(blob, 0, blob.size)
         }
     }
 }
