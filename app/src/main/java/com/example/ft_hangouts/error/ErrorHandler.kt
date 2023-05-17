@@ -1,12 +1,11 @@
 package com.example.ft_hangouts.error
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import com.example.ft_hangouts.R
 
 abstract class ErrorHandler {
-    protected var isTerminated: Boolean = false
+    private var isTerminated: Boolean = false
 
     abstract fun handle(context: Context)
 
@@ -23,7 +22,6 @@ class DatabaseCreateErrorHandler: ErrorHandler() {
     override fun handle(context: Context) {
         Toast.makeText(context, context.getString(R.string.database_create_error), Toast.LENGTH_SHORT).show()
     }
-
 }
 
 class DatabaseReadErrorHandler: ErrorHandler() {
@@ -53,7 +51,6 @@ class DatabaseSuccessHandler: ErrorHandler() {
 
 class SmsSystemErrorHandler: ErrorHandler() {
     override fun handle(context: Context) {
-        Log.i("error", "call handleSmsSystemError")
         Toast.makeText(context, context.getString(R.string.cannot_use_sms_feature), Toast.LENGTH_SHORT).show()
     }
 
