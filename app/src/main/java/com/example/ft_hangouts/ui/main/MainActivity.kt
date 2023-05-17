@@ -115,7 +115,8 @@ class MainActivity : BaseActivity() {
                 }
                 ItemTouchHelper.LEFT -> {
                     goToActivity(
-                        ContactSmsActivity::class.java, ContactActivityContract.CONTACT_ID, adapter.getIdByPosition(position))
+                        ContactSmsActivity::class.java, ContactActivityContract.CONTACT_ID, adapter.getItemId(position)
+                    )
                 }
             }
         }
@@ -135,7 +136,7 @@ class MainActivity : BaseActivity() {
     private fun contactRecyclerItemOnClick(view: View) {
         val adapter = binding.contactRecyclerView.adapter as ContactRecyclerAdapter
         val position = binding.contactRecyclerView.getChildLayoutPosition(view)
-        val id = adapter.getIdByPosition(position)
+        val id = adapter.getItemId(position)
 
         goToActivity(ContactDetailActivity::class.java, ContactActivityContract.CONTACT_ID, id)
     }

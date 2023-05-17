@@ -49,8 +49,22 @@ data class ContactDomainModel(
     val relation: String,
     val gender:String,
     val profile: Bitmap? = null,
-    var swiped: Boolean = false
-)
+) {
+    @Override
+    override fun equals(other: Any?): Boolean {
+        if (other !is ContactDomainModel) return false
+
+        val sameProfile = if (other.profile == null && this.profile == null) true else {
+            other.profile?.let {
+                other.profile.sameAs(this.profile)
+            } ?: false
+        }
+
+        return other.id == this.id && other.name == this.name && other.phoneNumber == this.phoneNumber &&
+                other.email == this.email && other.relation == this.relation && other.gender == this.gender &&
+                sameProfile
+    }
+}
 
 fun contactToContactDomainModel(contact: Contact): ContactDomainModel {
     return ContactDomainModel(
