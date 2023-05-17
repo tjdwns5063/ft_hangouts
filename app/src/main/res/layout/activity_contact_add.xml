@@ -32,6 +32,7 @@
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:background="@drawable/profile_background"
             android:backgroundTint="@color/white"
             android:scaleType="fitXY"

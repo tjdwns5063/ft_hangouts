@@ -2,7 +2,6 @@ package com.example.ft_hangouts.ui.main
 
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.PopupMenu
 import androidx.lifecycle.Lifecycle
@@ -146,7 +145,6 @@ class MainActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.appBarColor.collect {
-                    Log.i("appbar", "color: $it")
                     binding.appBar.backgroundTintList = ColorStateList.valueOf(it)
                 }
             }
@@ -156,7 +154,6 @@ class MainActivity : BaseActivity() {
     private fun observeAndUpdateContactList() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-
                 viewModel.contactList.collect {
                     (binding.contactRecyclerView.adapter as ContactRecyclerAdapter).submitList(it)
                 }
