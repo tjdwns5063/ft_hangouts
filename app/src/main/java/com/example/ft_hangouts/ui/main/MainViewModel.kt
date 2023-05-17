@@ -24,7 +24,7 @@ class MainViewModel(
     private val _contactList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
     val contactList: StateFlow<List<ContactDomainModel>> = _contactList.asStateFlow()
 
-    private val _appBarColor = MutableStateFlow<Int>(16119285)
+    private val _appBarColor = MutableStateFlow<Int>(-657931)
     val appBarColor: StateFlow<Int> = _appBarColor.asStateFlow()
 
     init {

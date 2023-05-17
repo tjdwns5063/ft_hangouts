@@ -23,7 +23,7 @@ class SharedPreferenceUtils(private val context: Context) {
             Context.MODE_PRIVATE
         )
 
-        return sharedPreference.getInt("color", 16119285)
+        return sharedPreference.getInt("color", -657931)
     }
 
     fun setLanguage(localeString: String?) {

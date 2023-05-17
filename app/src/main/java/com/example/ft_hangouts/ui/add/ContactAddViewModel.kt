@@ -8,6 +8,7 @@ import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.ui.base.BaseViewModel
+import com.example.ft_hangouts.util.compressBitmapToByteArray
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +38,7 @@ class ContactAddViewModel(
             email = email,
             gender = gender,
             relation = relation,
-            profile = ContactDatabaseDAO.compressBitmapToByteArray(profileBitmapDrawable?.bitmap)
+            profile = compressBitmapToByteArray(profileBitmapDrawable?.bitmap)
         )
     }
 
