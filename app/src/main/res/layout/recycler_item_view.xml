@@ -27,6 +27,6 @@
         android:paddingVertical="16dp"
         android:text="TextView"
         android:background="@drawable/bottom_stroke"
-        style="@style/contact_recycler_style"/>
+    style="@style/contact_recycler_style"/>
 
 </LinearLayout>

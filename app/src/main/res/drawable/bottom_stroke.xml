@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <item
-        android:top="-2dp"
-        android:left="-2dp"
-        android:right="-2dp">
+        android:top="-4dp"
+        android:left="-4dp"
+        android:right="-4dp">
         <shape
             android:shape="rectangle">
             <solid android:color="@color/white"/>
