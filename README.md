@@ -4,10 +4,10 @@
   <img width="309" alt="first_screen" src="https://github.com/tjdwns5063/ft_hangouts/assets/73011361/faaf40e1-1622-45fd-8daa-4cc20225f4b8">
 </center>
 
+<br>
+<br>
 
-ft_hangouts은 연락처 앱의 기본적인 기능들을 구현한 안드로이드 애플리케이션입니다.
-
-서드파티 라이브러리를 사용하지 않고 최대한 저수준 라이브러리를 사용하여 개발하려고 했습니다.
+**ft_hangouts은 연락처 앱의 기본적인 기능들을 구현한 안드로이드 애플리케이션입니다.**
 
 ## 핵심 기능
 
