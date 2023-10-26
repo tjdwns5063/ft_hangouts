@@ -52,7 +52,7 @@ internal class MainViewModelTest {
         // given
         val first = ContactDomainModel(1, "a", "00000000", "abc", "abc", "abc")
         val second = ContactDomainModel(2, "b", "11111111", "bcd", "bcd", "bcd")
-        val defaultColor = 16119285
+        val defaultColor = -657931
 
         dao.addItem(Contact(1, "a", "00000000", "abc", "abc", "abc"))
         dao.addItem(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
@@ -101,6 +101,6 @@ internal class MainViewModelTest {
 
     @After
     fun closeDb() {
-        mainViewModel.closeDatabase()
+        dbHelper.close()
     }
 }
