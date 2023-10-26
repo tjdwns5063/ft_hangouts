@@ -10,6 +10,7 @@ import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.util.compressBitmapToByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,7 @@ import kotlinx.coroutines.withContext
 
 class ContactEditViewModel(
     private val contactDatabaseDAO: ContactDatabaseDAO,
-    id: Long,
+    val id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
@@ -33,11 +34,12 @@ class ContactEditViewModel(
     val updatedProfile: StateFlow<Profile> = _updatedProfile.asStateFlow()
 
     init {
-        lifecycleScope.launch {
-            getContactById(id)
-        }
+        init()
     }
 
+    fun init() = lifecycleScope.launch {
+        getContactById(id)
+    }
     private fun createContact(
         name: String,
         phoneNumber: String,
@@ -84,10 +86,8 @@ class ContactEditViewModel(
         }
     }
 
-    fun updateProfileImage(uriString: String) {
-        lifecycleScope.launch {
-            updateProfileImageLogic(uriString)
-        }
+    fun updateProfileImage(uriString: String) = lifecycleScope.launch {
+        updateProfileImageLogic(uriString)
     }
 
     fun updateContact(
@@ -96,10 +96,10 @@ class ContactEditViewModel(
         email: String,
         gender: String,
         relation: String
-    ) {
+    ): Job {
         val newContact = createContact(name, phoneNumber, email, gender, relation)
 
-        lifecycleScope.launch {
+        return lifecycleScope.launch {
             updateContactById(contact.value.id, newContact)
         }
     }

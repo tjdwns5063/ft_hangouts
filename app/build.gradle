@@ -55,9 +55,27 @@ dependencies {
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.0-RC'
     testImplementation "androidx.test.ext:junit-ktx:1.1.5"
     testImplementation "org.robolectric:robolectric:4.10.3"
+    testImplementation 'org.mockito:mockito-core:5.3.1'
 }
 
 koverReport {
+    filters {
+        excludes {
+            classes(
+                    "androidx.databinding*",
+                    "androidx.databinding.library.baseAdapters*",
+                    "com.example.ft_hangouts.databinding*",
+                    "com.example.ft_hangouts.ui.custom_view.*",
+                    "com.example.ft_hangouts.ui.UiUtilsKt",
+                    "com.example.ft_hangouts.DataBinderMapperImpl",
+                    "com.example.ft_hangouts.DataBindingTriggerClass",
+                    "com.example.ft_hangouts.CustomBehavior",
+                    "com.example.ft_hangouts.EventDialog",
+                    "com.example.ft_hangouts.ReverseCustomBehavior",
+                    "com.example.ft_hangouts.BR",
+            )
+        }
+    }
 
     androidReports("debug") {
         html { /* HTML report config for `release` build variant */ }

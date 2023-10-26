@@ -59,7 +59,7 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
     }
 
     fun getItemById(rowId: Long): Contact {
-        with(dbHelper) {
+        val result = with(dbHelper) {
             val readDb = readableDatabase
 
             val projection = arrayOf(
@@ -102,8 +102,9 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
             }
             cursor.close()
             readDb.close()
-            return result
+            result
         }
+        return result
     }
     fun deleteById(rowId: Long): Int {
         with(dbHelper) {
