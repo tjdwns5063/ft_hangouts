@@ -15,8 +15,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+@Suppress("NonAsciiCharacters")
 @RunWith(RobolectricTestRunner::class)
 internal class LanguageSettingViewModelTest {
+    @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var languageSettingViewModel: LanguageSettingViewModel
@@ -34,7 +36,7 @@ internal class LanguageSettingViewModelTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun `given default language when change language to english then check state`() = runTest {
+    fun `언어 변경 테스트`() = runTest {
         // given
         sharedPreferenceUtils.setLanguage(null)
 
