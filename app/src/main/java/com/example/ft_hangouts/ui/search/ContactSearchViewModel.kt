@@ -1,6 +1,6 @@
 package com.example.ft_hangouts.ui.search
 
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactSearchViewModel(
-    private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val contactDAO: ContactDAO,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
 ) {
@@ -25,7 +25,7 @@ class ContactSearchViewModel(
 
     private suspend fun searchContact(text: String) = withContext(Dispatchers.IO) {
         try {
-            _searchedList.value = contactDatabaseDAO.searchContact(text).map { contactToContactDomainModel(it) }
+            _searchedList.value = contactDAO.search(text).map { contactToContactDomainModel(it) }
             _text.value = text
         } catch(err: Exception) {
             _searchedList.value = emptyList()
@@ -40,6 +40,6 @@ class ContactSearchViewModel(
     }
 
     fun search(text: String) = lifecycleScope.launch {
-        searchContact(text)
+        searchContact("$text%")
     }
 }

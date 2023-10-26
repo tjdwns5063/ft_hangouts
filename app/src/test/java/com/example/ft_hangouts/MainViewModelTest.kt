@@ -1,12 +1,13 @@
 package com.example.ft_hangouts
 
 import android.content.Context
+import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.main.MainViewModel
 import kotlinx.coroutines.*
@@ -28,8 +29,8 @@ internal class MainViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var mainViewModel: MainViewModel
     private lateinit var context: Context
-    private lateinit var dao: ContactDatabaseDAO
-    private lateinit var dbHelper: ContactHelper
+    private lateinit var contactDAO: ContactDAO
+    private lateinit var contactDatabase: ContactDatabase
     private lateinit var sharedPreferenceUtils: SharedPreferenceUtils
     private lateinit var baseViewModel: BaseViewModel
     private lateinit var testScope: TestScope
@@ -38,26 +39,28 @@ internal class MainViewModelTest {
     @ExperimentalCoroutinesApi
     fun setupViewModel() = runTest {
         context = InstrumentationRegistry.getInstrumentation().context
-        dbHelper = ContactHelper(context)
-        dao = ContactDatabaseDAO(ContactHelper(context))
+        contactDatabase = Room.inMemoryDatabaseBuilder(context, ContactDatabase::class.java).build()
+        contactDAO = contactDatabase.contactDao()
         sharedPreferenceUtils = SharedPreferenceUtils(context)
         testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
-        mainViewModel = MainViewModel(sharedPreferenceUtils, dao, testScope, baseViewModel)
+        mainViewModel = MainViewModel(sharedPreferenceUtils, contactDAO, testScope, baseViewModel)
     }
 
     @Test
     @ExperimentalCoroutinesApi
-    fun `given database have two item when viewModel create then check initial condition`() = runTest {
+    fun `뷰모델 초기화 테스트`() = runTest {
         // given
         val first = ContactDomainModel(1, "a", "00000000", "abc", "abc", "abc")
         val second = ContactDomainModel(2, "b", "11111111", "bcd", "bcd", "bcd")
         val defaultColor = -657931
 
-        dao.addItem(Contact(1, "a", "00000000", "abc", "abc", "abc"))
-        dao.addItem(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
+        CoroutineScope(Dispatchers.IO).launch {
+            contactDAO.add(Contact(1, "a", "00000000", "abc", "abc", "abc"))
+            contactDAO.add(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
+        }.join()
 
-        val initMain = MainViewModel(sharedPreferenceUtils, dao, TestScope(mainDispatcherRule.testDispatcher), baseViewModel)
+        val initMain = MainViewModel(sharedPreferenceUtils, contactDAO, TestScope(mainDispatcherRule.testDispatcher), baseViewModel)
 
         initMain.initRecyclerList().join()
 
@@ -69,12 +72,14 @@ internal class MainViewModelTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun `given database have two item when viewModel check items then get all item list`() = runTest {
+    fun `연락처 목록 테스트`() = runTest {
         val first = Contact(1, "a", "b", "c", "d", "e")
         val second = Contact(2, "b", "c", "d", "e", "f")
 
-        dao.addItem(first)
-        dao.addItem(second)
+        CoroutineScope(Dispatchers.IO).launch {
+            contactDAO.add(first)
+            contactDAO.add(second)
+        }.join()
 
         mainViewModel.initRecyclerList().join()
 
@@ -91,7 +96,7 @@ internal class MainViewModelTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun `given set appbar color when update appbar color expect color is set`() = runTest {
+    fun `앱바 색상 변경 테스트`() = runTest {
         sharedPreferenceUtils.setAppbarColor(1111111)
 
         mainViewModel.updateAppbarColor().join()
@@ -101,6 +106,6 @@ internal class MainViewModelTest {
 
     @After
     fun closeDb() {
-        dbHelper.close()
+        contactDatabase.close()
     }
 }

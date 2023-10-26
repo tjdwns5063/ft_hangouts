@@ -1,7 +1,7 @@
 package com.example.ft_hangouts.ui.add
 
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ContactAddViewModel(
-    private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val contactDAO: ContactDAO,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
@@ -23,30 +23,12 @@ class ContactAddViewModel(
     private val _profileImage = MutableStateFlow<Profile>(Profile(null))
     val profileImage: StateFlow<Profile> = _profileImage.asStateFlow()
 
-    private fun createContact(
-        name: String,
-        phoneNumber: String,
-        email: String,
-        gender: String,
-        relation: String
-    ): Contact {
-        val profileBitmapDrawable = profileImage.value.bitmapDrawable
-        return Contact(
-            id = 0,
-            name = name,
-            phoneNumber = phoneNumber,
-            email = email,
-            gender = gender,
-            relation = relation,
-            profile = compressBitmapToByteArray(profileBitmapDrawable?.bitmap)
-        )
-    }
-
     private suspend fun addContactToDatabase(contact: Contact) = withContext(Dispatchers.IO) {
         try {
-            contactDatabaseDAO.addItem(contact)
+            contactDAO.add(contact)
             baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
+            println(err.message)
             baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }
     }
@@ -57,7 +39,14 @@ class ContactAddViewModel(
                    gender: String,
                    relation: String
     ): Job {
-        val contact = createContact(name, phoneNumber, email, gender, relation)
+        val contact = Contact(
+            name = name,
+            phoneNumber = phoneNumber,
+            email = email,
+            gender = gender,
+            relation = relation,
+            profile = compressBitmapToByteArray(profileImage.value.bitmapDrawable?.bitmap)
+        )
 
         return lifecycleScope.launch {
             addContactToDatabase(contact)

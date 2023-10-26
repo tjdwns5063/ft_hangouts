@@ -1,20 +1,15 @@
 package com.example.ft_hangouts.ui.search
 
-import android.app.SearchManager
-import android.app.SearchableInfo
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.SearchView.OnQueryTextListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.databinding.ActivityContactSearchBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract
@@ -25,7 +20,7 @@ class ContactSearchActivity : BaseActivity() {
     private lateinit var binding: ActivityContactSearchBinding
     private val viewModel by lazy {
         ContactSearchViewModel(
-            ContactDatabaseDAO(ContactHelper.createDatabase(this)),
+            ContactDatabase.INSTANCE.contactDao(),
             lifecycleScope,
             baseViewModel
         )

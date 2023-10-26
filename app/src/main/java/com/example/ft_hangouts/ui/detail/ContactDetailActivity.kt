@@ -6,8 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
@@ -52,7 +51,7 @@ class ContactDetailActivity : BaseActivity() {
                 lifecycleScope,
                 id,
                 baseViewModel,
-                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext))
+                ContactDatabase.INSTANCE.contactDao()
             )
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseCreateErrorHandler())

@@ -14,8 +14,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
@@ -65,7 +64,7 @@ class ContactSmsActivity : BaseActivity() {
     private fun createViewModel() {
         try {
             viewModel = ContactSmsViewModel(
-                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+                ContactDatabase.INSTANCE.contactDao(),
                 id,
                 lifecycleScope,
                 super.baseViewModel,

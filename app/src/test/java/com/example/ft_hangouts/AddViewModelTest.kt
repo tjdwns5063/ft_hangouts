@@ -1,10 +1,11 @@
 package com.example.ft_hangouts
 
 import android.content.Context
+import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseSuccessHandler
 import com.example.ft_hangouts.ui.base.BaseViewModel
@@ -22,13 +23,14 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 internal class AddViewModelTest {
+    @ExperimentalCoroutinesApi
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var addViewModel: ContactAddViewModel
-    private lateinit var dao: ContactDatabaseDAO
+    private lateinit var contactDatabase: ContactDatabase
     private lateinit var baseViewModel: BaseViewModel
+    private lateinit var contactDAO: ContactDAO
     private lateinit var imageDao: ImageDatabaseDAO
-    private lateinit var dbHelper: ContactHelper
     private lateinit var context: Context
     private lateinit var testScope: TestScope
 
@@ -36,28 +38,32 @@ internal class AddViewModelTest {
     @ExperimentalCoroutinesApi
     fun setUpViewModel() {
         context = InstrumentationRegistry.getInstrumentation().context
-        dbHelper = ContactHelper(context)
-        dao = ContactDatabaseDAO(dbHelper)
+        contactDatabase = Room.inMemoryDatabaseBuilder(context, ContactDatabase::class.java).build()
+        contactDAO = contactDatabase.contactDao()
         imageDao = ImageDatabaseDAO(context)
         testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
-        addViewModel = ContactAddViewModel(dao, testScope, baseViewModel, imageDao)
+        addViewModel = ContactAddViewModel(contactDatabase.contactDao(), testScope, baseViewModel, imageDao)
     }
 
     @Test
     @ExperimentalCoroutinesApi
     fun `연락처 추가 테스트`() = runTest {
+        //given
         val expect = Contact(1, "seongjki", "01012345678", "abc@def.com", "mam", "friend")
-
         addViewModel.addContact("seongjki", "01012345678", "abc@def.com", "friend", "mam").join()
 
-        val actual = dao.getItemById(1)
+        //when
+        val actual = CoroutineScope(Dispatchers.IO).async {
+            contactDAO.getAllItems()
+        }.await()
 
-        assertEquals(expect, actual)
+        //then
+        assertEquals(expect, actual[0])
         assertEquals(baseViewModel.errorHandler.value is DatabaseSuccessHandler, true)
     }
     @After
     fun closeDb() {
-        dbHelper.close()
+        contactDatabase.close()
     }
 }

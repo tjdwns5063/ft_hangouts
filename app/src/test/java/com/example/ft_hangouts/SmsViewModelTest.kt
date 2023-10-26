@@ -2,8 +2,8 @@ package com.example.ft_hangouts
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.ui.base.BaseViewModel
@@ -25,8 +25,8 @@ class SmsViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-    private lateinit var contactHelper: ContactHelper
-    private lateinit var contactDatabaseDAO: ContactDatabaseDAO
+    private lateinit var contactDAO: ContactDAO
+    private lateinit var contactDatabase: ContactDatabase
     private lateinit var baseViewModel: BaseViewModel
     private lateinit var context: Context
     private lateinit var testScope: TestScope
@@ -38,16 +38,16 @@ class SmsViewModelTest {
     fun before() {
         context = InstrumentationRegistry.getInstrumentation().context
         testScope = TestScope(StandardTestDispatcher())
-        contactHelper = ContactHelper.createDatabase(context)
-        contactDatabaseDAO = ContactDatabaseDAO(contactHelper)
+        contactDatabase = createContactDatabase(context)
+        contactDAO = contactDatabase.contactDao()
         smsDatabaseDAO = SmsDatabaseDAO(context.contentResolver)
         baseViewModel = BaseViewModel(testScope)
-        viewModel = ContactSmsViewModel(contactDatabaseDAO, 1, testScope, baseViewModel, smsDatabaseDAO)
+        viewModel = ContactSmsViewModel(contactDAO, 1, testScope, baseViewModel, smsDatabaseDAO)
     }
 
     @After
     fun after() {
-        contactHelper.close()
+        contactDatabase.close()
     }
 
     @Test

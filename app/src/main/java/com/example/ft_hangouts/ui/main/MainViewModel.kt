@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val sharedPreferenceUtils: SharedPreferenceUtils,
-    private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val contactDAO: ContactDAO,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
     ) {
@@ -36,7 +36,7 @@ class MainViewModel(
 
     private suspend fun getContactList() = withContext(Dispatchers.IO) {
         try {
-            _contactList.value = contactDatabaseDAO.getAllItems().map { contactToContactDomainModel(it) }
+            _contactList.value = contactDAO.getAllItems().map { contactToContactDomainModel(it) }
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {

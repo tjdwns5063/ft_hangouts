@@ -1,6 +1,6 @@
 package com.example.ft_hangouts.ui.detail
 
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
@@ -17,7 +17,7 @@ class ContactDetailViewModel(
     private val lifecycleScope: CoroutineScope,
     private val id: Long,
     private val baseViewModel: BaseViewModel,
-    private val contactDatabaseDAO: ContactDatabaseDAO
+    private val contactDAO: ContactDAO
     ) {
     private val _contact = MutableStateFlow<ContactDomainModel>(ContactDomainModel(-1, "", "", "", "", ""))
     val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
@@ -28,7 +28,7 @@ class ContactDetailViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            val contact = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+            val contact = contactToContactDomainModel(contactDAO.getItemById(id))
             _contact.value = contact
             baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
@@ -38,7 +38,7 @@ class ContactDetailViewModel(
 
     private suspend fun deleteContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            contactDatabaseDAO.deleteById(id)
+            contactDAO.deleteById(id)
             baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseDeleteErrorHandler())

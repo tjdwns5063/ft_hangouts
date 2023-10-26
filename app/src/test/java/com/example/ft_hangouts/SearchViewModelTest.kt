@@ -3,14 +3,18 @@ package com.example.ft_hangouts
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.search.ContactSearchViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.*
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -25,26 +29,27 @@ class SearchViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var context: Context
     private lateinit var searchViewModel: ContactSearchViewModel
-    private lateinit var contactDatabaseDAO: ContactDatabaseDAO
-    private lateinit var contactHelper: ContactHelper
+    private lateinit var contactDAO: ContactDAO
+    private lateinit var contactDatabase: ContactDatabase
     private lateinit var testScope: TestScope
     private lateinit var baseViewModel: BaseViewModel
 
     @Before
-    fun setUpViewModel() {
+    fun before() {
         context = InstrumentationRegistry.getInstrumentation().context
-        contactHelper = ContactHelper(context)
-        contactDatabaseDAO = ContactDatabaseDAO(contactHelper)
+        contactDatabase = createContactDatabase(context)
+        contactDAO = contactDatabase.contactDao()
         testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
-        searchViewModel = ContactSearchViewModel(contactDatabaseDAO, testScope, baseViewModel)
+        searchViewModel = ContactSearchViewModel(contactDAO, testScope, baseViewModel)
     }
 
     @Test
     fun `given match two contact when search partial match then check result`() = runTest {
         //given
-        contactDatabaseDAO.addItem(Contact(0, "seongjki", "000000", "", "", ""))
-        contactDatabaseDAO.addItem(Contact(1, "seo", "111111", "", "", ""))
+        CoroutineScope(Dispatchers.IO).launch {
+            contactDAO.add(Contact(0, "seongjki", "000000", "", "", ""), Contact(0, "seo", "111111", "", "", ""))
+        }.join()
 
         //when
         searchViewModel.search("se").join()
@@ -59,5 +64,10 @@ class SearchViewModelTest {
             ContactDomainModel(2, "seo", "111111", "", "", ""),
             searchViewModel.searchedList.value[1]
         )
+    }
+
+    @After
+    fun after() {
+        contactDatabase.close()
     }
 }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactEditViewModel(
-    private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val contactDAO: ContactDAO,
     val id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
@@ -50,7 +50,7 @@ class ContactEditViewModel(
         val profileBitmapDrawable= updatedProfile.value.bitmapDrawable
 
         return Contact(
-            id = 0,
+            id = id,
             name = name,
             phoneNumber = phoneNumber,
             email = email,
@@ -62,16 +62,16 @@ class ContactEditViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            _contact.value = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+            _contact.value = contactToContactDomainModel(contactDAO.getItemById(id))
             baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler().apply { this.updateTerminated(true) })
         }
     }
 
-    private suspend fun updateContactById(rowId: Long, newContact: Contact) = withContext(Dispatchers.IO) {
+    private suspend fun updateContact(newContact: Contact) = withContext(Dispatchers.IO) {
         try {
-            contactDatabaseDAO.updateById(rowId, newContact)
+            contactDAO.update(newContact)
             baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseUpdateErrorHandler())
@@ -100,7 +100,7 @@ class ContactEditViewModel(
         val newContact = createContact(name, phoneNumber, email, gender, relation)
 
         return lifecycleScope.launch {
-            updateContactById(contact.value.id, newContact)
+            updateContact(newContact)
         }
     }
 

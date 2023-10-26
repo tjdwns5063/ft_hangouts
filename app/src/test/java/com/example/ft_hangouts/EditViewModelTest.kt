@@ -3,18 +3,22 @@ package com.example.ft_hangouts
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.contact_database.Contact
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
+import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.ContactHelper
 import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.edit.ContactEditViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -35,8 +39,8 @@ class EditViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
     private lateinit var context: Context
-    private lateinit var dbHelper: ContactHelper
-    private lateinit var contactDatabaseDAO: ContactDatabaseDAO
+    private lateinit var contactDatabase: ContactDatabase
+    private lateinit var contactDAO: ContactDAO
     private lateinit var baseViewModel: BaseViewModel
     private lateinit var testScope: TestScope
     @Mock
@@ -46,8 +50,8 @@ class EditViewModelTest {
     @Before
     fun before() {
         context = InstrumentationRegistry.getInstrumentation().context
-        dbHelper = ContactHelper.createDatabase(context)
-        contactDatabaseDAO = ContactDatabaseDAO(dbHelper)
+        contactDatabase = Room.inMemoryDatabaseBuilder(context, ContactDatabase::class.java).build()
+        contactDAO = contactDatabase.contactDao()
         testScope = TestScope(StandardTestDispatcher())
         baseViewModel = BaseViewModel(testScope)
         MockitoAnnotations.openMocks(this)
@@ -58,18 +62,23 @@ class EditViewModelTest {
     fun `연락처 업데이트 테스트`() = runTest {
         //given
         val newContact = Contact(1, "seongjki", "01012345678", "abc@def.ghi", "", "")
-        contactDatabaseDAO.addItem(newContact)
+        CoroutineScope(Dispatchers.IO).launch {
+            contactDAO.add(newContact)
+        }.join()
 
-        viewModel = ContactEditViewModel(contactDatabaseDAO, 1, testScope, baseViewModel, imageDatabaseDAO)
+        viewModel = ContactEditViewModel(contactDAO, 1, testScope, baseViewModel, imageDatabaseDAO)
         viewModel.init().join()
 
         //when
         viewModel.updateContact("mkang", "01012345678", "abc@def.ghi", "", "").join()
+        val result = CoroutineScope(Dispatchers.IO).async {
+            contactToContactDomainModel(contactDAO.getItemById(1))
+        }.await()
 
         //then
         Assert.assertEquals(
             ContactDomainModel(1, "mkang", "01012345678", "abc@def.ghi", "", "")
-            , contactToContactDomainModel(contactDatabaseDAO.getItemById(1))
+            , result
         )
 
     }
@@ -78,9 +87,11 @@ class EditViewModelTest {
     fun `프로필 업데이트 테스트`() = runTest {
         //given
         val newContact = Contact(1, "seongjki", "01012345678", "abc@def.ghi", "", "")
-        contactDatabaseDAO.addItem(newContact)
+        CoroutineScope(Dispatchers.IO).launch {
+            contactDAO.add(newContact)
+        }.join()
 
-        viewModel = ContactEditViewModel(contactDatabaseDAO, 1, testScope, baseViewModel, imageDatabaseDAO)
+        viewModel = ContactEditViewModel(contactDAO, 1, testScope, baseViewModel, imageDatabaseDAO)
         viewModel.init().join()
         val bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
         Mockito.`when`(
@@ -96,7 +107,7 @@ class EditViewModelTest {
 
     @After
     fun after() {
-        dbHelper.close()
+        contactDatabase.close()
     }
 
 }

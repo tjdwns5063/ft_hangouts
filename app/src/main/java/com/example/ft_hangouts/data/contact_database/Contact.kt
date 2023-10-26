@@ -1,12 +1,18 @@
 package com.example.ft_hangouts.data.contact_database
 
 import android.graphics.Bitmap
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.example.ft_hangouts.util.decodeByteArrayToBitmap
 import java.io.Serializable
 
+@Entity
 data class Contact(
-    val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
     val name: String,
+    @ColumnInfo("phone_number")
     val phoneNumber: String,
     val email: String,
     val relation: String,

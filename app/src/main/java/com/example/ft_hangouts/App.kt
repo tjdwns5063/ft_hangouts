@@ -3,6 +3,7 @@ package com.example.ft_hangouts
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -13,6 +14,12 @@ class App : Application() {
 
     init {
         INSTANCE = this
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        ContactDatabase.INSTANCE = ContactDatabase.create(applicationContext)
     }
 
     private fun updateForeground(foregroundActivityName: String) {

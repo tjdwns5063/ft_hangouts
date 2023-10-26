@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactSmsViewModel(
-    private val contactDatabaseDAO: ContactDatabaseDAO,
+    private val contactDAO: ContactDAO,
     private val id: Long,
     private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
@@ -41,7 +41,7 @@ class ContactSmsViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            _contact.value = contactToContactDomainModel(contactDatabaseDAO.getItemById(id))
+            _contact.value = contactToContactDomainModel(contactDAO.getItemById(id))
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {

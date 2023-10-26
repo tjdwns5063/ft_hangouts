@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
-import com.example.ft_hangouts.data.contact_database.ContactHelper
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
 import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
@@ -60,7 +59,7 @@ class MainActivity : BaseActivity() {
         try {
             viewModel = MainViewModel(
                 sharedPreferenceUtils,
-                ContactDatabaseDAO(ContactHelper.createDatabase(applicationContext)),
+                ContactDatabase.INSTANCE.contactDao(),
                 lifecycleScope,
                 super.baseViewModel
             )
