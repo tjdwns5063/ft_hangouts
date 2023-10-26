@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlinx.kover'
 }
 
 android {
@@ -27,6 +28,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled true
+        }
     }
 
 
@@ -40,7 +44,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
@@ -51,5 +54,12 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.0-RC'
     testImplementation "androidx.test.ext:junit-ktx:1.1.5"
-    testImplementation "org.robolectric:robolectric:4.9"
+    testImplementation "org.robolectric:robolectric:4.10.3"
+}
+
+koverReport {
+
+    androidReports("debug") {
+        html { /* HTML report config for `release` build variant */ }
+    }
 }
