@@ -52,6 +52,8 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                     list += Contact(id, name, phoneNumber, email, relation, gender, profile)
                 }
             }
+            cursor.close()
+            readDb.close()
             return list
         }
     }
@@ -82,9 +84,13 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                 null,
                 null
             )
-            with(cursor) {
-                if (!moveToNext()) throw IllegalStateException("can't find contact by id")
-                return Contact(
+            val result = with(cursor) {
+                if (!moveToNext())  {
+                    cursor.close()
+                    readDb.close()
+                    throw IllegalStateException("can't find contact by id")
+                }
+                Contact(
                     id = getLong(getColumnIndexOrThrow(BaseColumns._ID)),
                     name = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_NAME)),
                     phoneNumber = getString(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER)),
@@ -94,6 +100,9 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                     profile = getBlob(getColumnIndexOrThrow(ContactContract.ContactEntry.COLUMN_PROFILE))
                 )
             }
+            cursor.close()
+            readDb.close()
+            return result
         }
     }
     fun deleteById(rowId: Long): Int {
@@ -121,7 +130,9 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                 put(ContactContract.ContactEntry.COLUMN_NAME_PHONE_NUMBER, contact.phoneNumber)
                 put(ContactContract.ContactEntry.COLUMN_PROFILE, contact.profile)
             }
-            return writeDb.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
+            val result = writeDb.insert(ContactContract.ContactEntry.TABLE_NAME, null, values)
+            writeDb.close()
+            return result
         }
     }
 
@@ -145,8 +156,10 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
                 selection,
                 selectionArgs
             )
-            if (ret == 0)
+            writeDb.close()
+            if (ret == 0) {
                 throw IllegalStateException("can't update this rowId $rowId")
+            }
         }
     }
 
@@ -195,8 +208,11 @@ class ContactDatabaseDAO(private val dbHelper: ContactHelper) {
 
                     list += Contact(id, name, phoneNumber, email, relation, gender, profile)
                 }
-                return list
+                list
             }
+            cursor.close()
+            readDb.close()
+            return list
         }
     }
 }
