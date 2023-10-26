@@ -4,7 +4,6 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabaseDAO
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
-import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +23,7 @@ class ContactDetailViewModel(
     val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
 
     init {
-        updateContact()
+        initContact()
     }
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
@@ -46,13 +45,12 @@ class ContactDetailViewModel(
         }
     }
 
-    fun updateContact() = lifecycleScope.launch {
+    fun initContact() = lifecycleScope.launch {
         getContactById(id)
     }
 
-    fun deleteContact(id: Long) {
-        lifecycleScope.launch {
-            deleteContactById(id)
-        }
+    fun deleteContact() = lifecycleScope.launch {
+        deleteContactById(id)
     }
+
 }

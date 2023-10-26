@@ -76,7 +76,7 @@ class ContactDetailActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        viewModel.updateContact()
+        viewModel.initContact()
     }
 
     private fun setBottomNavItemListener() {
@@ -86,7 +86,7 @@ class ContactDetailActivity : BaseActivity() {
                     EventDialog.showEventDialog(
                         fragmentManager = supportFragmentManager,
                         message = getString(R.string.check_delete_message),
-                        onClick = { _, _ -> viewModel.deleteContact(id) })
+                        onClick = { _, _ -> viewModel.deleteContact() })
                 }
                 R.id.detail_bottom_sms -> { goToActivity(ContactSmsActivity::class.java, CONTACT_ID, id) }
                 R.id.detail_bottom_call -> {

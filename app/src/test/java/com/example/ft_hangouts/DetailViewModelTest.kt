@@ -12,11 +12,13 @@ import com.example.ft_hangouts.ui.detail.ContactDetailViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.IllegalStateException
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -31,7 +33,7 @@ class DetailViewModelTest {
     private lateinit var contactDatabaseDAO: ContactDatabaseDAO
 
     @Before
-    fun setUpViewModel() {
+    fun before() {
         context = ApplicationProvider.getApplicationContext()
         testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
@@ -41,19 +43,41 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `given id1 detail then init detail page expect correct data`() = runTest {
+    fun `연락처 정보 초기화 테스트`() = runTest {
         //given
         contactDatabaseDAO.addItem(Contact(1, "a", "0000000", "abc@def.com", "", ""))
 
-        // then
+        //then
         val detailViewModel = ContactDetailViewModel(testScope, 1, baseViewModel, contactDatabaseDAO)
-        detailViewModel.updateContact().join()
-
+        detailViewModel.initContact().join()
 
         //expect
         Assert.assertEquals(
             ContactDomainModel(1, "a", "0000000", "abc@def.com", "", ""),
             detailViewModel.contact.value
         )
+    }
+
+    @Test
+    fun `연락처 삭제 테스트`() = runTest {
+        //given
+        contactDatabaseDAO.addItem(Contact(1, "a", "0000000", "abc@def.com", "", ""))
+
+        //then
+        val detailViewModel = ContactDetailViewModel(testScope, 1, baseViewModel, contactDatabaseDAO)
+        detailViewModel.initContact().join()
+        detailViewModel.deleteContact().join()
+
+        //expect
+        Assert.assertThrows(
+            IllegalStateException::class.java,
+        ) {
+            contactDatabaseDAO.getItemById(1)
+        }
+    }
+
+    @After
+    fun after() {
+        contactHelper.close()
     }
 }
