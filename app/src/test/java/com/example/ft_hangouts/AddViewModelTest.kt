@@ -33,6 +33,7 @@ internal class AddViewModelTest {
     private lateinit var testScope: TestScope
 
     @Before
+    @ExperimentalCoroutinesApi
     fun setUpViewModel() {
         context = InstrumentationRegistry.getInstrumentation().context
         dbHelper = ContactHelper(context)
@@ -45,25 +46,16 @@ internal class AddViewModelTest {
 
     @Test
     @ExperimentalCoroutinesApi
-    fun `given add contact then check database expect add properly`() = runTest {
+    fun `연락처 추가 테스트`() = runTest {
         val expect = Contact(1, "seongjki", "01012345678", "abc@def.com", "mam", "friend")
 
-        `given add contact`()
+        addViewModel.addContact("seongjki", "01012345678", "abc@def.com", "friend", "mam").join()
 
-        val actual = `then check database`()
+        val actual = dao.getItemById(1)
 
         assertEquals(expect, actual)
         assertEquals(baseViewModel.errorHandler.value is DatabaseSuccessHandler, true)
     }
-
-    private suspend fun `given add contact`()  {
-        addViewModel.addContact("seongjki", "01012345678", "abc@def.com", "friend", "mam").join()
-    }
-
-    private fun `then check database`(): Contact {
-        return dao.getItemById(1)
-    }
-
     @After
     fun closeDb() {
         dbHelper.close()
