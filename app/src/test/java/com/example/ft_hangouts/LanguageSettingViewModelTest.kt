@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.ui.setting.language_setting.LanguageSettingViewModel
+import com.example.ft_hangouts.ui.setting.language_setting.LanguageViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -25,13 +26,15 @@ internal class LanguageSettingViewModelTest {
     private lateinit var context: Context
     private lateinit var testScope: TestScope
     private lateinit var sharedPreferenceUtils: SharedPreferenceUtils
+    private lateinit var viewModelFactory: LanguageViewModelFactory
 
     @Before
     fun setUpViewModel() {
         context = InstrumentationRegistry.getInstrumentation().context
         testScope = TestScope(StandardTestDispatcher())
         sharedPreferenceUtils = SharedPreferenceUtils(context)
-        languageSettingViewModel = LanguageSettingViewModel(testScope, sharedPreferenceUtils)
+        viewModelFactory = LanguageViewModelFactory(sharedPreferenceUtils)
+        languageSettingViewModel = LanguageSettingViewModel(sharedPreferenceUtils)
     }
 
     @Test
@@ -41,7 +44,7 @@ internal class LanguageSettingViewModelTest {
         sharedPreferenceUtils.setLanguage(null)
 
         // when
-        languageSettingViewModel.updateLanguage("en").join()
+        languageSettingViewModel.updateLanguage("en")
 
 
         Assert.assertEquals("en", languageSettingViewModel.selectedLanguage.value)

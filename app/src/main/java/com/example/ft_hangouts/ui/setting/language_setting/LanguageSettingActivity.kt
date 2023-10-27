@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
 import android.view.View
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,7 +21,7 @@ import java.util.*
 
 class LanguageSettingActivity : BaseActivity() {
     private val binding by lazy { ActivityLanguageSettingBinding.inflate(layoutInflater) }
-    private val viewModel by lazy { LanguageSettingViewModel(lifecycleScope, sharedPreferenceUtils) }
+    private val viewModel: LanguageSettingViewModel by viewModels { LanguageViewModelFactory(sharedPreferenceUtils) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
