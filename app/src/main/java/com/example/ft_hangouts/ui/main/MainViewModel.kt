@@ -1,10 +1,11 @@
 package com.example.ft_hangouts.ui.main
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.*
-import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
-import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +19,8 @@ import kotlinx.coroutines.withContext
 class MainViewModel(
     private val sharedPreferenceUtils: SharedPreferenceUtils,
     private val contactDAO: ContactDAO,
-    private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel
-    ) {
+    ): ViewModel() {
     private val _contactList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
     val contactList: StateFlow<List<ContactDomainModel>> = _contactList.asStateFlow()
 
@@ -28,7 +28,7 @@ class MainViewModel(
     val appBarColor: StateFlow<Int> = _appBarColor.asStateFlow()
 
     init {
-        lifecycleScope.launch {
+        viewModelScope.launch {
             initRecyclerList()
             updateAppbarColor()
         }
@@ -44,7 +44,7 @@ class MainViewModel(
         }
     }
 
-    fun initRecyclerList() = lifecycleScope.launch {
+    suspend fun initRecyclerList() {
         getContactList()
     }
 
@@ -52,7 +52,22 @@ class MainViewModel(
         _appBarColor.value = sharedPreferenceUtils.getAppbarColor()
     }
 
-    fun updateAppbarColor() = lifecycleScope.launch {
+    suspend fun updateAppbarColor() {
         getAppbarColor()
+    }
+}
+
+class MainViewModelFactory(
+    private val sharedPreferenceUtils: SharedPreferenceUtils,
+    private val baseViewModel: BaseViewModel,
+    private val database: ContactDatabase
+): ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return MainViewModel(
+            sharedPreferenceUtils,
+            database.contactDao(),
+            baseViewModel
+        ) as T
     }
 }

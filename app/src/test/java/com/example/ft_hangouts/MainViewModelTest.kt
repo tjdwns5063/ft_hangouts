@@ -10,6 +10,7 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.main.MainViewModel
+import com.example.ft_hangouts.ui.main.MainViewModelFactory
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.After
@@ -22,6 +23,7 @@ import org.robolectric.RobolectricTestRunner
 
 
 
+@Suppress("NonAsciiCharacters")
 @RunWith(RobolectricTestRunner::class)
 internal class MainViewModelTest {
     @get:Rule
@@ -34,6 +36,7 @@ internal class MainViewModelTest {
     private lateinit var sharedPreferenceUtils: SharedPreferenceUtils
     private lateinit var baseViewModel: BaseViewModel
     private lateinit var testScope: TestScope
+    private lateinit var viewModelFactory: MainViewModelFactory
 
     @Before
     @ExperimentalCoroutinesApi
@@ -44,7 +47,8 @@ internal class MainViewModelTest {
         sharedPreferenceUtils = SharedPreferenceUtils(context)
         testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
-        mainViewModel = MainViewModel(sharedPreferenceUtils, contactDAO, testScope, baseViewModel)
+        viewModelFactory = MainViewModelFactory(sharedPreferenceUtils, baseViewModel, contactDatabase)
+        mainViewModel = viewModelFactory.create(MainViewModel::class.java)
     }
 
     @Test
@@ -60,14 +64,13 @@ internal class MainViewModelTest {
             contactDAO.add(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
         }.join()
 
-        val initMain = MainViewModel(sharedPreferenceUtils, contactDAO, TestScope(mainDispatcherRule.testDispatcher), baseViewModel)
 
-        initMain.initRecyclerList().join()
+        mainViewModel.initRecyclerList()
 
-        assertEquals(2, initMain.contactList.value.size)
-        assertEquals(first, initMain.contactList.value[0])
-        assertEquals(second, initMain.contactList.value[1])
-        assertEquals(defaultColor, initMain.appBarColor.value)
+        assertEquals(2, mainViewModel.contactList.value.size)
+        assertEquals(first, mainViewModel.contactList.value[0])
+        assertEquals(second, mainViewModel.contactList.value[1])
+        assertEquals(defaultColor, mainViewModel.appBarColor.value)
     }
 
     @Test
@@ -81,7 +84,7 @@ internal class MainViewModelTest {
             contactDAO.add(second)
         }.join()
 
-        mainViewModel.initRecyclerList().join()
+        mainViewModel.initRecyclerList()
 
         assertEquals(2, mainViewModel.contactList.value.size)
         assertEquals(
@@ -99,7 +102,7 @@ internal class MainViewModelTest {
     fun `앱바 색상 변경 테스트`() = runTest {
         sharedPreferenceUtils.setAppbarColor(1111111)
 
-        mainViewModel.updateAppbarColor().join()
+        mainViewModel.updateAppbarColor()
 
         assertEquals(1111111, mainViewModel.appBarColor.value)
     }

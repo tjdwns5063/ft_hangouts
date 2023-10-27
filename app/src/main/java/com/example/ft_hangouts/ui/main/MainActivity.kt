@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.PopupMenu
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -29,14 +30,19 @@ import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels {
+        MainViewModelFactory(
+            sharedPreferenceUtils,
+            baseViewModel,
+            ContactDatabase.INSTANCE
+        )
+    }
     private lateinit var callSystemHelper: CallSystemHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         initCallSystemHelper()
-        createViewModel()
         binding.viewModel = viewModel
         setContentView(binding.root)
         callSystemHelper.registerCallPermissionLauncher()
@@ -52,19 +58,6 @@ class MainActivity : BaseActivity() {
             callSystemHelper = CallSystemHelper(this)
         } catch (err: Exception) {
             baseViewModel.submitHandler(CallSystemErrorHandler())
-        }
-    }
-
-    private fun createViewModel() {
-        try {
-            viewModel = MainViewModel(
-                sharedPreferenceUtils,
-                ContactDatabase.INSTANCE.contactDao(),
-                lifecycleScope,
-                super.baseViewModel
-            )
-        } catch (err: Exception) {
-            baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }
     }
 
@@ -128,8 +121,10 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        viewModel.initRecyclerList()
-        viewModel.updateAppbarColor()
+        lifecycleScope.launch {
+            viewModel.initRecyclerList()
+            viewModel.updateAppbarColor()
+        }
     }
 
     private fun contactRecyclerItemOnClick(view: View) {
