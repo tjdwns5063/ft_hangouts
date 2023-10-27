@@ -18,10 +18,14 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @Suppress("NonAsciiCharacters")
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.DEFAULT_MANIFEST_NAME)
 class SmsViewModelTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
@@ -32,6 +36,7 @@ class SmsViewModelTest {
     private lateinit var context: Context
     private lateinit var testScope: TestScope
     private lateinit var viewModel: ContactSmsViewModel
+    @Mock
     private lateinit var smsDatabaseDAO: SmsDatabaseDAO
     private lateinit var viewModelFactory: SmsViewModelFactory
 
@@ -41,7 +46,7 @@ class SmsViewModelTest {
         testScope = TestScope(StandardTestDispatcher())
         contactDatabase = createContactDatabase(context)
         contactDAO = contactDatabase.contactDao()
-        smsDatabaseDAO = SmsDatabaseDAO(context.contentResolver)
+        MockitoAnnotations.openMocks(this)
         baseViewModel = BaseViewModel(testScope)
         viewModelFactory = SmsViewModelFactory(contactDatabase, 1, smsDatabaseDAO, baseViewModel)
         viewModel = viewModelFactory.create(ContactSmsViewModel::class.java)
