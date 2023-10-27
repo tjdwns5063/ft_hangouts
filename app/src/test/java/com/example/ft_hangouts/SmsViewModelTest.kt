@@ -8,6 +8,7 @@ import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.data.sms_database.SmsInfo
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.sms.ContactSmsViewModel
+import com.example.ft_hangouts.ui.sms.SmsViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -32,7 +33,7 @@ class SmsViewModelTest {
     private lateinit var testScope: TestScope
     private lateinit var viewModel: ContactSmsViewModel
     private lateinit var smsDatabaseDAO: SmsDatabaseDAO
-
+    private lateinit var viewModelFactory: SmsViewModelFactory
 
     @Before
     fun before() {
@@ -42,7 +43,8 @@ class SmsViewModelTest {
         contactDAO = contactDatabase.contactDao()
         smsDatabaseDAO = SmsDatabaseDAO(context.contentResolver)
         baseViewModel = BaseViewModel(testScope)
-        viewModel = ContactSmsViewModel(contactDAO, 1, testScope, baseViewModel, smsDatabaseDAO)
+        viewModelFactory = SmsViewModelFactory(contactDatabase, 1, smsDatabaseDAO, baseViewModel)
+        viewModel = viewModelFactory.create(ContactSmsViewModel::class.java)
     }
 
     @After

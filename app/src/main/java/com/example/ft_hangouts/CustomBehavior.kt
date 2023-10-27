@@ -6,7 +6,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.example.ft_hangouts.ui.dpToPixel
+import com.example.ft_hangouts.util.dpToPixel
 import com.google.android.material.appbar.AppBarLayout
 import kotlin.math.max
 

@@ -1,34 +1,41 @@
 package com.example.ft_hangouts.ui.sms
 
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
-import android.provider.Telephony
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.sms_database.SmsDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivitySmsBinding
 import com.example.ft_hangouts.data.sms_database.SmsInfo
-import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.error.SmsSystemErrorHandler
 import com.example.ft_hangouts.system.SmsSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
+import com.example.ft_hangouts.util.parseSmsMessage
 import kotlinx.coroutines.launch
 
 class ContactSmsActivity : BaseActivity() {
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
     private lateinit var binding: ActivitySmsBinding
-    private lateinit var viewModel: ContactSmsViewModel
+    private val viewModel: ContactSmsViewModel by viewModels {
+        SmsViewModelFactory(
+            ContactDatabase.INSTANCE,
+            id,
+            SmsDatabaseDAO(contentResolver),
+            baseViewModel
+        )
+    }
     private lateinit var smsSystemHelper: SmsSystemHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +51,6 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun updateActivity() {
-        createViewModel()
         registerSmsReceiver()
         setRecyclerView()
         setClickListener()
@@ -60,23 +66,6 @@ class ContactSmsActivity : BaseActivity() {
             }
         }
     }
-
-    private fun createViewModel() {
-        try {
-            viewModel = ContactSmsViewModel(
-                ContactDatabase.INSTANCE.contactDao(),
-                id,
-                lifecycleScope,
-                super.baseViewModel,
-                SmsDatabaseDAO(contentResolver)
-            )
-        } catch (err: Exception) {
-            baseViewModel.submitHandler(DatabaseReadErrorHandler().apply {
-                this.updateTerminated(true)
-            })
-        }
-    }
-
     private fun initSmsSystemHelper() {
         try {
             smsSystemHelper = SmsSystemHelper(this)
@@ -93,31 +82,27 @@ class ContactSmsActivity : BaseActivity() {
     }
 
     private fun registerSendSmsReceiver() {
-        registerReceiver(object: BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (resultCode == Activity.RESULT_OK) {
-                    val message = binding.sendSmsEditText.text.toString()
-
-                    viewModel.addMessage(SmsInfo(message, System.currentTimeMillis(), 2))
-                    binding.sendSmsEditText.text.clear()
-                } else {
-                    EventDialog(getString(R.string.message_of_sms_send_failure)) { _, _ ->
-                        onClickSmsSendButton()
-                    }
-                }
-            }
-        }, IntentFilter("SEND_SMS_SUCCESS"))
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(
+                SmsSendBroadcastReceiver(viewModel::addMessage),
+                IntentFilter("android.provider.Telephony.SMS_SENT"),
+                RECEIVER_EXPORTED
+            )
+        } else {
+            ContextCompat.registerReceiver(
+                applicationContext,
+                SmsSendBroadcastReceiver(viewModel::addMessage),
+                IntentFilter("android.provider.Telephony.SMS_SENT"),
+                ContextCompat.RECEIVER_EXPORTED
+            )
+        }
     }
 
     private fun registerReceiveSmsReceiver() {
-        registerReceiver(object: BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                intent?.let {
-                    val newMessage = parseSmsMessage(it)
-                    viewModel.addMessage(SmsInfo(newMessage, System.currentTimeMillis(), 1))
-                }
-            }
-        }, IntentFilter("android.provider.Telephony.SMS_RECEIVED"))
+        registerReceiver(
+            SmsRecvBroadcastReceiver(viewModel::addMessage),
+            IntentFilter("android.provider.Telephony.SMS_RECEIVED")
+        )
     }
 
     private fun setRecyclerView() {
@@ -151,14 +136,26 @@ class ContactSmsActivity : BaseActivity() {
                 PendingIntent.FLAG_IMMUTABLE)
         )
     }
+}
 
-    private fun parseSmsMessage(intent: Intent): String {
-        val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-        val receiveMessage = StringBuilder()
-
-        for (smsMessage in messages) {
-            receiveMessage.append(smsMessage.messageBody)
+private class SmsSendBroadcastReceiver(
+    private val callback: (SmsInfo) -> Unit
+): BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        intent?.let {
+            val newMessage = parseSmsMessage(it)
+            callback(SmsInfo(newMessage, System.currentTimeMillis(), 2))
         }
-        return receiveMessage.toString()
+    }
+}
+
+private class SmsRecvBroadcastReceiver(
+    private val callback: (SmsInfo) -> Unit
+): BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        intent?.let {
+            val newMessage = parseSmsMessage(it)
+            callback(SmsInfo(newMessage, System.currentTimeMillis(), 1))
+        }
     }
 }

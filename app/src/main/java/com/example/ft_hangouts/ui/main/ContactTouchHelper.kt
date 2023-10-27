@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.App
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.ui.dpToPixel
+import com.example.ft_hangouts.util.dpToPixel
 
 fun interface ItemTouchHelperListener {
     fun onItemSwipe(position: Int, direction: Int)
