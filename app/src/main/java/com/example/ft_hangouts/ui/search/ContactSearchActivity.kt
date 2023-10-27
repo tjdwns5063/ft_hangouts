@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.SearchView.OnQueryTextListener
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,10 +19,9 @@ import kotlinx.coroutines.launch
 
 class ContactSearchActivity : BaseActivity() {
     private lateinit var binding: ActivityContactSearchBinding
-    private val viewModel by lazy {
-        ContactSearchViewModel(
-            ContactDatabase.INSTANCE.contactDao(),
-            lifecycleScope,
+    private val viewModel: ContactSearchViewModel by viewModels {
+        SearchViewModelFactory(
+            ContactDatabase.INSTANCE,
             baseViewModel
         )
     }
@@ -68,7 +68,6 @@ class ContactSearchActivity : BaseActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.update()
                 viewModel.searchedList.collect {
                     adapter.submitList(it)
                 }
@@ -82,10 +81,7 @@ class ContactSearchActivity : BaseActivity() {
         }
 
         override fun onQueryTextChange(text: String?): Boolean {
-            text ?: return false
-            if (text == "") return false
-            viewModel.search(text)
-            return true
+            return viewModel.update(text)
         }
     }
 }

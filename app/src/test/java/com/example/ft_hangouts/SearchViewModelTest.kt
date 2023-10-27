@@ -8,6 +8,7 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.search.ContactSearchViewModel
+import com.example.ft_hangouts.ui.search.SearchViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,6 +34,7 @@ class SearchViewModelTest {
     private lateinit var contactDatabase: ContactDatabase
     private lateinit var testScope: TestScope
     private lateinit var baseViewModel: BaseViewModel
+    private lateinit var viewModelFactory: SearchViewModelFactory
 
     @Before
     fun before() {
@@ -41,7 +43,8 @@ class SearchViewModelTest {
         contactDAO = contactDatabase.contactDao()
         testScope = TestScope(mainDispatcherRule.testDispatcher)
         baseViewModel = BaseViewModel(testScope)
-        searchViewModel = ContactSearchViewModel(contactDAO, testScope, baseViewModel)
+        viewModelFactory = SearchViewModelFactory(contactDatabase, baseViewModel)
+        searchViewModel = viewModelFactory.create(ContactSearchViewModel::class.java)
     }
 
     @Test
@@ -52,7 +55,7 @@ class SearchViewModelTest {
         }.join()
 
         //when
-        searchViewModel.search("se").join()
+        searchViewModel.search("se")
 
         //then
         Assert.assertEquals(2, searchViewModel.searchedList.value.size)
