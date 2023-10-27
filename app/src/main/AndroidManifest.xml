@@ -36,7 +36,7 @@
             android:name=".ui.setting.language_setting.LanguageSettingActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.setting.abb_bar_setting.AppBarSettingActivity"
+            android:name=".ui.setting.abb_bar_setting.ColorSettingActivity"
             android:exported="false" />
         <activity
             android:name=".ui.edit.ContactEditActivity"

@@ -16,10 +16,9 @@ import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.databinding.ActivityMainBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
-import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
-import com.example.ft_hangouts.ui.setting.abb_bar_setting.AppBarSettingActivity
+import com.example.ft_hangouts.ui.setting.abb_bar_setting.ColorSettingActivity
 import com.example.ft_hangouts.ui.add.ContactAddActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract
 import com.example.ft_hangouts.ui.detail.ContactDetailActivity
@@ -73,7 +72,7 @@ class MainActivity : BaseActivity() {
         popupMenu.setOnMenuItemClickListener { menu ->
             when (menu.itemId) {
                 R.id.main_header_color_change_menu -> {
-                    goToActivity(AppBarSettingActivity::class.java)
+                    goToActivity(ColorSettingActivity::class.java)
                     true
                 }
                 R.id.main_language_select_menu -> {
