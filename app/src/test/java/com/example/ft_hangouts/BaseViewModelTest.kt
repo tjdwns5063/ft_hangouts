@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 internal class BaseViewModelTest {
     @get:Rule
     val mainDispatcher = MainDispatcherRule()

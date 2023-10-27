@@ -3,6 +3,7 @@ package com.example.ft_hangouts
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.contact_database.Contact
@@ -14,6 +15,7 @@ import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.edit.ContactEditViewModel
+import com.example.ft_hangouts.ui.edit.EditViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,6 +48,7 @@ class EditViewModelTest {
     @Mock
     private lateinit var imageDatabaseDAO: ImageDatabaseDAO
     private lateinit var viewModel: ContactEditViewModel
+    private lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Before
     fun before() {
@@ -55,7 +58,7 @@ class EditViewModelTest {
         testScope = TestScope(StandardTestDispatcher())
         baseViewModel = BaseViewModel(testScope)
         MockitoAnnotations.openMocks(this)
-//        imageDatabaseDAO = ImageDatabaseDAO(context)
+        viewModelFactory = EditViewModelFactory(1, baseViewModel, imageDatabaseDAO, contactDatabase)
     }
 
     @Test
@@ -66,11 +69,11 @@ class EditViewModelTest {
             contactDAO.add(newContact)
         }.join()
 
-        viewModel = ContactEditViewModel(contactDAO, 1, testScope, baseViewModel, imageDatabaseDAO)
-        viewModel.init().join()
+        viewModel = viewModelFactory.create(ContactEditViewModel::class.java)
+        viewModel.init()
 
         //when
-        viewModel.updateContact("mkang", "01012345678", "abc@def.ghi", "", "").join()
+        viewModel.updateContact("mkang", "01012345678", "abc@def.ghi", "", "")
         val result = CoroutineScope(Dispatchers.IO).async {
             contactToContactDomainModel(contactDAO.getItemById(1))
         }.await()
@@ -91,15 +94,15 @@ class EditViewModelTest {
             contactDAO.add(newContact)
         }.join()
 
-        viewModel = ContactEditViewModel(contactDAO, 1, testScope, baseViewModel, imageDatabaseDAO)
-        viewModel.init().join()
+        viewModel = viewModelFactory.create(ContactEditViewModel::class.java)
+        viewModel.init()
         val bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
         Mockito.`when`(
             imageDatabaseDAO.getImageFromUri("123"))
             .thenReturn(Profile(BitmapDrawable(null, bitmap))
         )
         //when
-        viewModel.updateProfileImage("123").join()
+        viewModel.updateProfileImage("123")
 
         //then
         Assert.assertEquals(bitmap.byteCount, viewModel.updatedProfile.value.bitmapDrawable?.bitmap?.byteCount)

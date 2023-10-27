@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,14 +23,14 @@ import kotlinx.coroutines.launch
 class ContactEditActivity : BaseActivity() {
     private val id by lazy { receiveId() }
     private val binding by lazy { ActivityContactEditBinding.inflate(layoutInflater) }
-    private val viewModel by lazy {
-        ContactEditViewModel(
-            ContactDatabase.INSTANCE.contactDao(),
+    private val viewModel: ContactEditViewModel by viewModels {
+        EditViewModelFactory(
             id,
-            lifecycleScope,
             super.baseViewModel,
-            ImageDatabaseDAO(this)
-        ) }
+            ImageDatabaseDAO(this),
+            ContactDatabase.INSTANCE
+        )
+    }
     private lateinit var imageSelectLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +49,9 @@ class ContactEditActivity : BaseActivity() {
             if (it.resultCode == Activity.RESULT_OK) {
                 val uriString = it.data?.dataString ?: return@registerForActivityResult
 
-                viewModel.updateProfileImage(uriString)
+                lifecycleScope.launch {
+                    viewModel.updateProfileImage(uriString)
+                }
             }
         }
     }
@@ -78,13 +81,16 @@ class ContactEditActivity : BaseActivity() {
             return
         }
 
-        viewModel.updateContact(
-            name = binding.editNameEditText.text.toString(),
-            email = binding.editEmailEditText.text.toString(),
-            phoneNumber = binding.editPhoneNumberEditText.text.toString(),
-            gender = binding.editGenderEditText.text.toString(),
-            relation = binding.editRelationEditText.text.toString()
-        )
+        lifecycleScope.launch {
+            viewModel.updateContact(
+                name = binding.editNameEditText.text.toString(),
+                email = binding.editEmailEditText.text.toString(),
+                phoneNumber = binding.editPhoneNumberEditText.text.toString(),
+                gender = binding.editGenderEditText.text.toString(),
+                relation = binding.editRelationEditText.text.toString()
+            )
+        }
+
     }
 
     private fun setData() {

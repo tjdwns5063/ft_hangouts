@@ -1,5 +1,8 @@
 package com.example.ft_hangouts.ui.edit
 
+import android.graphics.drawable.BitmapDrawable
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.ft_hangouts.data.contact_database.*
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
@@ -8,22 +11,20 @@ import com.example.ft_hangouts.error.DatabaseUpdateErrorHandler
 import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.util.compressBitmapToByteArray
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import androidx.lifecycle.viewModelScope
 
 class ContactEditViewModel(
     private val contactDAO: ContactDAO,
-    val id: Long,
-    private val lifecycleScope: CoroutineScope,
+    private val id: Long,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
-    ) {
+    ): ViewModel() {
 
     private val _contact = MutableStateFlow<ContactDomainModel>(
         ContactDomainModel(-1, "", "", "", "", "")
@@ -37,9 +38,21 @@ class ContactEditViewModel(
         init()
     }
 
-    fun init() = lifecycleScope.launch {
-        getContactById(id)
+    fun init() {
+        viewModelScope.launch {
+            getContactById(id)
+
+        }
+        initProfile()
     }
+
+    private fun initProfile() {
+        val bitmapDrawable = contact.value.profile?.let {
+            BitmapDrawable(null, contact.value.profile)
+        }
+        _updatedProfile.value = Profile(bitmapDrawable)
+    }
+
     private fun createContact(
         name: String,
         phoneNumber: String,
@@ -86,27 +99,42 @@ class ContactEditViewModel(
         }
     }
 
-    fun updateProfileImage(uriString: String) = lifecycleScope.launch {
+    suspend fun updateProfileImage(uriString: String) {
         updateProfileImageLogic(uriString)
     }
 
-    fun updateContact(
+    suspend fun updateContact(
         name: String,
         phoneNumber: String,
         email: String,
         gender: String,
         relation: String
-    ): Job {
+    ) {
         val newContact = createContact(name, phoneNumber, email, gender, relation)
 
-        return lifecycleScope.launch {
-            updateContact(newContact)
-        }
+        updateContact(newContact)
     }
 
     fun clearProfileImage() {
-        lifecycleScope.launch {
-            _updatedProfile.value = Profile(null)
-        }
+        _updatedProfile.value = Profile(null)
+    }
+}
+
+class EditViewModelFactory(
+    private val id: Long,
+    private val baseViewModel: BaseViewModel,
+    private val imageDatabaseDAO: ImageDatabaseDAO,
+    private val database: ContactDatabase
+): ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(
+        modelClass: Class<T>,
+    ): T {
+        return ContactEditViewModel(
+                database.contactDao(),
+                id,
+                baseViewModel,
+                imageDatabaseDAO
+            ) as T
     }
 }
