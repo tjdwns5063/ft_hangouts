@@ -1,11 +1,14 @@
 package com.example.ft_hangouts.ui.detail
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.error.*
 import com.example.ft_hangouts.ui.base.BaseViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,11 +17,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactDetailViewModel(
-    private val lifecycleScope: CoroutineScope,
     private val id: Long,
     private val baseViewModel: BaseViewModel,
     private val contactDAO: ContactDAO
-    ) {
+    ): ViewModel() {
     private val _contact = MutableStateFlow<ContactDomainModel>(ContactDomainModel(-1, "", "", "", "", ""))
     val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
 
@@ -45,12 +47,28 @@ class ContactDetailViewModel(
         }
     }
 
-    fun initContact() = lifecycleScope.launch {
-        getContactById(id)
+    fun initContact() {
+        viewModelScope.launch {
+            getContactById(id)
+        }
     }
 
-    fun deleteContact() = lifecycleScope.launch {
+    suspend fun deleteContact()  {
         deleteContactById(id)
     }
+}
 
+class DetailViewModelFactory(
+    private val id: Long,
+    private val baseViewModel: BaseViewModel,
+    private val database: ContactDatabase
+): ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return ContactDetailViewModel(
+            id,
+            baseViewModel,
+            database.contactDao()
+        ) as T
+    }
 }

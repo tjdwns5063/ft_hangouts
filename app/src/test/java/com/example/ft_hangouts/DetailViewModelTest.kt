@@ -1,6 +1,7 @@
 package com.example.ft_hangouts
 
 import android.content.Context
+import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -10,12 +11,14 @@ import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.ContactDomainModel
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.detail.ContactDetailViewModel
+import com.example.ft_hangouts.ui.detail.DetailViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -35,6 +38,7 @@ class DetailViewModelTest {
     private lateinit var baseViewModel: BaseViewModel
     private lateinit var contactDatabase: ContactDatabase
     private lateinit var contactDAO: ContactDAO
+    private lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Before
     fun before() {
@@ -43,21 +47,21 @@ class DetailViewModelTest {
         baseViewModel = BaseViewModel(testScope)
         contactDatabase = Room.inMemoryDatabaseBuilder(context, ContactDatabase::class.java).build()
         contactDAO = contactDatabase.contactDao()
-        detailViewModel = ContactDetailViewModel(testScope, 1, baseViewModel, contactDAO)
+        viewModelFactory = DetailViewModelFactory(1, baseViewModel, contactDatabase)
+        detailViewModel = viewModelFactory.create(ContactDetailViewModel::class.java)
         runTest {
-            CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.IO) {
                 contactDAO.add(Contact(0, "a", "0000000", "abc@def.com", "", ""))
-            }.join()
+            }
         }
     }
 
     @Test
     fun `연락처 정보 초기화 테스트`() = runTest {
         //given
-        val detailViewModel = ContactDetailViewModel(testScope, 1, baseViewModel, contactDAO)
 
         //then
-        detailViewModel.initContact().join()
+        detailViewModel.initContact()
 
         //expect
         Assert.assertEquals(
@@ -74,9 +78,8 @@ class DetailViewModelTest {
         }
 
         //then
-        val detailViewModel = ContactDetailViewModel(testScope, 1, baseViewModel, contactDAO)
-        detailViewModel.initContact().join()
-        detailViewModel.deleteContact().join()
+        detailViewModel.initContact()
+        detailViewModel.deleteContact()
 
         //expect
         Assert.assertThrows(

@@ -1,6 +1,7 @@
 package com.example.ft_hangouts.ui.detail
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,12 +23,17 @@ import kotlinx.coroutines.launch
 class ContactDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityContactDetailBinding
     private val id by lazy { intent.getLongExtra(CONTACT_ID, -1) }
-    private lateinit var viewModel: ContactDetailViewModel
+    private val viewModel: ContactDetailViewModel by viewModels {
+        DetailViewModelFactory(
+            id,
+            baseViewModel,
+            ContactDatabase.INSTANCE
+        )
+    }
     private lateinit var callSystemHelper: CallSystemHelper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityContactDetailBinding.inflate(layoutInflater)
-        createViewModel()
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         initCallSystemHelper()
@@ -42,19 +48,6 @@ class ContactDetailActivity : BaseActivity() {
             callSystemHelper = CallSystemHelper(this)
         } catch (err: Exception) {
             baseViewModel.submitHandler(CallSystemErrorHandler())
-        }
-    }
-
-    private fun createViewModel() {
-        try {
-            viewModel = ContactDetailViewModel(
-                lifecycleScope,
-                id,
-                baseViewModel,
-                ContactDatabase.INSTANCE.contactDao()
-            )
-        } catch (err: Exception) {
-            baseViewModel.submitHandler(DatabaseCreateErrorHandler())
         }
     }
 
@@ -85,7 +78,7 @@ class ContactDetailActivity : BaseActivity() {
                     EventDialog.showEventDialog(
                         fragmentManager = supportFragmentManager,
                         message = getString(R.string.check_delete_message),
-                        onClick = { _, _ -> viewModel.deleteContact() })
+                        onClick = { _, _ -> lifecycleScope.launch { viewModel.deleteContact() } })
                 }
                 R.id.detail_bottom_sms -> { goToActivity(ContactSmsActivity::class.java, CONTACT_ID, id) }
                 R.id.detail_bottom_call -> {
