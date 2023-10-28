@@ -1,8 +1,12 @@
 package com.example.ft_hangouts.ui.add
 
 import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDAO
+import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
@@ -17,10 +21,9 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class ContactAddViewModel(
     private val contactDAO: ContactDAO,
-    private val lifecycleScope: CoroutineScope,
     private val baseViewModel: BaseViewModel,
     private val imageDatabaseDAO: ImageDatabaseDAO
-) {
+): ViewModel() {
     private val _profileImage = MutableStateFlow<Profile>(Profile(null))
     val profileImage: StateFlow<Profile> = _profileImage.asStateFlow()
 
@@ -39,7 +42,7 @@ class ContactAddViewModel(
                    email: String,
                    gender: String,
                    relation: String
-    ): Job {
+    ) {
         val contact = Contact(
             name = name,
             phoneNumber = phoneNumber,
@@ -48,8 +51,7 @@ class ContactAddViewModel(
             relation = relation,
             profile = compressBitmapToByteArray(profileImage.value.bitmap)
         )
-
-        return lifecycleScope.launch {
+        viewModelScope.launch {
             addContactToDatabase(contact)
         }
     }
@@ -63,14 +65,23 @@ class ContactAddViewModel(
     }
 
     fun updateProfile(uriString: String) {
-        lifecycleScope.launch {
+        viewModelScope.launch {
             updateProfileImage(uriString)
         }
     }
 
     fun clearProfileImage() {
-        lifecycleScope.launch {
-            _profileImage.value = Profile(null)
-        }
+        _profileImage.value = Profile(null)
+    }
+}
+
+class AddViewModelFactory(
+    private val database: ContactDatabase,
+    private val baseViewModel: BaseViewModel,
+    private val imageDatabaseDAO: ImageDatabaseDAO
+): ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return ContactAddViewModel(database.contactDao(), baseViewModel, imageDatabaseDAO) as T
     }
 }

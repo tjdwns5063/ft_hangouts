@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.activity.viewModels
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -25,12 +26,10 @@ import kotlinx.coroutines.launch
 
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
-    private val viewModel by lazy {
-        ContactAddViewModel(
-            ContactDatabase.INSTANCE.contactDao(),
-            lifecycleScope,
-            baseViewModel,
-            ImageDatabaseDAO(this))
+    private val viewModel: ContactAddViewModel by viewModels {
+        AddViewModelFactory(ContactDatabase.INSTANCE,
+        baseViewModel,
+        ImageDatabaseDAO(this))
     }
     private lateinit var imageActivityLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
