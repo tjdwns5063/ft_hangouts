@@ -24,10 +24,10 @@ class ContactSmsViewModel(
     private val _messageList = MutableStateFlow<List<SmsInfo>>(emptyList())
     val messageList: StateFlow<List<SmsInfo>> = _messageList.asStateFlow()
 
-    private val _contact = MutableStateFlow<ContactDomainModel>(
-        ContactDomainModel(-1, "", "", "", "", "")
+    private val _contact = MutableStateFlow<Contact>(
+        Contact(-1, "", "", "", "", "")
     )
-    val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
+    val contact: StateFlow<Contact> = _contact.asStateFlow()
 
     init {
         initialize()
@@ -43,7 +43,7 @@ class ContactSmsViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            _contact.value = contactToContactDomainModel(contactDAO.getItemById(id))
+            _contact.value = Contact.from(contactDAO.getItemById(id))
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {

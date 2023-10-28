@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,14 +19,14 @@ class ContactSearchViewModel(
     private val contactDAO: ContactDAO,
     private val baseViewModel: BaseViewModel
 ): ViewModel() {
-    private val _searchedList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
-    val searchedList: StateFlow<List<ContactDomainModel>> = _searchedList.asStateFlow()
+    private val _searchedList = MutableStateFlow<List<Contact>>(emptyList())
+    val searchedList: StateFlow<List<Contact>> = _searchedList.asStateFlow()
 
     private val _text = MutableStateFlow<String>("")
 
     private fun searchContact(text: String) {
         try {
-            _searchedList.value = contactDAO.search(text).map { contactToContactDomainModel(it) }
+            _searchedList.value = contactDAO.search(text).map { Contact.from(it) }
             _text.value = text
         } catch(err: Exception) {
             _searchedList.value = emptyList()

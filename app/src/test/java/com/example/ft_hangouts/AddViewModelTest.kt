@@ -1,10 +1,9 @@
 package com.example.ft_hangouts
 
 import android.content.Context
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDto
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
@@ -54,7 +53,7 @@ internal class AddViewModelTest {
     @ExperimentalCoroutinesApi
     fun `연락처 추가 테스트`() = runTest {
         //given
-        val expect = Contact(1, "seongjki", "01012345678", "abc@def.com", "mam", "friend")
+        val expect = ContactDto(1, "seongjki", "01012345678", "abc@def.com", "mam", "friend")
         addViewModel.addContact("seongjki", "01012345678", "abc@def.com", "friend", "mam")
 
         //when

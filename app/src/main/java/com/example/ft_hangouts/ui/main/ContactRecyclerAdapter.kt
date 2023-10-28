@@ -7,13 +7,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.RecyclerItemViewBinding
 import com.example.ft_hangouts.ui.main.ContactRecyclerAdapter.ContactViewHolder.Companion.callback
 
 class ContactRecyclerAdapter(
     private val clickListener: OnClickListener,
-    ): ListAdapter<ContactDomainModel, ContactRecyclerAdapter.ContactViewHolder>(callback) {
+    ): ListAdapter<Contact, ContactRecyclerAdapter.ContactViewHolder>(callback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, clickListener)
@@ -35,7 +35,7 @@ class ContactRecyclerAdapter(
             private val binding: RecyclerItemViewBinding,
             private val clickListener: OnClickListener
         ): RecyclerView.ViewHolder(binding.root) {
-        fun bind(contact: ContactDomainModel) {
+        fun bind(contact: Contact) {
             if (contact.profile.bitmap != null) {
                 binding.profileImg.setImageBitmap(contact.profile.bitmap)
             } else {
@@ -54,12 +54,12 @@ class ContactRecyclerAdapter(
                 return ContactViewHolder(binding, clickListener)
             }
 
-            val callback = object : DiffUtil.ItemCallback<ContactDomainModel>() {
-                override fun areItemsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
+            val callback = object : DiffUtil.ItemCallback<Contact>() {
+                override fun areItemsTheSame(oldItem: Contact, newItem: Contact): Boolean {
                     return oldItem.id == newItem.id
                 }
 
-                override fun areContentsTheSame(oldItem: ContactDomainModel, newItem: ContactDomainModel): Boolean {
+                override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
                     return oldItem == newItem
                 }
             }

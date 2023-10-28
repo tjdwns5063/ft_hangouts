@@ -1,6 +1,5 @@
 package com.example.ft_hangouts.ui.edit
 
-import android.graphics.drawable.BitmapDrawable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.ft_hangouts.data.contact_database.*
@@ -26,10 +25,10 @@ class ContactEditViewModel(
     private val imageDatabaseDAO: ImageDatabaseDAO
     ): ViewModel() {
 
-    private val _contact = MutableStateFlow<ContactDomainModel>(
-        ContactDomainModel(-1, "", "", "", "", "")
+    private val _contact = MutableStateFlow<Contact>(
+        Contact(-1, "", "", "", "", "")
     )
-    val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
+    val contact: StateFlow<Contact> = _contact.asStateFlow()
 
     private val _updatedProfile = MutableStateFlow<Profile>(Profile(null))
     val updatedProfile: StateFlow<Profile> = _updatedProfile.asStateFlow()
@@ -55,8 +54,8 @@ class ContactEditViewModel(
         email: String,
         gender: String,
         relation: String
-    ): Contact  {
-        return Contact(
+    ): ContactDto  {
+        return ContactDto(
             id = id,
             name = name,
             phoneNumber = phoneNumber,
@@ -69,16 +68,16 @@ class ContactEditViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            _contact.value = contactToContactDomainModel(contactDAO.getItemById(id))
+            _contact.value = Contact.from(contactDAO.getItemById(id))
             baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler().apply { this.updateTerminated(true) })
         }
     }
 
-    private suspend fun updateContact(newContact: Contact) = withContext(Dispatchers.IO) {
+    private suspend fun updateContact(newContactDto: ContactDto) = withContext(Dispatchers.IO) {
         try {
-            contactDAO.update(newContact)
+            contactDAO.update(newContactDto)
             baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseUpdateErrorHandler())

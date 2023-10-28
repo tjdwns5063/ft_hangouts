@@ -2,10 +2,10 @@ package com.example.ft_hangouts
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDto
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.search.ContactSearchViewModel
 import com.example.ft_hangouts.ui.search.SearchViewModelFactory
@@ -51,7 +51,7 @@ class SearchViewModelTest {
     fun `given match two contact when search partial match then check result`() = runTest {
         //given
         CoroutineScope(Dispatchers.IO).launch {
-            contactDAO.add(Contact(0, "seongjki", "000000", "", "", ""), Contact(0, "seo", "111111", "", "", ""))
+            contactDAO.add(ContactDto(0, "seongjki", "000000", "", "", ""), ContactDto(0, "seo", "111111", "", "", ""))
         }.join()
 
         //when
@@ -60,11 +60,11 @@ class SearchViewModelTest {
         //then
         Assert.assertEquals(2, searchViewModel.searchedList.value.size)
         Assert.assertEquals(
-            ContactDomainModel(1, "seongjki", "000000", "", "", ""),
+            Contact(1, "seongjki", "000000", "", "", ""),
             searchViewModel.searchedList.value[0]
         )
         Assert.assertEquals(
-            ContactDomainModel(2, "seo", "111111", "", "", ""),
+            Contact(2, "seo", "111111", "", "", ""),
             searchViewModel.searchedList.value[1]
         )
     }

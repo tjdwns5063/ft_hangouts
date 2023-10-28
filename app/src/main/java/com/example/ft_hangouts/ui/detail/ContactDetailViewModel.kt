@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
-import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.error.*
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,8 +20,8 @@ class ContactDetailViewModel(
     private val baseViewModel: BaseViewModel,
     private val contactDAO: ContactDAO
     ): ViewModel() {
-    private val _contact = MutableStateFlow<ContactDomainModel>(ContactDomainModel(-1, "", "", "", "", ""))
-    val contact: StateFlow<ContactDomainModel> = _contact.asStateFlow()
+    private val _contact = MutableStateFlow<Contact>(Contact(-1, "", "", "", "", ""))
+    val contact: StateFlow<Contact> = _contact.asStateFlow()
 
     init {
         initContact()
@@ -30,7 +29,7 @@ class ContactDetailViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            val contact = contactToContactDomainModel(contactDAO.getItemById(id))
+            val contact = Contact.from(contactDAO.getItemById(id))
             _contact.value = contact
             baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {

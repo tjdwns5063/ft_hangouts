@@ -1,10 +1,9 @@
 package com.example.ft_hangouts.ui.add
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDto
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.Profile
@@ -27,9 +26,9 @@ class ContactAddViewModel(
     private val _profileImage = MutableStateFlow<Profile>(Profile(null))
     val profileImage: StateFlow<Profile> = _profileImage.asStateFlow()
 
-    private suspend fun addContactToDatabase(contact: Contact) = withContext(Dispatchers.IO) {
+    private suspend fun addContactToDatabase(contactDto: ContactDto) = withContext(Dispatchers.IO) {
         try {
-            contactDAO.add(contact)
+            contactDAO.add(contactDto)
             baseViewModel.submitHandler(DatabaseSuccessHandler().apply { this.updateTerminated(true) })
         } catch (err: Exception) {
             println(err.message)
@@ -43,7 +42,7 @@ class ContactAddViewModel(
                    gender: String,
                    relation: String
     ) {
-        val contact = Contact(
+        val contactDto = ContactDto(
             name = name,
             phoneNumber = phoneNumber,
             email = email,
@@ -52,7 +51,7 @@ class ContactAddViewModel(
             profile = compressBitmapToByteArray(profileImage.value.bitmap)
         )
         viewModelScope.launch {
-            addContactToDatabase(contact)
+            addContactToDatabase(contactDto)
         }
     }
 

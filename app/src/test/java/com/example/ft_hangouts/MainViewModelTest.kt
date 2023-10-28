@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.SharedPreferenceUtils
-import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDto
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.main.MainViewModel
 import com.example.ft_hangouts.ui.main.MainViewModelFactory
@@ -55,13 +55,13 @@ internal class MainViewModelTest {
     @ExperimentalCoroutinesApi
     fun `뷰모델 초기화 테스트`() = runTest {
         // given
-        val first = ContactDomainModel(1, "a", "00000000", "abc", "abc", "abc")
-        val second = ContactDomainModel(2, "b", "11111111", "bcd", "bcd", "bcd")
+        val first = Contact(1, "a", "00000000", "abc", "abc", "abc")
+        val second = Contact(2, "b", "11111111", "bcd", "bcd", "bcd")
         val defaultColor = -657931
 
         CoroutineScope(Dispatchers.IO).launch {
-            contactDAO.add(Contact(1, "a", "00000000", "abc", "abc", "abc"))
-            contactDAO.add(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
+            contactDAO.add(ContactDto(1, "a", "00000000", "abc", "abc", "abc"))
+            contactDAO.add(ContactDto(2, "b", "11111111", "bcd", "bcd", "bcd"))
         }.join()
 
 
@@ -76,8 +76,8 @@ internal class MainViewModelTest {
     @Test
     @ExperimentalCoroutinesApi
     fun `연락처 목록 테스트`() = runTest {
-        val first = Contact(1, "a", "b", "c", "d", "e")
-        val second = Contact(2, "b", "c", "d", "e", "f")
+        val first = ContactDto(1, "a", "b", "c", "d", "e")
+        val second = ContactDto(2, "b", "c", "d", "e", "f")
 
         CoroutineScope(Dispatchers.IO).launch {
             contactDAO.add(first)
@@ -88,11 +88,11 @@ internal class MainViewModelTest {
 
         assertEquals(2, mainViewModel.contactList.value.size)
         assertEquals(
-            ContactDomainModel(1, "a", "b", "c", "d", "e"),
+            Contact(1, "a", "b", "c", "d", "e"),
             mainViewModel.contactList.value[0]
         )
         assertEquals(
-            ContactDomainModel(2, "b", "c", "d", "e", "f"),
+            Contact(2, "b", "c", "d", "e", "f"),
             mainViewModel.contactList.value[1]
         )
     }

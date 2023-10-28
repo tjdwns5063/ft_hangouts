@@ -2,16 +2,14 @@ package com.example.ft_hangouts
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.ft_hangouts.data.contact_database.Contact
+import com.example.ft_hangouts.data.contact_database.ContactDto
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.ContactDomainModel
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.Profile
-import com.example.ft_hangouts.data.contact_database.contactToContactDomainModel
 import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.edit.ContactEditViewModel
@@ -64,9 +62,9 @@ class EditViewModelTest {
     @Test
     fun `연락처 업데이트 테스트`() = runTest {
         //given
-        val newContact = Contact(1, "seongjki", "01012345678", "abc@def.ghi", "", "")
+        val newContactDto = ContactDto(1, "seongjki", "01012345678", "abc@def.ghi", "", "")
         CoroutineScope(Dispatchers.IO).launch {
-            contactDAO.add(newContact)
+            contactDAO.add(newContactDto)
         }.join()
 
         viewModel = viewModelFactory.create(ContactEditViewModel::class.java)
@@ -75,12 +73,12 @@ class EditViewModelTest {
         //when
         viewModel.updateContact("mkang", "01012345678", "abc@def.ghi", "", "")
         val result = CoroutineScope(Dispatchers.IO).async {
-            contactToContactDomainModel(contactDAO.getItemById(1))
+            Contact.from(contactDAO.getItemById(1))
         }.await()
 
         //then
         Assert.assertEquals(
-            ContactDomainModel(1, "mkang", "01012345678", "abc@def.ghi", "", "")
+            Contact(1, "mkang", "01012345678", "abc@def.ghi", "", "")
             , result
         )
 
@@ -89,9 +87,9 @@ class EditViewModelTest {
     @Test
     fun `프로필 업데이트 테스트`() = runTest {
         //given
-        val newContact = Contact(1, "seongjki", "01012345678", "abc@def.ghi", "", "")
+        val newContactDto = ContactDto(1, "seongjki", "01012345678", "abc@def.ghi", "", "")
         CoroutineScope(Dispatchers.IO).launch {
-            contactDAO.add(newContact)
+            contactDAO.add(newContactDto)
         }.join()
 
         viewModel = viewModelFactory.create(ContactEditViewModel::class.java)

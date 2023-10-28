@@ -1,15 +1,11 @@
 package com.example.ft_hangouts.data.contact_database
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import android.provider.BaseColumns
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.ft_hangouts.App
 
-@Database(entities = [Contact::class], version = 2)
+@Database(entities = [ContactDto::class], version = 2)
 abstract class ContactDatabase: RoomDatabase() {
     abstract fun contactDao(): ContactDAO
     companion object {

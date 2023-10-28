@@ -7,7 +7,6 @@ import com.example.ft_hangouts.data.SharedPreferenceUtils
 import com.example.ft_hangouts.data.contact_database.*
 import com.example.ft_hangouts.error.DatabaseReadErrorHandler
 import com.example.ft_hangouts.ui.base.BaseViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +20,8 @@ class MainViewModel(
     private val contactDAO: ContactDAO,
     private val baseViewModel: BaseViewModel
     ): ViewModel() {
-    private val _contactList = MutableStateFlow<List<ContactDomainModel>>(emptyList())
-    val contactList: StateFlow<List<ContactDomainModel>> = _contactList.asStateFlow()
+    private val _contactList = MutableStateFlow<List<Contact>>(emptyList())
+    val contactList: StateFlow<List<Contact>> = _contactList.asStateFlow()
 
     private val _appBarColor = MutableStateFlow<Int>(-657931)
     val appBarColor: StateFlow<Int> = _appBarColor.asStateFlow()
@@ -36,7 +35,7 @@ class MainViewModel(
 
     private suspend fun getContactList() = withContext(Dispatchers.IO) {
         try {
-            _contactList.value = contactDAO.getAllItems().map { contactToContactDomainModel(it) }
+            _contactList.value = contactDAO.getAllItems().map { Contact.from(it) }
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {
