@@ -98,14 +98,14 @@ class EditViewModelTest {
         viewModel.init()
         val bitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)
         Mockito.`when`(
-            imageDatabaseDAO.getImageFromUri("123"))
-            .thenReturn(Profile(BitmapDrawable(null, bitmap))
+            imageDatabaseDAO.loadImageIntoProfile("123"))
+            .thenReturn(Profile(bitmap)
         )
         //when
         viewModel.updateProfileImage("123")
 
         //then
-        Assert.assertEquals(bitmap.byteCount, viewModel.updatedProfile.value.bitmapDrawable?.bitmap?.byteCount)
+        Assert.assertEquals(bitmap.byteCount, viewModel.updatedProfile.value.bitmap?.byteCount)
     }
 
     @After

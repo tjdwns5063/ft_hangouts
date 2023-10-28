@@ -58,10 +58,10 @@ class ContactSmsActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.contact.collect {
                     binding.smsProfileName.text = it.name
-                    if  (it.profile == null)
+                    if  (it.profile.bitmap == null)
                         binding.smsProfileImg.setImageResource(R.drawable.ic_default_profile)
                     else
-                        binding.smsProfileImg.setImageBitmap(it.profile)
+                        binding.smsProfileImg.setImageBitmap(it.profile.bitmap)
                 }
             }
         }

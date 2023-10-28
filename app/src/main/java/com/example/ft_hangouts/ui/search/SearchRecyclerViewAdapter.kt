@@ -37,8 +37,8 @@ class SearchRecyclerViewAdapter(private val listener: View.OnClickListener):
         fun bind(item: ContactDomainModel) {
             binding.root.setOnClickListener(listener)
             binding.nameText.text = item.name
-            if (item.profile != null)
-                binding.profileImg.setImageBitmap(item.profile)
+            if (item.profile.bitmap != null)
+                binding.profileImg.setImageBitmap(item.profile.bitmap)
             else
                 binding.profileImg.setImageResource(R.drawable.ic_default_profile)
             binding.phoneNumberText.text = item.phoneNumber

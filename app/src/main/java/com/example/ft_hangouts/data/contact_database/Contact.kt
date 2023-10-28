@@ -55,21 +55,15 @@ data class ContactDomainModel(
     val email: String,
     val relation: String,
     val gender:String,
-    val profile: Bitmap? = null,
+    val profile: Profile = Profile(null),
 ) {
     @Override
     override fun equals(other: Any?): Boolean {
         if (other !is ContactDomainModel) return false
 
-        val sameProfile = if (other.profile == null && this.profile == null) true else {
-            other.profile?.let {
-                other.profile.sameAs(this.profile)
-            } ?: false
-        }
-
         return other.id == this.id && other.name == this.name && other.phoneNumber == this.phoneNumber &&
                 other.email == this.email && other.relation == this.relation && other.gender == this.gender &&
-                sameProfile
+                other.profile.bitmap?.byteCount == this.profile.bitmap?.byteCount
     }
 }
 
@@ -81,6 +75,6 @@ fun contactToContactDomainModel(contact: Contact): ContactDomainModel {
         email = contact.email,
         relation = contact.relation,
         gender = contact.gender,
-        profile = contact.profile?.let { decodeByteArrayToBitmap(it) }
+        profile = Profile(contact.profile?.let { decodeByteArrayToBitmap(it) })
     )
 }

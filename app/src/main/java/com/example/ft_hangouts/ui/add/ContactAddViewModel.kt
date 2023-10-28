@@ -1,5 +1,6 @@
 package com.example.ft_hangouts.ui.add
 
+import android.net.Uri
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.Profile
@@ -45,7 +46,7 @@ class ContactAddViewModel(
             email = email,
             gender = gender,
             relation = relation,
-            profile = compressBitmapToByteArray(profileImage.value.bitmapDrawable?.bitmap)
+            profile = compressBitmapToByteArray(profileImage.value.bitmap)
         )
 
         return lifecycleScope.launch {
@@ -55,7 +56,7 @@ class ContactAddViewModel(
 
     private suspend fun updateProfileImage(uriString: String) = withContext(Dispatchers.IO) {
         try {
-            _profileImage.value = imageDatabaseDAO.getImageFromUri(uriString)
+            _profileImage.value = imageDatabaseDAO.loadImageIntoProfile(uriString)
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         }
@@ -68,9 +69,6 @@ class ContactAddViewModel(
     }
 
     fun clearProfileImage() {
-        if (profileImage.value.bitmapDrawable == null)
-            return
-
         lifecycleScope.launch {
             _profileImage.value = Profile(null)
         }

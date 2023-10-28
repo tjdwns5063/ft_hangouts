@@ -48,10 +48,10 @@ class DetailViewModelTest {
         contactDatabase = Room.inMemoryDatabaseBuilder(context, ContactDatabase::class.java).build()
         contactDAO = contactDatabase.contactDao()
         viewModelFactory = DetailViewModelFactory(1, baseViewModel, contactDatabase)
-        detailViewModel = viewModelFactory.create(ContactDetailViewModel::class.java)
         runTest {
             withContext(Dispatchers.IO) {
                 contactDAO.add(Contact(0, "a", "0000000", "abc@def.com", "", ""))
+                detailViewModel = viewModelFactory.create(ContactDetailViewModel::class.java)
             }
         }
     }

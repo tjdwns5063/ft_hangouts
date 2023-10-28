@@ -41,16 +41,12 @@ class ContactEditViewModel(
     fun init() {
         viewModelScope.launch {
             getContactById(id)
-
+            initProfile()
         }
-        initProfile()
     }
 
     private fun initProfile() {
-        val bitmapDrawable = contact.value.profile?.let {
-            BitmapDrawable(null, contact.value.profile)
-        }
-        _updatedProfile.value = Profile(bitmapDrawable)
+        _updatedProfile.value = _contact.value.profile
     }
 
     private fun createContact(
@@ -60,8 +56,6 @@ class ContactEditViewModel(
         gender: String,
         relation: String
     ): Contact  {
-        val profileBitmapDrawable= updatedProfile.value.bitmapDrawable
-
         return Contact(
             id = id,
             name = name,
@@ -69,7 +63,7 @@ class ContactEditViewModel(
             email = email,
             gender = gender,
             relation = relation,
-            profile = compressBitmapToByteArray(profileBitmapDrawable?.bitmap)
+            profile = compressBitmapToByteArray(_updatedProfile.value.bitmap)
         )
     }
 
@@ -93,7 +87,7 @@ class ContactEditViewModel(
 
     private suspend fun updateProfileImageLogic(uriString: String) = withContext(Dispatchers.IO) {
         try {
-            _updatedProfile.value = imageDatabaseDAO.getImageFromUri(uriString)
+            _updatedProfile.value = imageDatabaseDAO.loadImageIntoProfile(uriString)
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         }

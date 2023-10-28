@@ -1,6 +1,8 @@
 package com.example.ft_hangouts.ui.detail
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -59,8 +61,13 @@ class ContactDetailActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.contact.collect {
-                    Profile.changeScaleType(binding.detailProfileImage, it.profile)
-                }
+                    it.profile.bitmap?.let { bitmap ->
+                        binding.detailProfileImage.scaleType = ImageView.ScaleType.FIT_XY
+                        binding.detailProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
+                    } ?: run {
+                        binding.detailProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
+                        binding.detailProfileImage.scaleType = ImageView.ScaleType.CENTER
+                    }                }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.example.ft_hangouts.ui.edit
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
@@ -101,8 +102,14 @@ class ContactEditActivity : BaseActivity() {
                 binding.editEmailEditText.setText(it.email)
                 binding.editGenderEditText.setText(it.gender)
                 binding.editRelationEditText.setText(it.relation)
-                Profile.changeScaleType(binding.editProfileImage, it.profile)
-            }
+                binding.editProfileImage.scaleType = ImageView.ScaleType.FIT_XY
+                it.profile.bitmap?.let { bitmap ->
+                    binding.editProfileImage.scaleType = ImageView.ScaleType.FIT_XY
+                    binding.editProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
+                } ?: run {
+                    binding.editProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
+                    binding.editProfileImage.scaleType = ImageView.ScaleType.CENTER
+                }            }
         }
     }
 
@@ -114,7 +121,13 @@ class ContactEditActivity : BaseActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.updatedProfile.collect {
-                    it.changeScaleType(binding.editProfileImage)
+                    it.bitmap?.let { bitmap ->
+                        binding.editProfileImage.scaleType = ImageView.ScaleType.FIT_XY
+                        binding.editProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
+                    } ?: run {
+                        binding.editProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
+                        binding.editProfileImage.scaleType = ImageView.ScaleType.CENTER
+                    }
                 }
             }
         }

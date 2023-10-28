@@ -1,20 +1,17 @@
 package com.example.ft_hangouts.data.image_database
 
 import android.content.Context
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import com.bumptech.glide.Glide
 import com.example.ft_hangouts.data.contact_database.Profile
 
 class ImageDatabaseDAO(private val context: Context) {
-    fun getImageFromUri(uriString: String): Profile {
+    fun loadImageIntoProfile(uriString: String): Profile {
         val imageUri = parseImageUri(uriString)
-        val inputStream = context.contentResolver.openInputStream(imageUri)
-            ?: throw IllegalStateException("cannot translate without imageStream")
-        val bitmapDrawable = BitmapDrawable.createFromStream(inputStream, "") as BitmapDrawable
+        val profile = Profile()
 
-        inputStream.close()
-
-        return Profile(bitmapDrawable)
+        Glide.with(context).asBitmap().load(imageUri).into(profile)
+        return profile
     }
 
     private fun parseImageUri(uriString: String): Uri {
