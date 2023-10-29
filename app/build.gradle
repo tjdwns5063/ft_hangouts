@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlinx.kover'
     id 'com.google.devtools.ksp'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -66,7 +67,6 @@ dependencies {
     testImplementation "org.robolectric:robolectric:4.10.3"
     testImplementation 'org.mockito:mockito-core:5.3.1'
     testImplementation("androidx.room:room-testing:2.6.0")
-
 }
 
 koverReport {

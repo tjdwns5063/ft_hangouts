@@ -5,10 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.example.ft_hangouts.data.contact_database.ContactDto
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.detail.ContactDetailViewModel
 import com.example.ft_hangouts.ui.detail.DetailViewModelFactory
@@ -48,17 +47,15 @@ class DetailViewModelTest {
         contactDatabase = Room.inMemoryDatabaseBuilder(context, ContactDatabase::class.java).build()
         contactDAO = contactDatabase.contactDao()
         viewModelFactory = DetailViewModelFactory(1, baseViewModel, contactDatabase)
-        runTest {
-            withContext(Dispatchers.IO) {
-                contactDAO.add(ContactDto(0, "a", "0000000", "abc@def.com", "", ""))
-                detailViewModel = viewModelFactory.create(ContactDetailViewModel::class.java)
-            }
-        }
+        detailViewModel = viewModelFactory.create(ContactDetailViewModel::class.java)
     }
 
     @Test
     fun `연락처 정보 초기화 테스트`() = runTest {
         //given
+        withContext(Dispatchers.IO) {
+            contactDAO.add(Contact(1, "a", "0000000", "abc@def.com", "", ""))
+        }
 
         //then
         detailViewModel.initContact()
@@ -73,8 +70,8 @@ class DetailViewModelTest {
     @Test
     fun `연락처 삭제 테스트`() = runTest {
         //given
-        CoroutineScope(Dispatchers.IO).launch {
-            contactDAO.add(ContactDto(0, "a", "0000000", "abc@def.com", "", ""))
+        withContext(Dispatchers.IO) {
+            contactDAO.add(Contact(0, "a", "0000000", "abc@def.com", "", ""))
         }
 
         //then

@@ -26,7 +26,7 @@ class ContactSearchViewModel(
 
     private fun searchContact(text: String) {
         try {
-            _searchedList.value = contactDAO.search(text).map { Contact.from(it) }
+            _searchedList.value = contactDAO.search(text)
             _text.value = text
         } catch(err: Exception) {
             _searchedList.value = emptyList()

@@ -23,6 +23,7 @@
             android:background="@drawable/profile_background"
             android:backgroundTint="@color/white"
             android:scaleType="fitXY"
+            app:profile="@{viewModel.contact.profile}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/contact_detail_title"

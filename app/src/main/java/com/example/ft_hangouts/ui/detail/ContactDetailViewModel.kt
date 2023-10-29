@@ -23,14 +23,9 @@ class ContactDetailViewModel(
     private val _contact = MutableStateFlow<Contact>(Contact(-1, "", "", "", "", ""))
     val contact: StateFlow<Contact> = _contact.asStateFlow()
 
-    init {
-        initContact()
-    }
-
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            val contact = Contact.from(contactDAO.getItemById(id))
-            _contact.value = contact
+            _contact.value = contactDAO.getItemById(id)
             baseViewModel.submitHandler(DatabaseSuccessHandler())
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
@@ -46,10 +41,14 @@ class ContactDetailViewModel(
         }
     }
 
-    fun initContact() {
+    init {
         viewModelScope.launch {
-            getContactById(id)
+            initContact()
         }
+    }
+
+    suspend fun initContact() {
+        getContactById(id)
     }
 
     suspend fun deleteContact()  {

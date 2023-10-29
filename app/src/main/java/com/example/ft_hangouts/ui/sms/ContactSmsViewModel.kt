@@ -43,7 +43,7 @@ class ContactSmsViewModel(
 
     private suspend fun getContactById(id: Long) = withContext(Dispatchers.IO) {
         try {
-            _contact.value = Contact.from(contactDAO.getItemById(id))
+            _contact.value = contactDAO.getItemById(id)
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {

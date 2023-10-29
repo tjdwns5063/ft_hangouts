@@ -35,7 +35,7 @@ class MainViewModel(
 
     private suspend fun getContactList() = withContext(Dispatchers.IO) {
         try {
-            _contactList.value = contactDAO.getAllItems().map { Contact.from(it) }
+            _contactList.value = contactDAO.getAllItems()
         } catch (err: Exception) {
             baseViewModel.submitHandler(DatabaseReadErrorHandler())
         } finally {

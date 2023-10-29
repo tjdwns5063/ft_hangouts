@@ -1,8 +1,6 @@
 package com.example.ft_hangouts.ui.detail
 
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.widget.ImageView
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -10,10 +8,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.ft_hangouts.EventDialog
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.Profile
 import com.example.ft_hangouts.databinding.ActivityContactDetailBinding
 import com.example.ft_hangouts.error.CallSystemErrorHandler
-import com.example.ft_hangouts.error.DatabaseCreateErrorHandler
 import com.example.ft_hangouts.system.CallSystemHelper
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
@@ -39,10 +35,18 @@ class ContactDetailActivity : BaseActivity() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         initCallSystemHelper()
+        initContact()
         roundProfileBorder()
         setBottomNavItemListener()
-        setContactObservationForProfileUpdates()
         setContentView(binding.root)
+    }
+
+    private fun initContact() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.initContact()
+            }
+        }
     }
 
     private fun initCallSystemHelper() {
@@ -55,27 +59,6 @@ class ContactDetailActivity : BaseActivity() {
 
     private fun roundProfileBorder() {
         binding.detailProfileImage.clipToOutline = true
-    }
-
-    private fun setContactObservationForProfileUpdates() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.contact.collect {
-                    it.profile.bitmap?.let { bitmap ->
-                        binding.detailProfileImage.scaleType = ImageView.ScaleType.FIT_XY
-                        binding.detailProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
-                    } ?: run {
-                        binding.detailProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
-                        binding.detailProfileImage.scaleType = ImageView.ScaleType.CENTER
-                    }                }
-            }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        viewModel.initContact()
     }
 
     private fun setBottomNavItemListener() {

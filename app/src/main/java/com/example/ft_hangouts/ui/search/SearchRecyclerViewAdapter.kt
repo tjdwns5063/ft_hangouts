@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ft_hangouts.R
 import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.databinding.SearchRecyclerItemViewBinding
+import kotlin.contracts.contract
 
 class SearchRecyclerViewAdapter(private val listener: View.OnClickListener):
     ListAdapter<Contact, SearchRecyclerViewAdapter.SearchRecyclerViewHolder>(callback) {
@@ -35,12 +36,9 @@ class SearchRecyclerViewAdapter(private val listener: View.OnClickListener):
     ): RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Contact) {
+            binding.contact = item
             binding.root.setOnClickListener(listener)
             binding.nameText.text = item.name
-            if (item.profile.bitmap != null)
-                binding.profileImg.setImageBitmap(item.profile.bitmap)
-            else
-                binding.profileImg.setImageResource(R.drawable.ic_default_profile)
             binding.phoneNumberText.text = item.phoneNumber
         }
 

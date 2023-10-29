@@ -8,22 +8,22 @@ import androidx.room.Update
 @Dao
 interface ContactDAO {
     @Query("SELECT * FROM contact")
-    fun getAllItems(): List<ContactDto>
+    fun getAllItems(): List<Contact>
 
     @Query("SELECT * FROM contact WHERE id = :id")
-    fun getItemById(id: Long): ContactDto
+    fun getItemById(id: Long): Contact
 
     @Query("DELETE FROM contact WHERE id = :id")
     fun deleteById(id: Long)
 
     @Insert
-    fun add(vararg contactDto: ContactDto)
+    fun add(vararg contact: Contact)
 
     @Update
-    fun update(vararg contactDto: ContactDto): Int
+    fun update(vararg contact: Contact): Int
 
     @Query("SELECT * FROM contact WHERE name LIKE :name")
-    fun search(name: String): List<ContactDto>
+    fun search(name: String): List<Contact>
 }
 
 

@@ -4,10 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.ft_hangouts.data.SharedPreferenceUtils
-import com.example.ft_hangouts.data.contact_database.ContactDto
+import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.data.contact_database.ContactDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.contact_database.Contact
 import com.example.ft_hangouts.ui.base.BaseViewModel
 import com.example.ft_hangouts.ui.main.MainViewModel
 import com.example.ft_hangouts.ui.main.MainViewModelFactory
@@ -60,8 +59,8 @@ internal class MainViewModelTest {
         val defaultColor = -657931
 
         CoroutineScope(Dispatchers.IO).launch {
-            contactDAO.add(ContactDto(1, "a", "00000000", "abc", "abc", "abc"))
-            contactDAO.add(ContactDto(2, "b", "11111111", "bcd", "bcd", "bcd"))
+            contactDAO.add(Contact(1, "a", "00000000", "abc", "abc", "abc"))
+            contactDAO.add(Contact(2, "b", "11111111", "bcd", "bcd", "bcd"))
         }.join()
 
 
@@ -76,8 +75,8 @@ internal class MainViewModelTest {
     @Test
     @ExperimentalCoroutinesApi
     fun `연락처 목록 테스트`() = runTest {
-        val first = ContactDto(1, "a", "b", "c", "d", "e")
-        val second = ContactDto(2, "b", "c", "d", "e", "f")
+        val first = Contact(1, "a", "b", "c", "d", "e")
+        val second = Contact(2, "b", "c", "d", "e", "f")
 
         CoroutineScope(Dispatchers.IO).launch {
             contactDAO.add(first)

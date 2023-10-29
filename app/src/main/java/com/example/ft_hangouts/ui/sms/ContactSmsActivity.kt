@@ -54,17 +54,6 @@ class ContactSmsActivity : BaseActivity() {
         registerSmsReceiver()
         setRecyclerView()
         setClickListener()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.contact.collect {
-                    binding.smsProfileName.text = it.name
-                    if  (it.profile.bitmap == null)
-                        binding.smsProfileImg.setImageResource(R.drawable.ic_default_profile)
-                    else
-                        binding.smsProfileImg.setImageBitmap(it.profile.bitmap)
-                }
-            }
-        }
     }
     private fun initSmsSystemHelper() {
         try {

@@ -12,10 +12,11 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.example.ft_hangouts.App
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.ImageDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
 import com.example.ft_hangouts.data.contact_database.Profile
-import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactEditBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
 import com.example.ft_hangouts.ui.base.ContactActivityContract.CONTACT_ID
@@ -28,21 +29,21 @@ class ContactEditActivity : BaseActivity() {
         EditViewModelFactory(
             id,
             super.baseViewModel,
-            ImageDatabaseDAO(this),
-            ContactDatabase.INSTANCE
+            ContactDatabase.INSTANCE,
+            ImageDAO(App.INSTANCE)
         )
     }
     private lateinit var imageSelectLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = this
         setContentView(binding.root)
-
         imageSelectLauncher = registerImageSelectLauncher()
         binding.editProfileImage.clipToOutline = true
-        setData()
         setClickListener()
-        repeatToCollectProfile()
+        repeatInitViewModel()
     }
 
     private fun registerImageSelectLauncher(): ActivityResultLauncher<Intent> {
@@ -64,8 +65,6 @@ class ContactEditActivity : BaseActivity() {
 
         binding.editProfileDeleteImage.setOnClickListener {
             viewModel.clearProfileImage()
-            binding.editProfileImage.scaleType = ImageView.ScaleType.CENTER
-            binding.editProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
         }
 
         binding.editOkButton.setOnClickListener { contactEditLogic() }
@@ -82,53 +81,23 @@ class ContactEditActivity : BaseActivity() {
             return
         }
 
-        lifecycleScope.launch {
-            viewModel.updateContact(
-                name = binding.editNameEditText.text.toString(),
-                email = binding.editEmailEditText.text.toString(),
-                phoneNumber = binding.editPhoneNumberEditText.text.toString(),
-                gender = binding.editGenderEditText.text.toString(),
-                relation = binding.editRelationEditText.text.toString()
-            )
-        }
-
-    }
-
-    private fun setData() {
-        lifecycleScope.launch {
-            viewModel.contact.collect {
-                binding.editNameEditText.setText(it.name)
-                binding.editPhoneNumberEditText.setText(it.phoneNumber)
-                binding.editEmailEditText.setText(it.email)
-                binding.editGenderEditText.setText(it.gender)
-                binding.editRelationEditText.setText(it.relation)
-                binding.editProfileImage.scaleType = ImageView.ScaleType.FIT_XY
-                it.profile.bitmap?.let { bitmap ->
-                    binding.editProfileImage.scaleType = ImageView.ScaleType.FIT_XY
-                    binding.editProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
-                } ?: run {
-                    binding.editProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
-                    binding.editProfileImage.scaleType = ImageView.ScaleType.CENTER
-                }            }
-        }
+        viewModel.updateContact(
+            name = binding.editNameEditText.text.toString(),
+            email = binding.editEmailEditText.text.toString(),
+            phoneNumber = binding.editPhoneNumberEditText.text.toString(),
+            gender = binding.editGenderEditText.text.toString(),
+            relation = binding.editRelationEditText.text.toString()
+        )
     }
 
     private fun receiveId(): Long {
         return intent.getLongExtra(CONTACT_ID, -1)
     }
 
-    private fun repeatToCollectProfile() {
+    private fun repeatInitViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.updatedProfile.collect {
-                    it.bitmap?.let { bitmap ->
-                        binding.editProfileImage.scaleType = ImageView.ScaleType.FIT_XY
-                        binding.editProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
-                    } ?: run {
-                        binding.editProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
-                        binding.editProfileImage.scaleType = ImageView.ScaleType.CENTER
-                    }
-                }
+                viewModel.initViewModel()
             }
         }
     }

@@ -2,8 +2,6 @@ package com.example.ft_hangouts.ui.add
 
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.content.res.Resources
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
@@ -12,24 +10,16 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
-import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.bumptech.glide.Glide
 import com.example.ft_hangouts.R
+import com.example.ft_hangouts.data.ImageDAO
 import com.example.ft_hangouts.data.contact_database.ContactDatabase
-import com.example.ft_hangouts.data.image_database.ImageDatabaseDAO
 import com.example.ft_hangouts.databinding.ActivityContactAddBinding
 import com.example.ft_hangouts.ui.base.BaseActivity
-import kotlinx.coroutines.launch
 
 class ContactAddActivity : BaseActivity() {
     private lateinit var binding: ActivityContactAddBinding
     private val viewModel: ContactAddViewModel by viewModels {
-        AddViewModelFactory(ContactDatabase.INSTANCE,
-        baseViewModel,
-        ImageDatabaseDAO(this))
+        AddViewModelFactory(ContactDatabase.INSTANCE, ImageDAO(this), baseViewModel)
     }
     private lateinit var imageActivityLauncher: ActivityResultLauncher<Intent>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +28,6 @@ class ContactAddActivity : BaseActivity() {
         setContentView(binding.root)
         imageActivityLauncher = registerImageActivityLauncher()
         binding.addProfileImage.clipToOutline = true
-        collectAndInitiateProfileImage()
         setFocusChangeListener()
         setClickListener()
         setBackPressedDispatcher()
@@ -47,22 +36,7 @@ class ContactAddActivity : BaseActivity() {
     private fun setDataBinding() {
         binding = ActivityContactAddBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
-    }
-
-    private fun collectAndInitiateProfileImage() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.profileImage.collect {
-                    it.bitmap?.let { bitmap ->
-                        binding.addProfileImage.scaleType = ImageView.ScaleType.FIT_XY
-                        binding.addProfileImage.setImageDrawable(BitmapDrawable(null, bitmap))
-                    } ?: run {
-                        binding.addProfileImage.setImageResource(R.drawable.baseline_camera_alt_24)
-                        binding.addProfileImage.scaleType = ImageView.ScaleType.CENTER
-                    }
-                }
-            }
-        }
+        binding.viewModel = viewModel
     }
 
     private fun registerImageActivityLauncher(): ActivityResultLauncher<Intent> {
